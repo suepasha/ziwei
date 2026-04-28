@@ -1,6 +1,6 @@
 const express = require('express');
 const https = require('https');
-const http = require('http');
+const { astro } = require('iztro');
 const app = express();
 
 app.use(express.json({ limit: '10mb' }));
@@ -14,124 +14,53 @@ app.use((req, res, next) => {
   next();
 });
 
-function fetchWindada(urlStr, callback) {
-  const isHttps = urlStr.startsWith('https');
-  const lib = isHttps ? https : http;
-  const url = new URL(urlStr);
-
-  const options = {
-    hostname: url.hostname,
-    port: url.port || (isHttps ? 443 : 80),
-    path: url.pathname + url.search,
-    method: 'GET',
-    headers: {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
-      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-      'Accept-Language': 'zh-TW,zh;q=0.9,en;q=0.8',
-      'Accept-Encoding': 'identity',
-      'Referer': 'https://fate.windada.com/',
-      'Connection': 'keep-alive'
+// ── Calculate ZWDS chart using iztro ──
+app.get('/chart', (req, res) => {
+  try {
+    const { year, month, day, hour, gender } = req.query;
+    if (!year || !month || !day || !hour || !gender) {
+      return res.status(400).json({ error: 'Missing parameters' });
     }
-  };
 
-  const chunks = [];
-  const req2 = lib.request(options, (resp) => {
-    console.log('Status:', resp.statusCode, '| Content-Type:', resp.headers['content-type']);
-    if ((resp.statusCode === 301 || resp.statusCode === 302) && resp.headers.location) {
-      const loc = resp.headers.location.startsWith('http')
-        ? resp.headers.location
-        : 'https://fate.windada.com' + resp.headers.location;
-      resp.resume();
-      return fetchWindada(loc, callback);
-    }
-    resp.on('data', chunk => chunks.push(chunk));
-    resp.on('end', () => {
-      const buf = Buffer.concat(chunks);
-      // Try all encodings, pick the one that has palace markers
-      const encodings = ['big5', 'cp950', 'gbk', 'utf-8'];
-      let html = '';
-      let usedEnc = 'none';
-      for (const enc of encodings) {
-        try {
-          const decoded = new TextDecoder(enc).decode(buf);
-          if (decoded.includes('\u3010') || decoded.includes('命宮') || decoded.includes('命宫') || decoded.includes('\u5927\u9650')) {
-            html = decoded;
-            usedEnc = enc;
-            break;
-          }
-          if (!html) html = decoded; // keep first successful decode as fallback
-        } catch(e) {}
-      }
-      console.log('Encoding used:', usedEnc, '| Length:', html.length);
-      console.log('Has 【:', html.includes('\u3010'), '| Has 命宮:', html.includes('命宮') || html.includes('命宫'));
-      console.log('Snippet:', html.slice(0, 300).replace(/\s+/g, ' '));
-      callback(null, html, buf);
-    });
-  });
-  req2.on('error', (err) => callback(err));
-  req2.setTimeout(20000, () => { req2.destroy(); callback(new Error('Timeout')); });
-  req2.end();
-}
+    // iztro hour index: 0=子 1=丑 2=寅 3=卯 4=辰 5=巳 6=午 7=未 8=申 9=酉 10=戌 11=亥
+    const hourIndex = parseInt(hour);
+    const iztroGender = gender === 'male' ? '男' : '女';
+    const dateStr = year + '-' + month + '-' + day;
 
-// Debug endpoint 2 — shows cleaned text around palace markers
-app.get('/debug2', (req, res) => {
-  const url = 'https://fate.windada.com/cgi-bin/fate?Sex=%E5%A5%B3&Year=1967&Month=7&Day=1&Hour=9&Calendar=S';
-  fetchWindada(url, (err, html) => {
-    if (err) return res.json({ error: err.message });
-    const clean = html
-      .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-      .replace(/<style[\s\S]*?<\/style>/gi, ' ')
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/&nbsp;/g, ' ')
-      .replace(/\s+/g, ' ');
-    // Find 【 and show context around it
-    const idx = clean.indexOf('\u3010');
-    const snippet = idx > -1 ? clean.slice(Math.max(0, idx-150), idx+400) : 'NOT FOUND';
-    // Also look for ganzhi pattern
-    const ganzhiMatch = clean.match(/[甲乙丙丁戊己庚辛壬癸][子丑寅卯辰巳午未申酉戌亥]/);
+    const chart = astro.bySolar(dateStr, hourIndex, iztroGender, true, 'zh-TW');
+
+    const palaces = chart.palaces.map(p => ({
+      stem: p.heavenlyStem,
+      branch: p.earthlyBranch,
+      name: p.name,
+      isLifePalace: p.name === '命宮',
+      isBodyPalace: p.isBodyPalace,
+      decadeRange: p.decadal ? p.decadal.range : '',
+      majorStars: p.majorStars.map(s => s.name + (s.mutagen || '')),
+      minorStars: p.minorStars.map(s => s.name + (s.mutagen || ''))
+    }));
+
     res.json({
-      palaceMarkerAt: idx,
-      snippet: snippet,
-      firstGanzhi: ganzhiMatch ? ganzhiMatch[0] : 'none',
-      cleanLength: clean.length,
-      first300: clean.slice(0, 300)
+      lunarDate: chart.lunarDate,
+      chinesePillars: chart.chineseDate,
+      fiveElements: chart.fiveElementsClass,
+      lifeMaster: chart.soul,
+      bodyMaster: chart.body,
+      yearTransforms: chart.yearlyDecChanges || '',
+      palaces: palaces
     });
-  });
-});
 
-// Debug endpoint — returns raw info
-app.get('/debug', (req, res) => {
-  const url = 'https://fate.windada.com/cgi-bin/fate?Sex=%E5%A5%B3&Year=1967&Month=7&Day=1&Hour=9&Calendar=S';
-  fetchWindada(url, (err, html, buf) => {
-    if (err) return res.json({ error: err.message });
-    res.json({
-      length: html.length,
-      hasPalaceMarker: html.includes('\u3010'),
-      hasCommandPalace: html.includes('命宮') || html.includes('命宫'),
-      first500: html.slice(0, 500),
-      hexStart: buf ? buf.slice(0, 40).toString('hex') : ''
-    });
-  });
-});
-
-app.get('/windada', (req, res) => {
-  const { sex, year, month, day, hour } = req.query;
-  if (!sex || !year || !month || !day || !hour) {
-    return res.status(400).json({ error: 'Missing parameters' });
+  } catch(e) {
+    console.error('Chart error:', e.message);
+    res.status(500).json({ error: e.message });
   }
-  const url = 'https://fate.windada.com/cgi-bin/fate?Sex=' + encodeURIComponent(sex) +
-    '&Year=' + year + '&Month=' + month + '&Day=' + day +
-    '&Hour=' + hour + '&Calendar=S';
-
-  fetchWindada(url, (err, html) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ html, hasPalaces: html.includes('\u3010') || html.includes('命宮') || html.includes('命宫') });
-  });
 });
 
+// ── Proxy Anthropic API ──
 app.post('/proxy', (req, res) => {
   const apiKey = req.headers['x-api-key'];
   if (!apiKey) return res.status(400).json({ error: { message: 'No API key provided' } });
+
   const body = JSON.stringify(req.body);
   const options = {
     hostname: 'api.anthropic.com',
@@ -144,6 +73,7 @@ app.post('/proxy', (req, res) => {
       'anthropic-version': '2023-06-01'
     }
   };
+
   const proxyReq = https.request(options, (proxyRes) => {
     const chunks = [];
     proxyRes.on('data', chunk => chunks.push(chunk));
@@ -151,6 +81,7 @@ app.post('/proxy', (req, res) => {
       res.status(proxyRes.statusCode).set('Content-Type', 'application/json').send(Buffer.concat(chunks).toString('utf8'));
     });
   });
+
   proxyReq.on('error', (err) => res.status(500).json({ error: { message: err.message } }));
   proxyReq.write(body);
   proxyReq.end();
