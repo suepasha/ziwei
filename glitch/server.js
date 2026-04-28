@@ -21,45 +21,40 @@ app.get('/chart', (req, res) => {
     if (!year || !month || !day || !hour || !gender) {
       return res.status(400).json({ error: 'Missing parameters' });
     }
-
-    // iztro hour index: 0=子 1=丑 2=寅 3=卯 4=辰 5=巳 6=午 7=未 8=申 9=酉 10=戌 11=亥
-    const hourIndex = parseInt(hour);
+    const chart = astro.bySolar(year+'-'+month+'-'+day, parseInt(hour), gender==='male'?'女':'男'==='男'?'男':'女', true, 'zh-TW');
+    // fix: female=女 male=男
     const iztroGender = gender === 'male' ? '男' : '女';
-    const dateStr = year + '-' + month + '-' + day;
-
-    const chart = astro.bySolar(dateStr, hourIndex, iztroGender, true, 'zh-TW');
-
-    const palaces = chart.palaces.map(p => ({
-      stem: p.heavenlyStem,
-      branch: p.earthlyBranch,
-      name: p.name,
-      isLifePalace: p.name === '命宮',
-      isBodyPalace: p.isBodyPalace,
-      decadeRange: p.decadal ? p.decadal.range : '',
-      majorStars: p.majorStars.map(s => s.name + (s.mutagen || '')),
-      minorStars: p.minorStars.map(s => s.name + (s.mutagen || ''))
-    }));
-
+    const chart2 = astro.bySolar(year+'-'+month+'-'+day, parseInt(hour), iztroGender, true, 'zh-TW');
     res.json({
-      lunarDate: chart.lunarDate,
-      chinesePillars: chart.chineseDate,
-      fiveElements: chart.fiveElementsClass,
-      lifeMaster: chart.soul,
-      bodyMaster: chart.body,
-      yearTransforms: chart.yearlyDecChanges || '',
-      palaces: palaces
+      lunarDate: chart2.lunarDate,
+      chinesePillars: chart2.chineseDate,
+      fiveElements: chart2.fiveElementsClass,
+      lifeMaster: chart2.soul,
+      bodyMaster: chart2.body,
+      palaces: chart2.palaces.map(p => ({
+        stem: p.heavenlyStem,
+        branch: p.earthlyBranch,
+        name: p.name,
+        isLifePalace: p.name === '命宮',
+        isBodyPalace: p.isBodyPalace,
+        decadeRange: p.decadal ? p.decadal.range : '',
+        majorStars: p.majorStars.map(s => s.name+(s.mutagen||'')),
+        minorStars: p.minorStars.map(s => s.name+(s.mutagen||''))
+      }))
     });
-
   } catch(e) {
     console.error('Chart error:', e.message);
     res.status(500).json({ error: e.message });
   }
 });
 
-// ── Proxy Anthropic API ──
+// ── Proxy Anthropic API — uses server-side key ──
 app.post('/proxy', (req, res) => {
-  const apiKey = req.headers['x-api-key'];
-  if (!apiKey) return res.status(400).json({ error: { message: 'No API key provided' } });
+  // Use server env key first, fall back to client-supplied key
+  const apiKey = process.env.ANTHROPIC_API_KEY || req.headers['x-api-key'];
+  if (!apiKey) {
+    return res.status(400).json({ error: { message: 'No API key configured. Add ANTHROPIC_API_KEY to Render environment variables.' } });
+  }
 
   const body = JSON.stringify(req.body);
   const options = {
@@ -78,11 +73,16 @@ app.post('/proxy', (req, res) => {
     const chunks = [];
     proxyRes.on('data', chunk => chunks.push(chunk));
     proxyRes.on('end', () => {
-      res.status(proxyRes.statusCode).set('Content-Type', 'application/json').send(Buffer.concat(chunks).toString('utf8'));
+      res.status(proxyRes.statusCode)
+        .set('Content-Type', 'application/json')
+        .send(Buffer.concat(chunks).toString('utf8'));
     });
   });
 
-  proxyReq.on('error', (err) => res.status(500).json({ error: { message: err.message } }));
+  proxyReq.on('error', (err) => {
+    res.status(500).json({ error: { message: err.message } });
+  });
+
   proxyReq.write(body);
   proxyReq.end();
 });
