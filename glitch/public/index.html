@@ -275,6 +275,69 @@ async function callAPI(key, body){
   return data;
 }
 
+// ── Parse Windada HTML into structured palace data ──
+var MAIN_STARS = ['紫微','天機','太陽','武曲','天同','廉貞','天府','太陰','貪狼','巨門','天相','天梁','七殺','破軍'];
+var NEG_STARS  = ['擎羊','陀羅','火星','鈴星','地空','地劫'];
+var FX_MARKERS = ['化祿','化權','化科','化忌'];
+
+function parseWindadaHTML(html) {
+  // Windada uses Big5 — decode from binary string
+  function big5decode(str) {
+    try {
+      var bytes = new Uint8Array(str.length);
+      for(var i=0;i<str.length;i++) bytes[i]=str.charCodeAt(i)&0xff;
+      return new TextDecoder('big5').decode(bytes);
+    } catch(e) { return str; }
+  }
+  var decoded = big5decode(html);
+
+  var result = {
+    palaces:[],yearStem:'',yearBranch:'',lunarMonth:'',lunarDay:'',
+    hourBranch:'',lifePalaceBranch:'',sihua:'',lifeMaster:'',bodyMaster:'',wuxing:''
+  };
+
+  var lines = decoded.split(/[\n\r]/).map(function(l){return l.replace(/<[^>]+>/g,' ').replace(/&[^;]+;/g,' ').replace(/\s+/g,' ').trim();}).filter(Boolean);
+
+  lines.forEach(function(line) {
+    // Palace line pattern: GanZhi【PalaceName】
+    var m = line.match(/([甲乙丙丁戊己庚辛壬癸])([子丑寅卯辰巳午未申酉戌亥])【([^】]+)】/);
+    if(m) {
+      var stem=m[1], branch=m[2], rawName=m[3];
+      var palaceName = rawName.replace(/[-–—]\s*身[宮宫]/g,'').trim();
+      var isBody = rawName.includes('身宮')||rawName.includes('身宫');
+      var dec = (line.match(/大限[：:]([\d\-–]+)/)||[])[1]||'';
+      var afterXL = line.replace(/^.*小限[：:][\d\s]+/,'').trim();
+      var stars = afterXL ? afterXL.split(/[,，]/) : [];
+      var mainStars=[],fxMarkers=[],negStars=[],minorStars=[];
+      stars.forEach(function(s){
+        s=s.trim(); if(!s) return;
+        if(/^(胎|養|長生|沐浴|冠帶|臨官|帝旺|衰|病|死|墓|絕|养|长生|沐浴|冠带|临官|帝旺|衰|绝)$/.test(s)) return;
+        if(MAIN_STARS.some(function(x){return s.startsWith(x);})) mainStars.push(s);
+        else if(FX_MARKERS.some(function(x){return s.includes(x);})) fxMarkers.push(s);
+        else if(NEG_STARS.some(function(x){return s.startsWith(x);})) negStars.push(s);
+        else minorStars.push(s);
+      });
+      result.palaces.push({stem,branch,palaceName,isLifePalace:palaceName.includes('命宮')||palaceName.includes('命宫'),isBodyPalace:isBody,mainStars,fxMarkers,negStars,minorStars,decadeAge:dec});
+    }
+    // Meta line
+    if(/阳历|陽曆|干支|乾支/.test(line)||/农历|農曆/.test(line)) {
+      var gz2=line.match(/干支[：:]([甲乙丙丁戊己庚辛壬癸])([子丑寅卯辰巳午未申酉戌亥])/);
+      if(gz2){result.yearStem=gz2[1];result.yearBranch=gz2[2];}
+      var lm=line.match(/农历[：:]\s*\d+年\s*(\d+)月(\d+)/)||line.match(/農曆[：:]\s*\d+年\s*(\d+)月(\d+)/);
+      if(lm){result.lunarMonth=lm[1];result.lunarDay=lm[2];}
+      var hr=line.match(/([子丑寅卯辰巳午未申酉戌亥])[时時]/);
+      if(hr) result.hourBranch=hr[1];
+      var sh=line.match(/生年四化[：:]([^\s　\n]+)/); if(sh) result.sihua=sh[1];
+      var lmm=line.match(/命主[：:]([^,，\s　\n]+)/); if(lmm) result.lifeMaster=lmm[1];
+      var bm=line.match(/身主[：:]([^,，\s　\n]+)/); if(bm) result.bodyMaster=bm[1];
+      var wx=line.match(/五行局[：:]\s*([^\s　\n]+)/); if(wx) result.wuxing=wx[1];
+    }
+  });
+
+  result.palaces.forEach(function(p){if(p.isLifePalace) result.lifePalaceBranch=p.branch;});
+  return result;
+}
+
 async function generate(){
   var key = localStorage.getItem('zwds_key');
   if(!key){ openModal(); return; }
@@ -284,12 +347,17 @@ async function generate(){
   var month  = document.getElementById('f-mo').value;
   var day    = document.getElementById('f-dy').value;
   var hrSel  = document.getElementById('f-hr');
-  var hrBr   = hrSel.value;
+  var hrVal  = hrSel.value;
   var hrTxt  = hrSel.options[hrSel.selectedIndex].text;
   var gender = document.querySelector('input[name=gender]:checked').value;
   var pronoun = gender==='Male' ? 'he/his' : 'she/her';
   var responseLang = LANG==='zh' ? 'Traditional Chinese (繁體中文)' : 'English';
   var ganzhi  = gz(parseInt(year));
+  var windadaSex = gender==='Male' ? '男' : '女';
+
+  // Convert hour branch to Windada hour number
+  var hrMap = {'子':23,'丑':1,'寅':3,'卯':5,'辰':7,'巳':9,'午':11,'未':13,'申':15,'酉':17,'戌':19,'亥':21};
+  var windadaHour = hrMap[hrVal] || 9;
 
   document.getElementById('btn-gen').disabled = true;
   document.getElementById('results').className = 'results';
@@ -297,16 +365,44 @@ async function generate(){
   document.getElementById('err-box').className = 'err-box';
   document.getElementById('loading').className = 'loading on';
 
-  var msgs = ['Consulting the heavenly stems…','Placing stars across twelve palaces…','Reading the Life Palace…','Composing the profile…'];
+  var msgs = ['Fetching chart from Windada…','Parsing star placements…','Reading the twelve palaces…','Composing the profile…'];
   var mi=0, ticker=setInterval(function(){document.getElementById('load-txt').textContent=msgs[mi=(mi+1)%msgs.length];},2200);
 
-  var prompt =
+  try {
+    // ── Step 1: Fetch real chart from Windada via server ──
+    var windadaRes = await fetch('/windada?sex='+encodeURIComponent(windadaSex)+'&year='+year+'&month='+month+'&day='+day+'&hour='+windadaHour);
+    var windadaJson = await windadaRes.json();
+    var chartData = null;
+
+    if(windadaJson.html && windadaJson.html.includes('【')) {
+      chartData = parseWindadaHTML(windadaJson.html);
+    }
+
+    if(!chartData || chartData.palaces.length < 10) {
+      // Windada fetch failed — show error with fallback message
+      throw new Error('Could not fetch chart from Windada. Please try again.');
+    }
+
+    // ── Step 2: Build chart summary from real data ──
+    var chartSummary = chartData.palaces.map(function(p){
+      var stars=[].concat(p.mainStars,p.fxMarkers,p.negStars,p.minorStars).join('，');
+      return (p.stem||'')+(p.branch||'')+'【'+p.palaceName+'】大限:'+(p.decadeAge||'')+(stars?' '+stars:'');
+    }).join('\n');
+
+    // ── Step 3: Generate profile using real chart data ──
+    var prompt =
 'You are a Zi Wei Dou Shu (紫微斗數) expert. Respond entirely in '+responseLang+'.\n\n'+
-'Birth: '+(name||'this person')+' · '+gender+' · '+year+'/'+month+'/'+day+' · '+hrTxt+' ('+hrBr+' hour) · Year '+ganzhi+'\n\n'+
+'Name: '+(name||'this person')+' | Gender: '+gender+' | Born: '+year+'/'+month+'/'+day+' | Hour: '+hrTxt+'\n'+
+'Year: '+ganzhi+(chartData.lunarMonth?' | Lunar: '+chartData.lunarMonth+'/'+chartData.lunarDay:'')+'\n'+
+(chartData.wuxing?'Five Element: '+chartData.wuxing+' | ':'')+
+(chartData.sihua?'Year Transforms: '+chartData.sihua+'\n':'')+
+(chartData.lifeMaster?'Life Master: '+chartData.lifeMaster+' | Body Master: '+chartData.bodyMaster+'\n':'')+
+'\nACTUAL NATAL CHART (from Windada — use these star placements exactly):\n'+chartSummary+'\n\n'+
+'Based on the ACTUAL star placements above, generate the analysis. Do NOT recalculate — use these exact stars.\n\n'+
 'Use EXACTLY these section markers:\n\n'+
-'===META===\nLunar: [month]/[day]\nPillars: [yr]·[mo]·[dy]·[hr]\nLife Palace: [branch]\nBody Palace: [branch]\n5-Element: [name]\nTransforms: [list]\nLife Master: [star]\nBody Master: [star]\n\n'+
-'===PALACES===\n[12 lines: Palace Name | Branch | Key stars & theme]\n\n'+
-'===INTRO===\n[2-3 sentence summary using '+pronoun+' pronouns]\n\n'+
+'===META===\nLunar: '+(chartData.lunarMonth||'?')+'/'+(chartData.lunarDay||'?')+'\nPillars: '+ganzhi+'\nLife Palace: '+(chartData.lifePalaceBranch||'?')+'\nBody Palace: '+(chartData.palaces.filter(function(p){return p.isBodyPalace;})[0]||{branch:'?'}).branch+'\n5-Element: '+(chartData.wuxing||'?')+'\nTransforms: '+(chartData.sihua||'?')+'\nLife Master: '+(chartData.lifeMaster||'?')+'\nBody Master: '+(chartData.bodyMaster||'?')+'\n\n'+
+'===PALACES===\n[12 lines using the actual star data above: Palace Name | Branch | Stars & interpretation]\n\n'+
+'===INTRO===\n[2-3 sentence summary using '+pronoun+' pronouns based on actual chart]\n\n'+
 '===CORE BEHAVIOR===\n• point\n• point\n• point\n\n'+
 '===PERSONALITY PATTERN===\n• point\n• point\n• point\n• point\n\n'+
 '===WORK BEHAVIOR===\n• point\n• point\n• point\n\n'+
@@ -319,26 +415,25 @@ async function generate(){
 '===STRENGTH===\n[one line]\n\n'+
 '===CHALLENGE===\n[one line]';
 
-  try {
     var data = await callAPI(key, {model:'claude-sonnet-4-5', max_tokens:4000, messages:[{role:'user', content:prompt}]});
     clearInterval(ticker);
     var text = data.content&&data.content[0] ? data.content[0].text : '';
     if(!text) throw new Error('No text in response.');
-    renderResults(text, name, year, month, day, hrTxt, gender, ganzhi);
+    renderResults(text, name, year, month, day, hrTxt, gender, ganzhi, chartData);
+
   } catch(e) {
     clearInterval(ticker);
     var eb = document.getElementById('err-box');
-    eb.innerHTML = '<b>Error:</b> '+e.message+'<br><br>Click ⚙ to check your API key, or verify billing at console.anthropic.com';
+    eb.innerHTML = '<b>Error:</b> '+e.message;
     eb.className = 'err-box on';
   }
   document.getElementById('loading').className = 'loading';
   document.getElementById('btn-gen').disabled = false;
 }
-
 function sec(t,tag){var m=t.match(new RegExp('==='+tag+'===\\n([\\s\\S]*?)(?====|$)'));return m?m[1].trim():'';}
 function bullets(r){return r.split('\n').map(function(l){return l.replace(/^[•·\-]\s*/,'').trim();}).filter(Boolean);}
 
-function renderResults(text, name, year, month, day, hrTxt, gender, ganzhi){
+function renderResults(text, name, year, month, day, hrTxt, gender, ganzhi, chartData){
   var ml={};
   sec(text,'META').split('\n').forEach(function(l){var c=l.indexOf(':');if(c>-1)ml[l.slice(0,c).trim()]=l.slice(c+1).trim();});
   var palRows=sec(text,'PALACES').split('\n').filter(Boolean).map(function(l){var p=l.split('|');return p.length>=3?{palace:p[0].trim(),branch:p[1].trim(),stars:p[2].trim()}:null;}).filter(Boolean);
