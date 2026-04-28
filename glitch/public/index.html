@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" id="html-root">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>紫微斗數 · Purple Star Astrology</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#0c0b0f;--ink2:#161520;--ink3:#1e1d28;--gold:#c9a46a;--gold2:#e2c48a;--cream:#e8dcc8;--cream2:#b8ab98;--cream3:#7a7060;--border:rgba(201,164,106,.18);--border2:rgba(201,164,106,.35)}
+:root{--ink:#f7f4ef;--ink2:#ffffff;--ink3:#f0ece4;--gold:#9a6f3a;--gold2:#c9a46a;--cream:#2a2420;--cream2:#5a5040;--cream3:#8a7860;--border:#e0d8cc;--border2:#c9a46a}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Jost',sans-serif;background:var(--ink);color:var(--cream);min-height:100vh;line-height:1.7}
 body::before{content:'';display:block;height:3px;background:linear-gradient(90deg,transparent,var(--gold),var(--gold2),var(--gold),transparent)}
@@ -114,37 +114,38 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
 <header class="site-header">
   <h1>紫微斗數</h1>
   <div class="en-title">Purple Star Astrology · Zi Wei Dou Shu</div>
+  <div style="margin-top:12px">
+    <div style="display:inline-flex;border:1px solid var(--border2);border-radius:6px;overflow:hidden">
+      <button id="btn-en" onclick="setLang('en')" style="padding:5px 18px;background:var(--gold);color:#fff;border:none;font-size:13px;cursor:pointer;font-family:inherit">English</button>
+      <button id="btn-zh" onclick="setLang('zh')" style="padding:5px 18px;background:none;border:none;color:var(--cream3);font-size:13px;cursor:pointer;font-family:inherit">中文</button>
+    </div>
+  </div>
   <button class="gear-btn" onclick="openModal()" title="Settings">⚙</button>
 </header>
 
 <main class="main">
   <div class="form-card">
-    <div class="form-title">Birth information</div>
+    <div class="form-title" id="t-birth">Birth information</div>
     <div class="field">
-      <label>Name (optional)</label>
+      <label id="t-name">Name (optional)</label>
       <input type="text" id="f-name" placeholder="Enter name…"/>
     </div>
     <div class="field">
-      <label>Gender</label>
+      <label id="t-gender">Gender</label>
       <div class="radios">
-        <label><input type="radio" name="gender" value="Male"> Male</label>
-        <label><input type="radio" name="gender" value="Female" checked> Female</label>
+        <label><input type="radio" name="gender" value="Male"> <span id="t-male">Male</span></label>
+        <label><input type="radio" name="gender" value="Female" checked> <span id="t-female">Female</span></label>
       </div>
     </div>
     <div class="field">
       <div class="grid3">
-        <div><label>Year</label><select id="f-yr"></select></div>
-        <div><label>Month</label><select id="f-mo">
-          <option value="1">January</option><option value="2">February</option><option value="3">March</option>
-          <option value="4">April</option><option value="5">May</option><option value="6">June</option>
-          <option value="7" selected>July</option><option value="8">August</option><option value="9">September</option>
-          <option value="10">October</option><option value="11">November</option><option value="12">December</option>
-        </select></div>
-        <div><label>Day</label><select id="f-dy"></select></div>
+        <div><label id="t-yr">Year</label><select id="f-yr"></select></div>
+        <div><label id="t-mo">Month</label><select id="f-mo"></select></div>
+        <div><label id="t-dy">Day</label><select id="f-dy"></select></div>
       </div>
     </div>
     <div class="field">
-      <label>Birth hour</label>
+      <label id="t-hr">Birth hour</label>
       <select id="f-hr">
         <option value="子">23:00 – 00:59</option><option value="丑">01:00 – 02:59</option>
         <option value="寅">03:00 – 04:59</option><option value="卯">05:00 – 06:59</option>
@@ -167,11 +168,52 @@ var STEMS=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
 var BR=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
 function gz(y){return STEMS[(y-4)%10]+BR[(y-4)%12];}
 
+var LANG='en';
+var MO={en:['January','February','March','April','May','June','July','August','September','October','November','December'],zh:['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月']};
+var TX={
+  en:{birth:'Birth information',name:'Name (optional)',ph:'Enter name…',gender:'Gender',male:'Male',female:'Female',yr:'Year',mo:'Month',dy:'Day',hr:'Birth hour',btn:'Generate natal chart & profile'},
+  zh:{birth:'出生資料',name:'姓名（選填）',ph:'輸入姓名…',gender:'性別',male:'男',female:'女',yr:'年',mo:'月',dy:'日',hr:'出生時辰',btn:'生成命盤與分析'}
+};
+
+function setLang(l){
+  LANG=l;
+  localStorage.setItem('zwds_lang',l);
+  document.getElementById('btn-en').style.background=l==='en'?'var(--gold)':'none';
+  document.getElementById('btn-en').style.color=l==='en'?'#fff':'var(--cream3)';
+  document.getElementById('btn-zh').style.background=l==='zh'?'var(--gold)':'none';
+  document.getElementById('btn-zh').style.color=l==='zh'?'#fff':'var(--cream3)';
+  var t=TX[l];
+  document.getElementById('t-birth').textContent=t.birth;
+  document.getElementById('t-name').textContent=t.name;
+  document.getElementById('f-name').placeholder=t.ph;
+  document.getElementById('t-gender').textContent=t.gender;
+  document.getElementById('t-male').textContent=t.male;
+  document.getElementById('t-female').textContent=t.female;
+  document.getElementById('t-yr').textContent=t.yr;
+  document.getElementById('t-mo').textContent=t.mo;
+  document.getElementById('t-dy').textContent=t.dy;
+  document.getElementById('t-hr').textContent=t.hr;
+  document.getElementById('btn-gen').textContent=t.btn;
+  rebuildMonths();
+}
+
+function rebuildMonths(){
+  var sel=document.getElementById('f-mo'),cur=sel.value||'7';
+  sel.innerHTML='';
+  MO[LANG].forEach(function(m,i){var o=document.createElement('option');o.value=i+1;o.textContent=m;if((i+1)==cur)o.selected=true;sel.appendChild(o);});
+}
+
 (function(){
   var yr=document.getElementById('f-yr');
   for(var y=2010;y>=1900;y--){var o=document.createElement('option');o.value=y;o.textContent=y;if(y===1967)o.selected=true;yr.appendChild(o);}
   var dy=document.getElementById('f-dy');
   for(var d=1;d<=31;d++){var o=document.createElement('option');o.value=d;o.textContent=d;if(d===1)o.selected=true;dy.appendChild(o);}
+  rebuildMonths();
+  document.getElementById('f-mo').value='7';
+  var savedName=localStorage.getItem('zwds_name');
+  if(savedName) document.getElementById('f-name').value=savedName;
+  var savedLang=localStorage.getItem('zwds_lang')||'en';
+  setLang(savedLang);
   if(!localStorage.getItem('zwds_key')) openModal();
 })();
 
@@ -237,6 +279,7 @@ async function generate(){
   var key = localStorage.getItem('zwds_key');
   if(!key){ openModal(); return; }
   var name   = document.getElementById('f-name').value.trim();
+  if(name) localStorage.setItem('zwds_name', name);
   var year   = document.getElementById('f-yr').value;
   var month  = document.getElementById('f-mo').value;
   var day    = document.getElementById('f-dy').value;
@@ -245,6 +288,7 @@ async function generate(){
   var hrTxt  = hrSel.options[hrSel.selectedIndex].text;
   var gender = document.querySelector('input[name=gender]:checked').value;
   var pronoun = gender==='Male' ? 'he/his' : 'she/her';
+  var responseLang = LANG==='zh' ? 'Traditional Chinese (繁體中文)' : 'English';
   var ganzhi  = gz(parseInt(year));
 
   document.getElementById('btn-gen').disabled = true;
@@ -257,7 +301,7 @@ async function generate(){
   var mi=0, ticker=setInterval(function(){document.getElementById('load-txt').textContent=msgs[mi=(mi+1)%msgs.length];},2200);
 
   var prompt =
-'You are a Zi Wei Dou Shu (紫微斗數) expert. Generate a complete natal chart analysis.\n\n'+
+'You are a Zi Wei Dou Shu (紫微斗數) expert. Respond entirely in '+responseLang+'.\n\n'+
 'Birth: '+(name||'this person')+' · '+gender+' · '+year+'/'+month+'/'+day+' · '+hrTxt+' ('+hrBr+' hour) · Year '+ganzhi+'\n\n'+
 'Use EXACTLY these section markers:\n\n'+
 '===META===\nLunar: [month]/[day]\nPillars: [yr]·[mo]·[dy]·[hr]\nLife Palace: [branch]\nBody Palace: [branch]\n5-Element: [name]\nTransforms: [list]\nLife Master: [star]\nBody Master: [star]\n\n'+
@@ -355,7 +399,6 @@ function renderResults(text, name, year, month, day, hrTxt, gender, ganzhi){
 function newGen(){
   document.getElementById('results').className='results';
   document.getElementById('results').innerHTML='';
-  document.getElementById('f-name').value='';
   window.scrollTo({top:0,behavior:'smooth'});
 }
 </script>
