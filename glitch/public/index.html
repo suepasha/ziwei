@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" id="html-root">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>紫微斗數 · Purple Star Astrology</title>
+<title id="page-title">紫微斗數 · Purple Star Astrology</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{--ink:#f7f4ef;--ink2:#ffffff;--ink3:#f0ece4;--gold:#9a6f3a;--gold2:#c9a46a;--cream:#2a2420;--cream2:#5a5040;--cream3:#8a7860;--border:#e0d8cc;--border2:#c9a46a;--sbg:#f0faf4;--sbr:#b8dfc8;--stx:#2d7a4f;--wbg:#fef9ec;--wbr:#e8d49a;--wtx:#8a6a10}
@@ -26,7 +26,7 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
 .field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238a7860' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-color:var(--ink3);padding-right:32px}
 .field input:focus,.field select:focus{border-color:var(--gold2)}
 .field input::placeholder{color:var(--cream3)}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .radios{display:flex;gap:20px;padding:2px 0}
 .radios label{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--cream);cursor:pointer}
 .radios input[type=radio]{accent-color:var(--gold);width:15px;height:15px}
@@ -49,10 +49,10 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
 .pill{background:var(--ink3);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--cream3)}
 .pill b{color:var(--cream);font-weight:500;margin-left:3px}
 .stitle{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:500;color:var(--gold);margin-bottom:1rem}
-.pal-tbl{width:100%;border-collapse:collapse;font-size:13px;background:var(--ink2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:1.5rem}
+.pal-tbl{width:100%;border-collapse:collapse;font-size:13px;background:var(--ink2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:1.5rem;table-layout:fixed}
 .pal-tbl th{text-align:left;padding:9px 14px;font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--cream3);background:var(--ink3);border-bottom:1px solid var(--border)}
-.pal-tbl td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--cream2);line-height:1.5;vertical-align:top}
-.pal-tbl td:first-child{color:var(--gold);font-weight:500;white-space:nowrap}
+.pal-tbl td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--cream2);line-height:1.5;vertical-align:top;word-break:break-word}
+.pal-tbl td:first-child{color:var(--gold);font-weight:500;white-space:nowrap;width:22%}.pal-tbl td:nth-child(2){width:18%;white-space:nowrap}.pal-tbl td:nth-child(3){width:60%}
 .pal-tbl tr:last-child td{border-bottom:none}
 .pal-tbl tr:hover td{background:var(--ink3)}
 .intro-blk{font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;color:var(--cream2);line-height:1.85;padding:1.25rem 1.5rem;border-left:3px solid var(--gold2);background:var(--ink2);margin-bottom:1.25rem}
@@ -107,11 +107,13 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
       </div>
     </div>
     <div class="field">
-      <div class="grid3">
-        <div><label id="t-yr">Year</label><select id="f-yr"></select></div>
+      <div class="grid2">
         <div><label id="t-mo">Month</label><select id="f-mo"></select></div>
         <div><label id="t-dy">Day</label><select id="f-dy"></select></div>
       </div>
+    </div>
+    <div class="field">
+      <label id="t-yr">Year</label><select id="f-yr" style="width:100%"></select>
     </div>
     <div class="field">
       <label id="t-hr">Birth hour</label>
@@ -132,7 +134,7 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
     </div>
   </div>
 
-  <button class="btn-generate" id="btn-gen" onclick="generate()">Generate natal chart &amp; profile</button>
+  <button class="btn-generate" id="btn-gen" onclick="generate()">Generate</button>
   <div class="loading" id="loading"><div class="spinner"></div><p id="load-txt">Calculating chart…</p></div>
   <div class="err-box" id="err-box"></div>
   <div class="results" id="results"></div>
@@ -145,8 +147,8 @@ var MO={
   zh:['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月']
 };
 var TX={
-  en:{birth:'Birth information',name:'Name (optional)',ph:'Enter name…',gender:'Gender',male:'Male',female:'Female',yr:'Year',mo:'Month',dy:'Day',hr:'Birth hour',btn:'Generate natal chart & profile'},
-  zh:{birth:'出生資料',name:'姓名（選填）',ph:'輸入姓名…',gender:'性別',male:'男',female:'女',yr:'年',mo:'月',dy:'日',hr:'出生時辰',btn:'生成命盤與分析'}
+  en:{birth:'Birth information',name:'Name (optional)',ph:'Enter name…',gender:'Gender',male:'Male',female:'Female',yr:'Year',mo:'Month',dy:'Day',hr:'Birth hour',btn:'Generate'},
+  zh:{birth:'出生資料',name:'姓名（選填）',ph:'輸入姓名…',gender:'性別',male:'男',female:'女',yr:'年',mo:'月',dy:'日',hr:'出生時辰',btn:'生成'}
 };
 var STEMS=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
 var BR=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
@@ -157,6 +159,8 @@ function setLang(l){
   localStorage.setItem('zwds_lang',l);
   document.getElementById('btn-en').classList.toggle('on',l==='en');
   document.getElementById('btn-zh').classList.toggle('on',l==='zh');
+  document.getElementById('page-title').textContent=l==='zh'?'紫微斗數 · 命盤分析':'Purple Star Astrology · Zi Wei Dou Shu';
+  document.getElementById('html-root')?document.getElementById('html-root').setAttribute('lang',l==='zh'?'zh-TW':'en'):null;
   var t=TX[l];
   document.getElementById('t-birth').textContent=t.birth;
   document.getElementById('t-name').textContent=t.name;
@@ -283,7 +287,7 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
   var palRows=sec(text,'PALACES').split('\n').filter(Boolean).map(function(l){var p=l.split('|');return p.length>=3?{palace:p[0].trim(),branch:p[1].trim(),stars:p[2].trim()}:null;}).filter(Boolean);
   var cycRows=sec(text,'CYCLES').split('\n').filter(Boolean).map(function(l){var p=l.split('|');return p.length>=3?{range:p[0].trim(),phase:p[1].trim(),text:p[2].trim()}:null;}).filter(Boolean);
 
-  var h='<div class="prof-hdr"><div class="pname">'+(name?name+' — ':'')+'Natal Chart Profile</div>';
+  var h='<div class="prof-hdr"><div class="pname">'+(name?name+' — ':'')+'Behavioral &amp; Personality Profile</div>';
   h+='<div class="psub">'+gender+' · '+month+'/'+day+'/'+year+' · '+hrTxt+' · '+ganzhi+' year</div>';
   h+='<div class="pills">';
   [['Lunar',chart.lunarDate],['Life Palace',lifePalaceFromChart(chart)],['Body Palace',bodyPalaceFromChart(chart)],['5-Element',chart.fiveElements],['Life Master',chart.lifeMaster],['Body Master',chart.bodyMaster]].forEach(function(pair){
