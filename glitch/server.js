@@ -36,56 +36,76 @@ function fetchWindada(urlStr, callback) {
 
   const chunks = [];
   const req2 = lib.request(options, (resp) => {
-    console.log('Windada status:', resp.statusCode, '| URL:', urlStr.slice(0, 80));
-
+    console.log('Status:', resp.statusCode, '| Content-Type:', resp.headers['content-type']);
     if ((resp.statusCode === 301 || resp.statusCode === 302) && resp.headers.location) {
       const loc = resp.headers.location.startsWith('http')
         ? resp.headers.location
         : 'https://fate.windada.com' + resp.headers.location;
-      console.log('Redirect to:', loc);
       resp.resume();
       return fetchWindada(loc, callback);
     }
-
     resp.on('data', chunk => chunks.push(chunk));
     resp.on('end', () => {
       const buf = Buffer.concat(chunks);
+      // Try all encodings, pick the one that has palace markers
+      const encodings = ['big5', 'cp950', 'gbk', 'utf-8'];
       let html = '';
-      try { html = new TextDecoder('big5').decode(buf); } catch(e) {
-        try { html = new TextDecoder('gbk').decode(buf); } catch(e2) {
-          html = buf.toString('utf8');
-        }
+      let usedEnc = 'none';
+      for (const enc of encodings) {
+        try {
+          const decoded = new TextDecoder(enc).decode(buf);
+          if (decoded.includes('\u3010') || decoded.includes('命宮') || decoded.includes('命宫') || decoded.includes('\u5927\u9650')) {
+            html = decoded;
+            usedEnc = enc;
+            break;
+          }
+          if (!html) html = decoded; // keep first successful decode as fallback
+        } catch(e) {}
       }
-      console.log('Length:', html.length, '| Has palaces:', html.includes('【'));
-      callback(null, html);
+      console.log('Encoding used:', usedEnc, '| Length:', html.length);
+      console.log('Has 【:', html.includes('\u3010'), '| Has 命宮:', html.includes('命宮') || html.includes('命宫'));
+      console.log('Snippet:', html.slice(0, 300).replace(/\s+/g, ' '));
+      callback(null, html, buf);
     });
   });
-
-  req2.on('error', (err) => { console.error('Fetch error:', err.message); callback(err); });
-  req2.setTimeout(15000, () => { req2.destroy(); callback(new Error('Timeout fetching Windada')); });
+  req2.on('error', (err) => callback(err));
+  req2.setTimeout(20000, () => { req2.destroy(); callback(new Error('Timeout')); });
   req2.end();
 }
+
+// Debug endpoint — returns raw info
+app.get('/debug', (req, res) => {
+  const url = 'https://fate.windada.com/cgi-bin/fate?Sex=%E5%A5%B3&Year=1967&Month=7&Day=1&Hour=9&Calendar=S';
+  fetchWindada(url, (err, html, buf) => {
+    if (err) return res.json({ error: err.message });
+    res.json({
+      length: html.length,
+      hasPalaceMarker: html.includes('\u3010'),
+      hasCommandPalace: html.includes('命宮') || html.includes('命宫'),
+      first500: html.slice(0, 500),
+      hexStart: buf ? buf.slice(0, 40).toString('hex') : ''
+    });
+  });
+});
 
 app.get('/windada', (req, res) => {
   const { sex, year, month, day, hour } = req.query;
   if (!sex || !year || !month || !day || !hour) {
     return res.status(400).json({ error: 'Missing parameters' });
   }
-
   const url = 'https://fate.windada.com/cgi-bin/fate?Sex=' + encodeURIComponent(sex) +
     '&Year=' + year + '&Month=' + month + '&Day=' + day +
     '&Hour=' + hour + '&Calendar=S';
 
   fetchWindada(url, (err, html) => {
     if (err) return res.status(500).json({ error: err.message });
-    res.json({ html, hasPalaces: html.includes('【') });
+    res.json({ html, hasPalaces: html.includes('\u3010') || html.includes('命宮') || html.includes('命宫') });
   });
 });
 
 app.post('/proxy', (req, res) => {
   const apiKey = req.headers['x-api-key'];
   if (!apiKey) return res.status(400).json({ error: { message: 'No API key provided' } });
-
   const body = JSON.stringify(req.body);
   const options = {
     hostname: 'api.anthropic.com',
@@ -98,7 +118,6 @@ app.post('/proxy', (req, res) => {
       'anthropic-version': '2023-06-01'
     }
   };
-
   const proxyReq = https.request(options, (proxyRes) => {
     const chunks = [];
     proxyRes.on('data', chunk => chunks.push(chunk));
@@ -106,7 +125,6 @@ app.post('/proxy', (req, res) => {
       res.status(proxyRes.statusCode).set('Content-Type', 'application/json').send(Buffer.concat(chunks).toString('utf8'));
     });
   });
-
   proxyReq.on('error', (err) => res.status(500).json({ error: { message: err.message } }));
   proxyReq.write(body);
   proxyReq.end();
