@@ -73,6 +73,32 @@ function fetchWindada(urlStr, callback) {
   req2.end();
 }
 
+// Debug endpoint 2 — shows cleaned text around palace markers
+app.get('/debug2', (req, res) => {
+  const url = 'https://fate.windada.com/cgi-bin/fate?Sex=%E5%A5%B3&Year=1967&Month=7&Day=1&Hour=9&Calendar=S';
+  fetchWindada(url, (err, html) => {
+    if (err) return res.json({ error: err.message });
+    const clean = html
+      .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+      .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/\s+/g, ' ');
+    // Find 【 and show context around it
+    const idx = clean.indexOf('\u3010');
+    const snippet = idx > -1 ? clean.slice(Math.max(0, idx-150), idx+400) : 'NOT FOUND';
+    // Also look for ganzhi pattern
+    const ganzhiMatch = clean.match(/[甲乙丙丁戊己庚辛壬癸][子丑寅卯辰巳午未申酉戌亥]/);
+    res.json({
+      palaceMarkerAt: idx,
+      snippet: snippet,
+      firstGanzhi: ganzhiMatch ? ganzhiMatch[0] : 'none',
+      cleanLength: clean.length,
+      first300: clean.slice(0, 300)
+    });
+  });
+});
+
 // Debug endpoint — returns raw info
 app.get('/debug', (req, res) => {
   const url = 'https://fate.windada.com/cgi-bin/fate?Sex=%E5%A5%B3&Year=1967&Month=7&Day=1&Hour=9&Calendar=S';
