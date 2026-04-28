@@ -281,25 +281,22 @@ var NEG_STARS  = ['擎羊','陀羅','火星','鈴星','地空','地劫'];
 var FX_MARKERS = ['化祿','化權','化科','化忌'];
 
 function parseWindadaHTML(html) {
-  // Windada uses Big5 — decode from binary string
-  function big5decode(str) {
-    try {
-      var bytes = new Uint8Array(str.length);
-      for(var i=0;i<str.length;i++) bytes[i]=str.charCodeAt(i)&0xff;
-      return new TextDecoder('big5').decode(bytes);
-    } catch(e) { return str; }
-  }
-  var decoded = big5decode(html);
-
+  // HTML is already UTF-8 decoded by the server — parse directly
   var result = {
     palaces:[],yearStem:'',yearBranch:'',lunarMonth:'',lunarDay:'',
     hourBranch:'',lifePalaceBranch:'',sihua:'',lifeMaster:'',bodyMaster:'',wuxing:''
   };
 
-  var lines = decoded.split(/[\n\r]/).map(function(l){return l.replace(/<[^>]+>/g,' ').replace(/&[^;]+;/g,' ').replace(/\s+/g,' ').trim();}).filter(Boolean);
+  // Strip HTML tags and split into lines
+  var lines = html
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .split(/[\n\r]/)
+    .map(function(l){ return l.replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&[^;]+;/g,'').replace(/\s+/g,' ').trim(); })
+    .filter(Boolean);
 
   lines.forEach(function(line) {
-    // Palace line pattern: GanZhi【PalaceName】
+    // Palace line: GanZhi【PalaceName】
     var m = line.match(/([甲乙丙丁戊己庚辛壬癸])([子丑寅卯辰巳午未申酉戌亥])【([^】]+)】/);
     if(m) {
       var stem=m[1], branch=m[2], rawName=m[3];
@@ -311,23 +308,25 @@ function parseWindadaHTML(html) {
       var mainStars=[],fxMarkers=[],negStars=[],minorStars=[];
       stars.forEach(function(s){
         s=s.trim(); if(!s) return;
-        if(/^(胎|養|長生|沐浴|冠帶|臨官|帝旺|衰|病|死|墓|絕|养|长生|沐浴|冠带|临官|帝旺|衰|绝)$/.test(s)) return;
+        if(/^(胎|養|長生|沐浴|冠帶|臨官|帝旺|衰|病|死|墓|絕|养|长生|冠带|临官|帝旺|绝)$/.test(s)) return;
         if(MAIN_STARS.some(function(x){return s.startsWith(x);})) mainStars.push(s);
         else if(FX_MARKERS.some(function(x){return s.includes(x);})) fxMarkers.push(s);
         else if(NEG_STARS.some(function(x){return s.startsWith(x);})) negStars.push(s);
         else minorStars.push(s);
       });
-      result.palaces.push({stem,branch,palaceName,isLifePalace:palaceName.includes('命宮')||palaceName.includes('命宫'),isBodyPalace:isBody,mainStars,fxMarkers,negStars,minorStars,decadeAge:dec});
+      result.palaces.push({stem,branch,palaceName,
+        isLifePalace:palaceName.includes('命宮')||palaceName.includes('命宫'),
+        isBodyPalace:isBody,mainStars,fxMarkers,negStars,minorStars,decadeAge:dec});
     }
     // Meta line
-    if(/阳历|陽曆|干支|乾支/.test(line)||/农历|農曆/.test(line)) {
+    if(/陽曆|阳历|干支|乾支|農曆|农历/.test(line)) {
       var gz2=line.match(/干支[：:]([甲乙丙丁戊己庚辛壬癸])([子丑寅卯辰巳午未申酉戌亥])/);
       if(gz2){result.yearStem=gz2[1];result.yearBranch=gz2[2];}
-      var lm=line.match(/农历[：:]\s*\d+年\s*(\d+)月(\d+)/)||line.match(/農曆[：:]\s*\d+年\s*(\d+)月(\d+)/);
+      var lm=line.match(/農曆[：:]\s*\d+年\s*(\d+)月(\d+)/)||line.match(/农历[：:]\s*\d+年\s*(\d+)月(\d+)/);
       if(lm){result.lunarMonth=lm[1];result.lunarDay=lm[2];}
-      var hr=line.match(/([子丑寅卯辰巳午未申酉戌亥])[时時]/);
+      var hr=line.match(/([子丑寅卯辰巳午未申酉戌亥])[時时]/);
       if(hr) result.hourBranch=hr[1];
-      var sh=line.match(/生年四化[：:]([^\s　\n]+)/); if(sh) result.sihua=sh[1];
+      var sh=line.match(/生年四化[：:]([^\s　\n,，]+)/); if(sh) result.sihua=sh[1];
       var lmm=line.match(/命主[：:]([^,，\s　\n]+)/); if(lmm) result.lifeMaster=lmm[1];
       var bm=line.match(/身主[：:]([^,，\s　\n]+)/); if(bm) result.bodyMaster=bm[1];
       var wx=line.match(/五行局[：:]\s*([^\s　\n]+)/); if(wx) result.wuxing=wx[1];
