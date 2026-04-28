@@ -14,7 +14,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// ── Fetch & parse Windada chart ──
+// ── Fetch Windada chart ──
 app.get('/windada', (req, res) => {
   const { sex, year, month, day, hour } = req.query;
   if (!sex || !year || !month || !day || !hour) {
@@ -25,50 +25,68 @@ app.get('/windada', (req, res) => {
     '&Year=' + year + '&Month=' + month + '&Day=' + day +
     '&Hour=' + hour + '&Calendar=S';
 
+  console.log('Fetching Windada:', path);
+
   const options = {
     hostname: 'fate.windada.com',
+    port: 80,
     path: path,
     method: 'GET',
     headers: {
-      'User-Agent': 'Mozilla/5.0 (compatible)',
-      'Accept': '*/*'
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      'Accept-Language': 'zh-TW,zh;q=0.9,en;q=0.8',
+      'Accept-Encoding': 'identity',
+      'Referer': 'http://fate.windada.com/',
+      'Connection': 'keep-alive'
     }
   };
 
-  const chunks = [];
-  const proxyReq = http.request(options, (proxyRes) => {
-    if (proxyRes.statusCode >= 300 && proxyRes.statusCode < 400 && proxyRes.headers.location) {
-      // follow redirect
-      const loc = proxyRes.headers.location;
-      const redirOptions = {
-        hostname: 'fate.windada.com',
-        path: loc,
-        method: 'GET',
-        headers: { 'User-Agent': 'Mozilla/5.0 (compatible)', 'Accept': '*/*' }
-      };
-      const redirChunks = [];
-      const redirReq = http.request(redirOptions, (rRes) => {
-        rRes.on('data', c => redirChunks.push(c));
-        rRes.on('end', () => {
-          const html = Buffer.concat(redirChunks).toString('binary');
-          res.json({ html, status: rRes.statusCode });
-        });
-      });
-      redirReq.on('error', e => res.status(500).json({ error: e.message }));
-      redirReq.end();
-      return;
-    }
-    proxyRes.on('data', chunk => chunks.push(chunk));
-    proxyRes.on('end', () => {
-      const html = Buffer.concat(chunks).toString('binary');
-      res.json({ html, status: proxyRes.statusCode });
-    });
-  });
+  function fetchUrl(opts, callback) {
+    const chunks = [];
+    const req2 = http.request(opts, (resp) => {
+      console.log('Windada status:', resp.statusCode, 'Content-Type:', resp.headers['content-type']);
 
-  proxyReq.on('error', (err) => {
-    res.status(500).json({ error: err.message });
+      // Handle redirect
+      if ((resp.statusCode === 301 || resp.statusCode === 302) && resp.headers.location) {
+        const loc = resp.headers.location;
+        console.log('Redirect to:', loc);
+        const newPath = loc.startsWith('http') ? new URL(loc).pathname + new URL(loc).search : loc;
+        return fetchUrl({ ...opts, path: newPath }, callback);
+      }
+
+      resp.on('data', chunk => chunks.push(chunk));
+      resp.on('end', () => {
+        const buf = Buffer.concat(chunks);
+        // Decode Big5 (Windada uses Big5/CNS encoding)
+        let html = '';
+        try {
+          const decoder = new TextDecoder('big5');
+          html = decoder.decode(buf);
+        } catch(e) {
+          try {
+            const decoder2 = new TextDecoder('gbk');
+            html = decoder2.decode(buf);
+          } catch(e2) {
+            html = buf.toString('utf8');
+          }
+        }
+        console.log('Response length:', html.length, '| Has palace marker:', html.includes('【'));
+        callback(null, html, resp.statusCode);
+      });
+    });
+    req2.on('error', (err) => callback(err));
+    req2.setTimeout(10000, () => { req2.abort(); callback(new Error('Timeout')); });
+    req2.end();
+  }
+
+  fetchUrl(options, (err, html, statusCode) => {
+    if (err) {
+      console.error('Windada fetch error:', err.message);
+      return res.status(500).json({ error: err.message });
+    }
+    res.json({ html, status: statusCode, hasPalaces: html.includes('【') });
   });
-  proxyReq.end();
 });
 
 // ── Proxy Anthropic API ──
