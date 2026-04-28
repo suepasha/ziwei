@@ -1,47 +1,28 @@
 <!DOCTYPE html>
-<html lang="en" id="html-root">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>紫微斗數 · Purple Star Astrology</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#f7f4ef;--ink2:#ffffff;--ink3:#f0ece4;--gold:#9a6f3a;--gold2:#c9a46a;--cream:#2a2420;--cream2:#5a5040;--cream3:#8a7860;--border:#e0d8cc;--border2:#c9a46a;--success-bg:#f0faf4;--success-border:#b8dfc8;--success-text:#2d7a4f;--warn-bg:#fef9ec;--warn-border:#e8d49a;--warn-text:#8a6a10}
+:root{--ink:#f7f4ef;--ink2:#ffffff;--ink3:#f0ece4;--gold:#9a6f3a;--gold2:#c9a46a;--cream:#2a2420;--cream2:#5a5040;--cream3:#8a7860;--border:#e0d8cc;--border2:#c9a46a;--sbg:#f0faf4;--sbr:#b8dfc8;--stx:#2d7a4f;--wbg:#fef9ec;--wbr:#e8d49a;--wtx:#8a6a10}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Jost',sans-serif;background:var(--ink);color:var(--cream);min-height:100vh;line-height:1.7}
 body::before{content:'';display:block;height:3px;background:linear-gradient(90deg,transparent,var(--gold),var(--gold2),var(--gold),transparent)}
-.site-header{text-align:center;padding:2.5rem 1.5rem 1.75rem;border-bottom:1px solid var(--border);position:relative}
+.site-header{text-align:center;padding:2.5rem 1.5rem 1.75rem;border-bottom:1px solid var(--border)}
 .site-header h1{font-family:'Cormorant Garamond',serif;font-size:clamp(26px,5vw,42px);font-weight:500;color:var(--gold);letter-spacing:.06em;margin-bottom:4px}
 .en-title{font-weight:300;font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--cream3);margin-bottom:12px}
-.lang-row{display:flex;align-items:center;justify-content:center;gap:8px}
 .lang-tog{display:inline-flex;border:1px solid var(--border2);border-radius:6px;overflow:hidden}
 .lang-tog button{padding:5px 18px;background:none;border:none;font-size:13px;cursor:pointer;font-family:'Jost',sans-serif;color:var(--cream3);transition:.15s}
 .lang-tog button.on{background:var(--gold);color:#fff}
-.gear-btn{position:absolute;top:1.5rem;right:1.5rem;background:none;border:1px solid var(--border);border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--cream3);font-size:15px;transition:.2s}
-.gear-btn:hover{border-color:var(--gold2);color:var(--gold)}
-.modal-bd{display:none;position:fixed;inset:0;background:rgba(247,244,239,.85);z-index:100;align-items:center;justify-content:center;padding:1rem}
-.modal-bd.open{display:flex}
-.modal{background:var(--ink2);border:1px solid var(--border2);border-radius:12px;padding:2rem;max-width:460px;width:100%}
-.modal h2{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:var(--gold);margin-bottom:8px}
-.modal p{font-size:13px;color:var(--cream2);line-height:1.7;margin-bottom:1rem}
-.modal p a{color:var(--gold)}
-.modal label{display:block;font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--cream3);margin-bottom:5px}
-.modal input{width:100%;padding:10px 14px;background:var(--ink3);border:1px solid var(--border);border-radius:6px;color:var(--cream);font-family:monospace;font-size:13px;outline:none;margin-bottom:.875rem;transition:.2s}
-.modal input:focus{border-color:var(--gold2)}
-.modal input::placeholder{color:var(--cream3);font-family:'Jost',sans-serif}
-.btn-gold{width:100%;padding:11px;background:var(--gold);color:#fff;border:none;border-radius:6px;font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;cursor:pointer;transition:opacity .2s}
-.btn-gold:hover{opacity:.87}
-.btn-gold:disabled{opacity:.4;cursor:not-allowed}
-.mmsg{font-size:12px;margin-top:.75rem;padding:8px 10px;border-radius:6px;display:none;line-height:1.5}
-.mmsg.ok{background:var(--success-bg);color:var(--success-text);border:1px solid var(--success-border);display:block}
-.mmsg.err{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;display:block}
 .main{max-width:820px;margin:0 auto;padding:2rem 1.5rem}
 .form-card{background:var(--ink2);border:1px solid var(--border);border-radius:12px;padding:1.75rem;margin-bottom:1.25rem}
 .form-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:500;color:var(--gold);margin-bottom:1.5rem;padding-bottom:.875rem;border-bottom:1px solid var(--border)}
 .field{margin-bottom:1rem}
 .field:last-child{margin-bottom:0}
 .field label{display:block;font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--cream3);margin-bottom:6px}
-.field input[type=text],.field select{width:100%;padding:10px 14px;background:var(--ink3);border:1px solid var(--border);border-radius:6px;color:var(--cream);font-family:'Jost',sans-serif;font-size:14px;outline:none;transition:.2s;appearance:none;-webkit-appearance:none;background-image:none}
+.field input[type=text],.field select{width:100%;padding:10px 14px;background:var(--ink3);border:1px solid var(--border);border-radius:6px;color:var(--cream);font-family:'Jost',sans-serif;font-size:14px;outline:none;transition:.2s;appearance:none;-webkit-appearance:none}
 .field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238a7860' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-color:var(--ink3);padding-right:32px}
 .field input:focus,.field select:focus{border-color:var(--gold2)}
 .field input::placeholder{color:var(--cream3)}
@@ -89,11 +70,11 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
 .cy-txt{font-size:13px;color:var(--cream3);line-height:1.6}
 .sfgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
 .sfbox{padding:12px 14px;border-radius:8px}
-.sf-s{background:var(--success-bg);border:1px solid var(--success-border)}
-.sf-c{background:var(--warn-bg);border:1px solid var(--warn-border)}
+.sf-s{background:var(--sbg);border:1px solid var(--sbr)}
+.sf-c{background:var(--wbg);border:1px solid var(--wbr)}
 .sf-lbl{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
-.sf-s .sf-lbl{color:var(--success-text)}
-.sf-c .sf-lbl{color:var(--warn-text)}
+.sf-s .sf-lbl{color:var(--stx)}
+.sf-c .sf-lbl{color:var(--wtx)}
 .sf-txt{font-size:13px;color:var(--cream2);line-height:1.55}
 .btn-new{width:100%;padding:12px;background:none;border:1px solid var(--border2);border-radius:8px;color:var(--cream2);font-family:'Jost',sans-serif;font-size:14px;cursor:pointer;margin-top:1.5rem;transition:.2s}
 .btn-new:hover{border-color:var(--gold);color:var(--gold)}
@@ -102,27 +83,13 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
 </head>
 <body>
 
-<div class="modal-bd" id="modal">
-  <div class="modal">
-    <h2>API key setup</h2>
-    <p>Your key is saved only in this browser.<br>Get a free key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> → API Keys. Add a few dollars credit at Billing (~$0.01 per profile).</p>
-    <label>Anthropic API key</label>
-    <input type="password" id="modal-key" placeholder="sk-ant-api03-…" autocomplete="off" spellcheck="false"/>
-    <button class="btn-gold" id="save-btn" onclick="saveKey()">Save &amp; test</button>
-    <div class="mmsg" id="modal-msg"></div>
-  </div>
-</div>
-
 <header class="site-header">
   <h1>紫微斗數</h1>
   <div class="en-title">Purple Star Astrology</div>
-  <div class="lang-row">
-    <div class="lang-tog">
-      <button id="btn-en" class="on" onclick="setLang('en')">English</button>
-      <button id="btn-zh" onclick="setLang('zh')">中文</button>
-    </div>
+  <div class="lang-tog">
+    <button id="btn-en" class="on" onclick="setLang('en')">English</button>
+    <button id="btn-zh" onclick="setLang('zh')">中文</button>
   </div>
-  <button class="gear-btn" onclick="openModal()">⚙</button>
 </header>
 
 <main class="main">
@@ -149,18 +116,18 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
     <div class="field">
       <label id="t-hr">Birth hour</label>
       <select id="f-hr">
-        <option value="子" data-idx="0">23:00 – 00:59</option>
-        <option value="丑" data-idx="1">01:00 – 02:59</option>
-        <option value="寅" data-idx="2">03:00 – 04:59</option>
-        <option value="卯" data-idx="3">05:00 – 06:59</option>
-        <option value="辰" data-idx="4">07:00 – 08:59</option>
-        <option value="巳" data-idx="5" selected>09:00 – 10:59</option>
-        <option value="午" data-idx="6">11:00 – 12:59</option>
-        <option value="未" data-idx="7">13:00 – 14:59</option>
-        <option value="申" data-idx="8">15:00 – 16:59</option>
-        <option value="酉" data-idx="9">17:00 – 18:59</option>
-        <option value="戌" data-idx="10">19:00 – 20:59</option>
-        <option value="亥" data-idx="11">21:00 – 22:59</option>
+        <option value="0">23:00 – 00:59</option>
+        <option value="1">01:00 – 02:59</option>
+        <option value="2">03:00 – 04:59</option>
+        <option value="3">05:00 – 06:59</option>
+        <option value="4">07:00 – 08:59</option>
+        <option value="5" selected>09:00 – 10:59</option>
+        <option value="6">11:00 – 12:59</option>
+        <option value="7">13:00 – 14:59</option>
+        <option value="8">15:00 – 16:59</option>
+        <option value="9">17:00 – 18:59</option>
+        <option value="10">19:00 – 20:59</option>
+        <option value="11">21:00 – 22:59</option>
       </select>
     </div>
   </div>
@@ -172,12 +139,12 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
 </main>
 
 <script>
-var LANG = 'en';
-var MO = {
+var LANG='en';
+var MO={
   en:['January','February','March','April','May','June','July','August','September','October','November','December'],
   zh:['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月']
 };
-var TX = {
+var TX={
   en:{birth:'Birth information',name:'Name (optional)',ph:'Enter name…',gender:'Gender',male:'Male',female:'Female',yr:'Year',mo:'Month',dy:'Day',hr:'Birth hour',btn:'Generate natal chart & profile'},
   zh:{birth:'出生資料',name:'姓名（選填）',ph:'輸入姓名…',gender:'性別',male:'男',female:'女',yr:'年',mo:'月',dy:'日',hr:'出生時辰',btn:'生成命盤與分析'}
 };
@@ -220,63 +187,19 @@ function rebuildMonths(){
   document.getElementById('f-mo').value='7';
   var sn=localStorage.getItem('zwds_name'); if(sn) document.getElementById('f-name').value=sn;
   setLang(localStorage.getItem('zwds_lang')||'en');
-  if(!localStorage.getItem('zwds_key')) openModal();
+  // Wake up Render server immediately on page load
+  fetch('/chart?year=2000&month=1&day=1&hour=5&gender=female').catch(function(){});
 })();
 
-function openModal(){
-  document.getElementById('modal-key').value=localStorage.getItem('zwds_key')||'';
-  document.getElementById('modal-msg').className='mmsg';
-  document.getElementById('modal-bd').classList.add('open');
-}
-document.getElementById('modal-bd').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
-
-async function saveKey(){
-  var k=document.getElementById('modal-key').value.trim();
-  if(!k){showMsg('Please enter your API key.','err');return;}
-  if(!k.startsWith('sk-ant-')){showMsg('Key must start with sk-ant- — check you copied it fully.','err');return;}
-  var btn=document.getElementById('save-btn');
-  btn.disabled=true; btn.textContent='Testing…';
-  showMsg('Connecting…','');
-  try{
-    var data=await callAPI(k,{model:'claude-haiku-4-5-20251001',max_tokens:10,messages:[{role:'user',content:'Say OK'}]});
-    if(data.content&&data.content[0]&&data.content[0].text){
-      localStorage.setItem('zwds_key',k);
-      document.getElementById('modal-bd').classList.remove('open');
-    } else {
-      showMsg('Unexpected response. Try generating anyway.','err');
-    }
-  } catch(e){ showMsg('Error: '+e.message,'err'); }
-  btn.disabled=false; btn.textContent='Save & test';
-}
-
-function showMsg(msg,type){
-  var el=document.getElementById('modal-msg');
-  el.textContent=msg;
-  el.className='mmsg'+(type?' '+type:'');
-  el.style.display=msg?'block':'none';
-}
-
-async function callAPI(key,body){
-  var res=await fetch('/proxy',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key},body:JSON.stringify(body)});
-  var raw=''; try{raw=await res.text();}catch(e){throw new Error('Network error');}
-  if(!raw) throw new Error('Empty response (HTTP '+res.status+')');
-  var data; try{data=JSON.parse(raw);}catch(e){throw new Error('Invalid response: '+raw.slice(0,80));}
-  if(data.error) throw new Error(data.error.message||'API error');
-  return data;
-}
-
 async function generate(){
-  var key=localStorage.getItem('zwds_key');
-  if(!key){openModal();return;}
   var name=document.getElementById('f-name').value.trim();
   if(name) localStorage.setItem('zwds_name',name);
   var year=document.getElementById('f-yr').value;
   var month=document.getElementById('f-mo').value;
   var day=document.getElementById('f-dy').value;
   var hrSel=document.getElementById('f-hr');
-  var hrOpt=hrSel.options[hrSel.selectedIndex];
-  var hrTxt=hrOpt.text;
-  var hourIndex=parseInt(hrOpt.getAttribute('data-idx'));
+  var hourIndex=hrSel.value;
+  var hrTxt=hrSel.options[hrSel.selectedIndex].text;
   var gender=document.querySelector('input[name=gender]:checked').value;
   var iztroGender=gender==='Male'?'male':'female';
   var pronoun=gender==='Male'?'he/his':'she/her';
@@ -293,13 +216,13 @@ async function generate(){
   var mi=0,ticker=setInterval(function(){document.getElementById('load-txt').textContent=msgs[mi=(mi+1)%msgs.length];},2200);
 
   try{
-    // Step 1: Get accurate chart from iztro
+    // Step 1: Get chart from iztro
     var chartRes=await fetch('/chart?year='+year+'&month='+month+'&day='+day+'&hour='+hourIndex+'&gender='+iztroGender);
     var chart=await chartRes.json();
-    if(chart.error) throw new Error('Chart calculation error: '+chart.error);
-    if(!chart.palaces||chart.palaces.length<12) throw new Error('Incomplete chart data returned');
+    if(chart.error) throw new Error('Chart error: '+chart.error);
+    if(!chart.palaces||chart.palaces.length<12) throw new Error('Incomplete chart data');
 
-    // Step 2: Build chart summary for Claude
+    // Step 2: Build palace summary for Claude
     var palaceSummary=chart.palaces.map(function(p){
       var stars=[].concat(p.majorStars,p.minorStars).join(' ');
       return p.stem+p.branch+'【'+p.name+(p.isBodyPalace?' 身宮':'')+' 】大限:'+p.decadeRange+(stars?' '+stars:'');
@@ -308,17 +231,14 @@ async function generate(){
     var lifePalace=chart.palaces.find(function(p){return p.isLifePalace;})||{branch:'?'};
     var bodyPalace=chart.palaces.find(function(p){return p.isBodyPalace;})||{branch:'?'};
 
-    // Step 3: Build prompt with real chart data
+    // Step 3: Call Claude with real chart data
     var prompt=
 'You are a Zi Wei Dou Shu (紫微斗數) expert. Respond entirely in '+responseLang+'.\n\n'+
 'Name: '+(name||'this person')+' | Gender: '+gender+' | Born: '+year+'/'+month+'/'+day+' | Hour: '+hrTxt+'\n'+
-'Lunar date: '+chart.lunarDate+'\n'+
-'Four Pillars: '+chart.chinesePillars+'\n'+
-'Five Elements: '+chart.fiveElements+'\n'+
-'Life Master: '+chart.lifeMaster+' | Body Master: '+chart.bodyMaster+'\n\n'+
-'ACTUAL NATAL CHART (calculated accurately — use these exact star placements, do NOT recalculate):\n'+
-palaceSummary+'\n\n'+
-'Based on these EXACT stars, generate the analysis using these section markers:\n\n'+
+'Lunar: '+chart.lunarDate+' | Pillars: '+chart.chinesePillars+'\n'+
+'Five Elements: '+chart.fiveElements+' | Life Master: '+chart.lifeMaster+' | Body Master: '+chart.bodyMaster+'\n\n'+
+'ACTUAL NATAL CHART (use these exact stars, do NOT recalculate):\n'+palaceSummary+'\n\n'+
+'Use EXACTLY these section markers:\n\n'+
 '===META===\nLunar: '+chart.lunarDate+'\nPillars: '+chart.chinesePillars+'\nLife Palace: '+lifePalace.branch+'\nBody Palace: '+bodyPalace.branch+'\n5-Element: '+chart.fiveElements+'\nLife Master: '+chart.lifeMaster+'\nBody Master: '+chart.bodyMaster+'\n\n'+
 '===PALACES===\n[12 lines: Palace Name | Stem+Branch | Stars & interpretation]\n\n'+
 '===INTRO===\n[2-3 sentence summary using '+pronoun+' pronouns]\n\n'+
@@ -334,10 +254,14 @@ palaceSummary+'\n\n'+
 '===STRENGTH===\n[one line]\n\n'+
 '===CHALLENGE===\n[one line]';
 
-    var data=await callAPI(key,{model:'claude-sonnet-4-5',max_tokens:4000,messages:[{role:'user',content:prompt}]});
+    var res=await fetch('/proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:4000,messages:[{role:'user',content:prompt}]})});
+    var raw=await res.text();
+    if(!raw) throw new Error('Empty response from server');
+    var apiData=JSON.parse(raw);
+    if(apiData.error) throw new Error(apiData.error.message||'API error');
     clearInterval(ticker);
-    var text=data.content&&data.content[0]?data.content[0].text:'';
-    if(!text) throw new Error('No text in response.');
+    var text=apiData.content&&apiData.content[0]?apiData.content[0].text:'';
+    if(!text) throw new Error('No text in response');
     renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart);
 
   } catch(e){
@@ -362,7 +286,7 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
   var h='<div class="prof-hdr"><div class="pname">'+(name?name+' — ':'')+'Natal Chart Profile</div>';
   h+='<div class="psub">'+gender+' · '+month+'/'+day+'/'+year+' · '+hrTxt+' · '+ganzhi+' year</div>';
   h+='<div class="pills">';
-  [['Lunar',chart.lunarDate],['Life Palace',ml['Life Palace']||''],['Body Palace',ml['Body Palace']||''],['5-Element',chart.fiveElements],['Life Master',chart.lifeMaster],['Body Master',chart.bodyMaster]].forEach(function(pair){
+  [['Lunar',chart.lunarDate],['Life Palace',lifePalaceFromChart(chart)],['Body Palace',bodyPalaceFromChart(chart)],['5-Element',chart.fiveElements],['Life Master',chart.lifeMaster],['Body Master',chart.bodyMaster]].forEach(function(pair){
     if(pair[1]) h+='<span class="pill">'+pair[0]+'<b>'+pair[1]+'</b></span>';
   });
   h+='</div></div>';
@@ -381,7 +305,6 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
     arr.forEach(function(b){s+='<li>'+b+'</li>';});
     return s+'</ul></div>';
   }
-
   h+='<div class="g2">'+
     card('Core behavior',bullets(sec(text,'CORE BEHAVIOR')))+
     card('Personality pattern',bullets(sec(text,'PERSONALITY PATTERN')))+
@@ -415,6 +338,14 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
   el.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
+function lifePalaceFromChart(chart){
+  var p=chart.palaces.find(function(p){return p.isLifePalace;});
+  return p?p.stem+p.branch:'';
+}
+function bodyPalaceFromChart(chart){
+  var p=chart.palaces.find(function(p){return p.isBodyPalace;});
+  return p?p.stem+p.branch:'';
+}
 function newGen(){
   document.getElementById('results').className='results';
   document.getElementById('results').innerHTML='';
