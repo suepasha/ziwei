@@ -281,59 +281,83 @@ var NEG_STARS  = ['擎羊','陀羅','火星','鈴星','地空','地劫'];
 var FX_MARKERS = ['化祿','化權','化科','化忌'];
 
 function parseWindadaHTML(html) {
-  // HTML is already UTF-8 decoded by the server — parse directly
   var result = {
     palaces:[],yearStem:'',yearBranch:'',lunarMonth:'',lunarDay:'',
     hourBranch:'',lifePalaceBranch:'',sihua:'',lifeMaster:'',bodyMaster:'',wuxing:''
   };
 
-  // Strip HTML tags and split into lines
-  var lines = html
-    .replace(/<script[\s\S]*?<\/script>/gi, '')
-    .replace(/<style[\s\S]*?<\/style>/gi, '')
-    .split(/[\n\r]/)
-    .map(function(l){ return l.replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&[^;]+;/g,'').replace(/\s+/g,' ').trim(); })
-    .filter(Boolean);
+  // Strip scripts and styles first
+  var clean = html
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ');
 
-  lines.forEach(function(line) {
-    // Palace line: GanZhi【PalaceName】
-    var m = line.match(/([甲乙丙丁戊己庚辛壬癸])([子丑寅卯辰巳午未申酉戌亥])【([^】]+)】/);
-    if(m) {
-      var stem=m[1], branch=m[2], rawName=m[3];
-      var palaceName = rawName.replace(/[-–—]\s*身[宮宫]/g,'').trim();
-      var isBody = rawName.includes('身宮')||rawName.includes('身宫');
-      var dec = (line.match(/大限[：:]([\d\-–]+)/)||[])[1]||'';
-      var afterXL = line.replace(/^.*小限[：:][\d\s]+/,'').trim();
-      var stars = afterXL ? afterXL.split(/[,，]/) : [];
-      var mainStars=[],fxMarkers=[],negStars=[],minorStars=[];
-      stars.forEach(function(s){
-        s=s.trim(); if(!s) return;
-        if(/^(胎|養|長生|沐浴|冠帶|臨官|帝旺|衰|病|死|墓|絕|养|长生|冠带|临官|帝旺|绝)$/.test(s)) return;
-        if(MAIN_STARS.some(function(x){return s.startsWith(x);})) mainStars.push(s);
-        else if(FX_MARKERS.some(function(x){return s.includes(x);})) fxMarkers.push(s);
-        else if(NEG_STARS.some(function(x){return s.startsWith(x);})) negStars.push(s);
-        else minorStars.push(s);
-      });
-      result.palaces.push({stem,branch,palaceName,
-        isLifePalace:palaceName.includes('命宮')||palaceName.includes('命宫'),
-        isBodyPalace:isBody,mainStars,fxMarkers,negStars,minorStars,decadeAge:dec});
-    }
-    // Meta line
-    if(/陽曆|阳历|干支|乾支|農曆|农历/.test(line)) {
-      var gz2=line.match(/干支[：:]([甲乙丙丁戊己庚辛壬癸])([子丑寅卯辰巳午未申酉戌亥])/);
-      if(gz2){result.yearStem=gz2[1];result.yearBranch=gz2[2];}
-      var lm=line.match(/農曆[：:]\s*\d+年\s*(\d+)月(\d+)/)||line.match(/农历[：:]\s*\d+年\s*(\d+)月(\d+)/);
-      if(lm){result.lunarMonth=lm[1];result.lunarDay=lm[2];}
-      var hr=line.match(/([子丑寅卯辰巳午未申酉戌亥])[時时]/);
-      if(hr) result.hourBranch=hr[1];
-      var sh=line.match(/生年四化[：:]([^\s　\n,，]+)/); if(sh) result.sihua=sh[1];
-      var lmm=line.match(/命主[：:]([^,，\s　\n]+)/); if(lmm) result.lifeMaster=lmm[1];
-      var bm=line.match(/身主[：:]([^,，\s　\n]+)/); if(bm) result.bodyMaster=bm[1];
-      var wx=line.match(/五行局[：:]\s*([^\s　\n]+)/); if(wx) result.wuxing=wx[1];
-    }
+  // Convert all HTML tags to spaces — keeps Chinese text intact
+  var text = clean.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&[a-z]+;/g, ' ');
+
+  // Collapse whitespace but keep enough context
+  // Search for palace pattern across the whole text
+  var palaceRe = /([甲乙丙丁戊己庚辛壬癸])\s*([子丑寅卯辰巳午未申酉戌亥])\s*【([^】]{1,30})】([^甲乙丙丁戊己庚辛壬癸]{0,300})/g;
+  var match;
+  while((match = palaceRe.exec(text)) !== null) {
+    var stem = match[1], branch = match[2], rawName = match[3].trim();
+    var rest = match[4].replace(/\s+/g,' ').trim();
+
+    var palaceName = rawName.replace(/[-–—]\s*身[宮宫]/g,'').trim();
+    var isBody = rawName.includes('身宮') || rawName.includes('身宫');
+
+    // Extract decade
+    var decMatch = rest.match(/大限[：:]?\s*([\d\-–]+)/);
+    var dec = decMatch ? decMatch[1] : '';
+
+    // Extract stars — everything after 小限 numbers
+    var afterXL = rest.replace(/大限[：:]?[\d\-–]+/,'').replace(/小限[：:]?[\d\s]+/,'').trim();
+    var stars = afterXL.split(/[,，\s]+/).filter(Boolean);
+
+    var mainStars=[],fxMarkers=[],negStars=[],minorStars=[];
+    stars.forEach(function(s){
+      s = s.trim(); if(!s || s.length < 2) return;
+      if(/^(胎|養|長生|沐浴|冠帶|臨官|帝旺|衰|病|死|墓|絕|养|长生|冠带|临官|帝旺|绝|力士|博士|青龍|小耗|將軍|奏書|飛廉|喜神|病符|大耗|伏兵|官府)$/.test(s)) return;
+      if(MAIN_STARS.some(function(x){return s.startsWith(x);})) mainStars.push(s);
+      else if(FX_MARKERS.some(function(x){return s.includes(x);})) fxMarkers.push(s);
+      else if(NEG_STARS.some(function(x){return s.startsWith(x);})) negStars.push(s);
+      else if(s.length >= 2) minorStars.push(s);
+    });
+
+    result.palaces.push({
+      stem, branch, palaceName,
+      isLifePalace: palaceName.includes('命宮') || palaceName.includes('命宫'),
+      isBodyPalace: isBody,
+      mainStars, fxMarkers, negStars, minorStars, decadeAge: dec
+    });
+  }
+
+  // Extract meta info from full text
+  var metaRe = /干支[：:]([甲乙丙丁戊己庚辛壬癸])([子丑寅卯辰巳午未申酉戌亥])/;
+  var mm = text.match(metaRe);
+  if(mm){result.yearStem=mm[1];result.yearBranch=mm[2];}
+
+  var lm = text.match(/農曆[：:]\s*\d+年\s*(\d+)月(\d+)/) || text.match(/农历[：:]\s*\d+年\s*(\d+)月(\d+)/);
+  if(lm){result.lunarMonth=lm[1];result.lunarDay=lm[2];}
+
+  var hr = text.match(/([子丑寅卯辰巳午未申酉戌亥])[時时]/);
+  if(hr) result.hourBranch = hr[1];
+
+  var sh = text.match(/生年四化[：:]([^\s　,，\n<]{2,30})/);
+  if(sh) result.sihua = sh[1];
+
+  var lmm = text.match(/命主[：:]([^\s,，　\n<]{2,10})/);
+  if(lmm) result.lifeMaster = lmm[1];
+
+  var bm = text.match(/身主[：:]([^\s,，　\n<]{2,10})/);
+  if(bm) result.bodyMaster = bm[1];
+
+  var wx = text.match(/五行局[：:]\s*([^\s　\n<,，]{2,20})/);
+  if(wx) result.wuxing = wx[1];
+
+  result.palaces.forEach(function(p){
+    if(p.isLifePalace) result.lifePalaceBranch = p.branch;
   });
 
-  result.palaces.forEach(function(p){if(p.isLifePalace) result.lifePalaceBranch=p.branch;});
   return result;
 }
 
@@ -377,9 +401,8 @@ async function generate(){
       chartData = parseWindadaHTML(windadaJson.html);
     }
 
-    if(!chartData || chartData.palaces.length < 10) {
-      // Windada fetch failed — show error with fallback message
-      throw new Error('Could not fetch chart from Windada. Please try again.');
+    if(!chartData || chartData.palaces.length < 5) {
+      throw new Error('Could not parse chart data (found ' + (chartData ? chartData.palaces.length : 0) + ' palaces). Please try again.');
     }
 
     // ── Step 2: Build chart summary from real data ──
