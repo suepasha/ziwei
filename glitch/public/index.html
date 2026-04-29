@@ -355,15 +355,16 @@ async function generate(){
 '[5-6 bullets. Each derived from a different part of the chart. Cover: how she acts, how she processes internally, how she decides, her energy rhythms, how she connects with others, how she handles pressure or change. Each bullet is one clear observation. Nothing repeated from the palaces above. Nothing that sounds like a horoscope — it sounds like someone who knows her.]\n'+
 '• \n• \n• \n• \n• \n• \n\n'+
 '===CYCLES===\n'+
-'[For each decade: write 2 sentences. First sentence: what specifically happens in this window based on the actual decade stars — what energy is active, what area of life is lit up. Second sentence: what this means for her specifically — what she builds, struggles with, releases, or discovers in this window. Be personal and chart-specific, not generic.]\n'+
-'3-12 | Early Formation | [2 sentences]\n'+
-'13-22 | Exploration | [2 sentences]\n'+
-'23-32 | Acceleration | [2 sentences]\n'+
-'33-42 | Structuring | [2 sentences]\n'+
-'43-52 | Peak Output | [2 sentences]\n'+
-'53-62 | Selection | [2 sentences]\n'+
-'63-72 | Stabilization | [2 sentences]\n'+
-'73-82 | Maintenance | [2 sentences]\n\n'+
+'[IMPORTANT: Put both sentences on ONE line after the | character. Do not use line breaks within a decade entry.]\n'+
+'[For each decade: Sentence 1 — what energy/stars are active and what life area is lit up. Sentence 2 — what this means for her specifically: what she builds, faces, releases or discovers. Personal and chart-specific.]\n'+
+'3-12 | Early Formation | [Sentence 1. Sentence 2.]\n'+
+'13-22 | Exploration | [Sentence 1. Sentence 2.]\n'+
+'23-32 | Acceleration | [Sentence 1. Sentence 2.]\n'+
+'33-42 | Structuring | [Sentence 1. Sentence 2.]\n'+
+'43-52 | Peak Output | [Sentence 1. Sentence 2.]\n'+
+'53-62 | Selection | [Sentence 1. Sentence 2.]\n'+
+'63-72 | Stabilization | [Sentence 1. Sentence 2.]\n'+
+'73-82 | Maintenance | [Sentence 1. Sentence 2.]\n\n'+
 '===SUMMARY===\n'+
 (name||'She')+' is someone who:\n'+
 '• [The single most essential truth this chart reveals — specific, personal, not generic]\n'+
@@ -398,15 +399,16 @@ async function generate(){
 '[5-6點。每點從不同星曜或宮位推導。涵蓋：行為模式、內在處理方式、決策風格、能量節奏、關係模式、面對壓力或變化的方式。每點清晰獨立，不重複十二宮內容，不像命理套語，像是真正了解她的人說的話。]\n'+
 '• \n• \n• \n• \n• \n• \n\n'+
 '===CYCLES===\n'+
-'[每個大限寫2句話。第一句：從實際大限主星說明這個時期的能量與主要人生面向被點亮的是什麼。第二句：這對她具體意味著什麼——她在這個時期建立什麼、面對什麼張力、釋放什麼或發現什麼。從命盤推導，不套用一般說法。]\n'+
-'3-12 | 成形期 | [2句]\n'+
-'13-22 | 探索期 | [2句]\n'+
-'23-32 | 加速期 | [2句]\n'+
-'33-42 | 架構期 | [2句]\n'+
-'43-52 | 高峰期 | [2句]\n'+
-'53-62 | 篩選期 | [2句]\n'+
-'63-72 | 穩定期 | [2句]\n'+
-'73-82 | 沉澱期 | [2句]\n\n'+
+'[重要：每個大限的兩句話必須寫在同一行，不要換行。]\n'+
+'[每個大限2句話。第一句：從實際大限主星說明這個時期的能量與被點亮的人生面向。第二句：這對她具體意味著什麼——建立什麼、面對什麼、釋放什麼或發現什麼。從命盤推導，不套用。]\n'+
+'3-12 | 成形期 | [第一句。第二句。]\n'+
+'13-22 | 探索期 | [第一句。第二句。]\n'+
+'23-32 | 加速期 | [第一句。第二句。]\n'+
+'33-42 | 架構期 | [第一句。第二句。]\n'+
+'43-52 | 高峰期 | [第一句。第二句。]\n'+
+'53-62 | 篩選期 | [第一句。第二句。]\n'+
+'63-72 | 穩定期 | [第一句。第二句。]\n'+
+'73-82 | 沉澱期 | [第一句。第二句。]\n\n'+
 '===SUMMARY===\n'+
 (name||'她')+'的特質：\n'+
 '• [這張命盤最核心的一個真相——具體、個人、不套用]\n'+
@@ -616,7 +618,13 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
   // ── LIFE CYCLES ──
   if(cycRows.length){
     h+='<div class="scard-full"><div class="sh">'+(LANG==='zh'?'大限流年':'Life Cycles')+'</div><div class="cycles">';
-    cycRows.forEach(function(cyc){h+='<div class="cyc"><div class="cy-lbl">'+cyc.range+' · '+cyc.phase+'</div><div class="cy-txt">'+cyc.text+'</div></div>';});
+    cycRows.forEach(function(cyc){
+      var sentences = cyc.text.split(/(?<=[.。])\s+/).filter(Boolean);
+      var textHtml = sentences.length > 1
+        ? sentences.map(function(s){return '<span style="display:block;margin-bottom:3px">'+s+'</span>';}).join('')
+        : cyc.text;
+      h+='<div class="cyc"><div class="cy-lbl">'+cyc.range+' · '+cyc.phase+'</div><div class="cy-txt">'+textHtml+'</div></div>';
+    });
     h+='</div></div>';
   }
 
