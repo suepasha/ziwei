@@ -328,17 +328,38 @@ async function generate(){
     // Step 3: Call Claude with real chart data
     var enInstructions =
 'You are a Zi Wei Dou Shu expert writing for a modern English-speaking audience who is curious but unfamiliar with Chinese astrology.\n\n'+
-'Star brightness levels: 廟/旺=peak power, 得/利=strong, 平=moderate, 陷=weakened. Let brightness shape HOW STRONGLY each quality shows up.\n\n'+
-'ENGLISH WRITING RULES:\n'+
-'- Write like a sharp, warm life coach who deeply understands human behavior\n'+
-'- Every sentence should feel personally true — something the person would nod at\n'+
-'- Be specific and concrete, not vague. NOT "she is driven" but "she sets a goal and does not stop until it is done, even when others have given up"\n'+
-'- For the 12 palace analysis: each palace is a life area. Describe what actually plays out in that area of their life — what they experience, how they behave, what challenges or gifts show up\n'+
-'- You MAY briefly name the Chinese star in parentheses for reference, but always lead with what it MEANS in real life\n'+
-'- Avoid generic astrology language. No "the stars indicate". Say what IS true about this person\n'+
-'- Use second-person-style phrasing in the profile sections: "She tends to...", "Her instinct is to...", "When under pressure, she..."\n\n'+
-'PALACE ANALYSIS FORMAT (one paragraph per palace, 2-3 sentences):\n'+
-'Lead with the life area name in plain English, then describe what this person actually experiences there. Be warm, direct, and specific.\n\n';
+'Star brightness levels: 廟/旺=peak power, 得/利=strong, 平=moderate, 陷=weakened. Use these to calibrate intensity.\n\n'+
+'CRITICAL ENGLISH RULES — strictly follow all of these:\n'+
+'- ZERO raw Chinese characters in the analysis text. No 廉貞, no 七殺, no 化忌, nothing. Fully translate everything.\n'+
+'- When referencing a star, use ONLY the English name in parentheses. Example: (Great Gate star, weakened) NOT 巨門陷\n'+
+'- Write like a sharp, warm life coach — specific, personal, behavioral\n'+
+'- Every sentence should feel true to this person — something they would nod at\n'+
+'- No "the stars indicate" or "this palace shows" — say what IS true\n'+
+'- Use: "She tends to...", "Her instinct is to...", "When under pressure, she..."\n\n'+
+'STRUCTURE — use EXACTLY this order of sections:\n\n'+
+'===META=== (chart data, no change)\n\n'+
+'===OVERALL LIFE STRUCTURE===\n'+
+'[Write 4-6 sentences describing the overarching shape of this person\'s life path — their fundamental orientation, how they move through the world, what drives them at the deepest level. This is NOT a list. It is a flowing narrative paragraph. Then add 3-5 bullet points like:\n'+
+'Life is shaped by:\n'+
+'• [one word or short phrase]\n'+
+'• [one word or short phrase]\n'+
+'• etc.]\n\n'+
+'===PALACES===\n'+
+'[12 paragraphs. Format each as:\n'+
+'"**[Palace English name]** — [1-2 sentences describing what plays out in this life area. Use ONLY English. Reference stars by English name in parentheses only if it adds meaning. Be warm and specific.]"\n'+
+'Example: "**Children** — This area carries tension and miscommunication (Great Gate star in weakened state with a negative transformation). High expectations on both sides create friction; the gift is that she takes their growth seriously."]\n\n'+
+'===INTRO===\n[2-3 sentence overall behavioral summary — NO Chinese]\n\n'+
+'===CORE BEHAVIOR===\n• point\n• point\n• point\n\n'+
+'===PERSONALITY PATTERN===\n• point\n• point\n• point\n• point\n\n'+
+'===WORK BEHAVIOR===\n• point\n• point\n• point\n\n'+
+'===FINANCIAL BEHAVIOR===\n• point\n• point\n• point\n\n'+
+'===RELATIONSHIP BEHAVIOR===\n• point\n• point\n• point\n\n'+
+'===ENERGY PATTERN===\n• point\n• point\n• point\n\n'+
+'===DECISION STYLE===\n• point\n• point\n• point\n\n'+
+'===CYCLES===\n3-12 | Formation | [2 sentences — NO Chinese]\n13-22 | Exploration | [2 sentences]\n23-32 | Acceleration | [2 sentences]\n33-42 | Structuring | [2 sentences]\n43-52 | Peak Output | [2 sentences]\n53-62 | Selection | [2 sentences]\n63-72 | Stabilization | [2 sentences]\n73-82 | Maintenance | [2 sentences]\n\n'+
+'===SUMMARY===\n• point\n• point\n• point\n• point\n\n'+
+'===STRENGTH===\n[one line — NO Chinese]\n\n'+
+'===CHALLENGE===\n[one line — NO Chinese]\n\n';
 
     var zhInstructions =
 '你是一位紫微斗數專家，請以繁體中文撰寫完整的命盤分析。\n\n'+
@@ -559,6 +580,30 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
         para=para.replace(/^\*\*([^*]+)\*\*/, '<span class="pal-name">$1</span>');
         h+='<div class="pal-para">'+para+'</div>';
       });
+      h+='</div>';
+    }
+  }
+
+  // Overall Life Structure (English only)
+  if(LANG==='en') {
+    var ols = sec(text,'OVERALL LIFE STRUCTURE');
+    if(ols) {
+      h+='<div class="scard-full" style="margin-bottom:10px">';
+      h+='<div class="sh">Overall Life Structure</div>';
+      // Split into narrative and bullets
+      var olsParts = ols.split(/\n(?=•|Life is shaped)/);
+      var narrative = olsParts[0].trim();
+      var bullets = olsParts.slice(1);
+      if(narrative) h+='<p style="font-size:13px;color:var(--cream2);line-height:1.8;margin-bottom:10px">'+narrative+'</p>';
+      if(bullets.length) {
+        h+='<ul class="blist">';
+        ols.split('\n').forEach(function(line){
+          line=line.replace(/^•\s*/,'').trim();
+          if(line && line!==narrative && !line.startsWith('Life is shaped')) h+='<li>'+line+'</li>';
+          if(line.startsWith('Life is shaped')) h+='<div style="font-size:12px;font-weight:500;color:var(--gold);margin:6px 0 4px">'+line+'</div>';
+        });
+        h+='</ul>';
+      }
       h+='</div>';
     }
   }
