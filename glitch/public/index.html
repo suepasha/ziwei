@@ -346,7 +346,7 @@ async function generate(){
 'Lunar: '+chart.lunarDate+'\nLife Palace: '+lifePalace.branch+'\nBody Palace: '+bodyPalace.branch+'\n5-Element: '+chart.fiveElements+'\n\n'+
 '===LIFE PORTRAIT===\n'+
 '[One paragraph, 4-5 sentences. Derived from Life Palace stars and overall chart. Open with her core nature — what actually drives her. Move into the pattern her life keeps returning to. Close with one thing true about her that most people never see. Write it so she reads it and feels seen, not analyzed.]\n'+
-'Life is shaped by:\n• [one specific force this chart shows — not generic]\n• [one specific force]\n• [one specific force]\n• [one specific force]\n\n'+
+
 '===PALACES===\n'+
 '[12 paragraphs. Order: Life · Siblings · Spouse\/Partner · Children · Wealth · Health · Travel & Change · Friends & Network · Career · Home · Inner Life · Parents\n'+
 'Format: **[Name]** — [2-3 sentences. What do the actual stars in this palace mean for this person? If weakened or challenged stars are present, name what actually happens there — the real friction, the recurring difficulty. If strong stars, name the real gift or pattern. Write it so the person recognizes their own life in it.]\n'+
@@ -369,7 +369,8 @@ async function generate(){
 (name||'She')+' is someone who:\n'+
 '• [The single most essential truth this chart reveals — specific, personal, not generic]\n'+
 '• [A second truth about a different dimension of who she is]\n'+
-'• [A third truth — something that captures both her gift and her friction in one honest line]';
+'• [A third truth — something that captures both her gift and her friction in one honest line]\n\n'+
+'Life is shaped by:\n• [one specific force from this chart — not generic]\n• [one specific force]\n• [one specific force]\n• [one specific force]';
 
     } else {
       prompt =
@@ -390,7 +391,7 @@ async function generate(){
 '農曆：'+chart.lunarDate+'\n干支：'+chart.chinesePillars+'\n命宮：'+lifePalace.branch+'\n身宮：'+bodyPalace.branch+'\n五行局：'+chart.fiveElements+'\n命主：'+chart.lifeMaster+'\n身主：'+chart.bodyMaster+'\n\n'+
 '===LIFE PORTRAIT===\n'+
 '[4-5句人物畫像。從命宮主星與整體命盤推導。第一句說她的核心本質——真正驅動她的力量。第二三句說她人生反覆呈現的模式。最後一句說旁人看不到、但她自己深知的那一面。讓她讀了覺得被看見，不是被分析。]\n'+
-'人生的基調：\n• [從命盤推導的具體力量或模式，不是套語]\n• [從命盤推導]\n• [從命盤推導]\n• [從命盤推導]\n\n'+
+
 '===PALACES===\n'+
 '[12段。順序：命宮·兄弟·夫妻·子女·財帛·疾厄·遷移·僕役·官祿·田宅·福德·父母\n'+
 '格式：**[宮位名]** — [2-3句。引用主星與亮度。若有化忌、陷落或煞星，直接說明這個人在這個人生面向的實際困難或張力。若星曜強旺，說明實際帶來的能力或機遇。讓人讀了認出自己的人生。]\n'+
@@ -413,7 +414,8 @@ async function generate(){
 (name||'她')+'的特質：\n'+
 '• [這張命盤最核心的一個真相——具體、個人、不套用]\n'+
 '• [第二個真相，不同面向]\n'+
-'• [第三個真相——同時包含她的天賦與她的摩擦，誠實而有力的一句話]';
+'• [第三個真相——同時包含她的天賦與她的摩擦，誠實而有力的一句話]\n\n'+
+'人生的基調：\n• [從命盤推導的具體力量，不是套語]\n• [從命盤推導]\n• [從命盤推導]\n• [從命盤推導]';
     }
 
         var res=await fetch('/proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:6000,messages:[{role:'user',content:prompt}]})});
@@ -629,10 +631,27 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
   }
 
   // ── FINAL SUMMARY ──
-  var summaryItems=bullets(sec(text,'SUMMARY')).filter(function(b){
-    return b.toLowerCase().indexOf('is someone who')<0&&b.indexOf('的特質')<0;
+  var summaryRaw = sec(text,'SUMMARY');
+  var summaryLines = summaryRaw.split('\n');
+  var summaryItems = [], shapedSubhead = '', shapedItems = [], inShaped = false;
+  summaryLines.forEach(function(l){
+    l = l.trim(); if(!l) return;
+    var isBullet = l.charCodeAt(0)===8226 || l.charAt(0)==='-';
+    var isSubhead = l.toLowerCase().indexOf('life is shaped')>-1 || l.indexOf('人生的基調')>-1;
+    var isSkip = l.toLowerCase().indexOf('is someone who')>-1 || l.indexOf('的特質')>-1;
+    if(isSkip) return;
+    if(isSubhead){ inShaped=true; shapedSubhead=l; }
+    else if(isBullet && inShaped){ shapedItems.push(l.replace(/^[•\-]\s*/,'')); }
+    else if(isBullet && !inShaped){ summaryItems.push(l.replace(/^[•\-]\s*/,'')); }
   });
   h+='<div class="scard-full">';
+  if(shapedSubhead||shapedItems.length){
+    if(shapedSubhead) h+='<div style="font-size:11px;font-weight:500;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">'+shapedSubhead+'</div>';
+    h+='<ul class="blist">';
+    shapedItems.forEach(function(b){h+='<li>'+b+'</li>';});
+    h+='</ul>';
+    h+='<div style="margin:14px 0 8px;border-top:1px solid var(--border)"></div>';
+  }
   h+='<div class="sh">'+(LANG==='zh'?'總結 — '+(name||'她')+'的特質':'Final Summary — '+(name||'this person')+' is someone who')+'</div>';
   h+='<ul class="blist">';
   summaryItems.forEach(function(b){h+='<li>'+b+'</li>';});
