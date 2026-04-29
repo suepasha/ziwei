@@ -91,6 +91,7 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
 .mp-cell{border:1px solid #c8b8a8;padding:6px;min-height:120px;background:#f0ece8;vertical-align:top;position:relative}
 .mp-cell.life{background:#c8a898}
 .mp-cell.sanfang{background:#dde8dc}
+.mp-cell.body{background:#dce4ee}
 .mp-cell.center{background:#faf8f5;display:flex;flex-direction:column;justify-content:center;padding:10px 14px;font-size:12px;line-height:1.9;color:#222}
 .mp-gz{color:#222;font-size:11px;font-weight:500;margin-bottom:1px}
 .mp-name{color:#00c;font-size:12px;font-weight:700;text-decoration:underline;margin-bottom:2px}
@@ -538,7 +539,8 @@ function buildMingpan() {
       chart.palaces.forEach(function(pl){if(pl.isLifePalace) lifeBranch=pl.branch;});
       var sanfangBranches = SANFANG_MAP[lifeBranch]||[];
       var sanfang = sanfangBranches.indexOf(p.branch)>-1;
-      var cls = 'mp-cell'+(isLife?' life':(sanfang?' sanfang':''));
+      var isBodyPal = p.isBodyPalace && !isLife;
+      var cls = 'mp-cell'+(isLife?' life':(isBodyPal?' body':(sanfang?' sanfang':'')));
       var decRange = p.decadeRange?p.decadeRange.toString().replace(',','-'):'';
       var gz = p.stem+p.branch;
       // small limits base
