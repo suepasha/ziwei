@@ -273,16 +273,35 @@ async function generate(){
     var bodyPalace=chart.palaces.find(function(p){return p.isBodyPalace;})||{branch:'?'};
 
     // Step 3: Call Claude with real chart data
-    var prompt=
-'You are a Zi Wei Dou Shu (紫微斗數) expert. Respond entirely in '+responseLang+'.\n\n'+
+    var enInstructions =
+'You are a Zi Wei Dou Shu expert translating an ancient Chinese astrological chart into modern English behavioral psychology.\n\n'+
+'IMPORTANT — English audience rules:\n'+
+'- NEVER use raw Chinese star names alone (廉貞, 七殺, etc.) in the analysis text — always translate to behavioral meaning\n'+
+'- Describe what each star MEANS in plain English: behavior, personality, tendencies, patterns\n'+
+'- Use modern relatable language: "driven by ambition", "struggles with trust", "thrives under pressure"\n'+
+'- You may briefly reference the star name in the palace overview column only\n'+
+'- Write like a psychologist or executive coach, not an astrologer\n'+
+'- Make every point feel like something the person would recognize about themselves\n\n';
+
+    var zhInstructions =
+'你是一位紫微斗數專家，請以繁體中文撰寫完整的命盤分析。\n\n'+
+'使用正統紫微斗數術語，引用星曜特質、四化、宮位交互關係。\n'+
+'分析應深入、具體，讓熟悉命理的讀者能充分理解。\n\n';
+
+    var sharedChart =
 'Name: '+(name||'this person')+' | Gender: '+gender+' | Born: '+year+'/'+month+'/'+day+' | Hour: '+hrTxt+'\n'+
 'Lunar: '+chart.lunarDate+' | Pillars: '+chart.chinesePillars+'\n'+
 'Five Elements: '+chart.fiveElements+' | Life Master: '+chart.lifeMaster+' | Body Master: '+chart.bodyMaster+'\n\n'+
-'ACTUAL NATAL CHART (use these exact stars, do NOT recalculate):\n'+palaceSummary+'\n\n'+
+'NATAL CHART (use these exact star placements, do NOT recalculate):\n'+palaceSummary+'\n\n';
+
+    var enPalaceNote = '[12 lines. Format: Life Area | Key theme in plain English — e.g. "Life Palace | Decisive and intense — a natural leader who acts on instinct and holds firm under pressure"]';
+    var zhPalaceNote = '[12行，格式：宮位名 | 干支 | 主要星曜與解析]';
+
+    var prompt = (LANG==='en' ? enInstructions : zhInstructions) + sharedChart +
 'Use EXACTLY these section markers:\n\n'+
 '===META===\nLunar: '+chart.lunarDate+'\nPillars: '+chart.chinesePillars+'\nLife Palace: '+lifePalace.branch+'\nBody Palace: '+bodyPalace.branch+'\n5-Element: '+chart.fiveElements+'\nLife Master: '+chart.lifeMaster+'\nBody Master: '+chart.bodyMaster+'\n\n'+
-'===PALACES===\n[12 lines: Palace Name | Stem+Branch | Stars & interpretation]\n\n'+
-'===INTRO===\n[2-3 sentence summary using '+pronoun+' pronouns]\n\n'+
+'===PALACES===\n'+(LANG==='en'?enPalaceNote:zhPalaceNote)+'\n\n'+
+'===INTRO===\n'+(LANG==='en'?'[2-3 sentences in plain English — describe who this person is in behavioral terms, no star names]':'[2-3句總結，使用命理術語]')+'\n\n'+
 '===CORE BEHAVIOR===\n• point\n• point\n• point\n\n'+
 '===PERSONALITY PATTERN===\n• point\n• point\n• point\n• point\n\n'+
 '===WORK BEHAVIOR===\n• point\n• point\n• point\n\n'+
