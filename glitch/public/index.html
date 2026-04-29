@@ -84,6 +84,28 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
 .btn-new{width:100%;padding:12px;background:none;border:1px solid var(--border2);border-radius:8px;color:var(--cream2);font-family:'Jost',sans-serif;font-size:14px;cursor:pointer;margin-top:1.5rem;transition:.2s}
 .btn-new:hover{border-color:var(--gold);color:var(--gold)}
 @media(max-width:580px){.grid3{grid-template-columns:1fr 1fr}.g2,.sfgrid{grid-template-columns:1fr}.main{padding:1.5rem 1rem}}
+
+.mingpan-wrap{margin-bottom:1.5rem}
+.mingpan-btn{width:100%;padding:10px;background:none;border:1.5px solid var(--border2);border-radius:8px;color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:17px;cursor:pointer;margin-bottom:10px;transition:.2s}
+.mingpan-btn:hover{background:var(--ink3)}
+.mp-grid{display:grid;grid-template-columns:repeat(4,1fr);border:2px solid #888;font-size:11px;background:#fff;display:none}
+.mp-grid.show{display:grid}
+.mp-cell{border:1px solid #aaa;padding:6px;min-height:120px;background:#d4e84a;vertical-align:top;position:relative}
+.mp-cell.life{background:#f0a830}
+.mp-cell.body{background:#d4e84a}
+.mp-cell.center{background:#f5f5f5;display:flex;flex-direction:column;justify-content:center;padding:10px 14px;font-size:12px;line-height:1.9;color:#222}
+.mp-gz{color:#222;font-size:11px;font-weight:500;margin-bottom:1px}
+.mp-name{color:#00c;font-size:12px;font-weight:700;text-decoration:underline;margin-bottom:2px}
+.mp-decade{color:#00c;font-size:11px;margin-bottom:1px}
+.mp-xlimit{color:#00c;font-size:10px;margin-bottom:4px}
+.mp-stars{font-size:11px;line-height:1.6;color:#c00}
+.mp-stars .bl{color:#00a}
+.mp-stars .bk{color:#222}
+.mp-stars .rd{color:#c00}
+.mp-stars .fx-lu{color:#c00;background:#ffd;padding:0 2px}
+.mp-stars .fx-ke{color:#00a;background:#ddf;padding:0 2px}
+.mp-stars .fx-ji{color:#c00;border:1px solid #c00;padding:0 2px}
+.mp-stars .fx-qu{color:#c00;padding:0 2px}
 </style>
 </head>
 <body>
@@ -375,10 +397,122 @@ async function generate(){
   document.getElementById('btn-gen').disabled=false;
 }
 
+
+function toggleMingpan() {
+  var grid = document.getElementById('mp-grid');
+  if(!grid) return;
+  if(grid.classList.contains('show')) {
+    grid.classList.remove('show');
+    document.querySelector('.mingpan-btn').textContent = '命盤 ▸';
+    return;
+  }
+  grid.innerHTML = buildMingpan();
+  grid.classList.add('show');
+  document.querySelector('.mingpan-btn').textContent = '命盤 ▴ (收起)';
+}
+
+var _lastChart = null;
+var _lastName = '';
+
+function buildMingpan() {
+  var chart = _lastChart;
+  if(!chart) return '<div style="padding:1rem">無命盤資料</div>';
+
+  // Branch to grid position mapping
+  var POS = {
+    '巳':[0,0],'午':[0,1],'未':[0,2],'申':[0,3],
+    '辰':[1,0],            '酉':[1,3],
+    '卯':[2,0],            '戌':[2,3],
+    '寅':[3,0],'丑':[3,1],'子':[3,2],'亥':[3,3]
+  };
+
+  // Small limit base by branch (traditional ZWDS 陰女命)
+  var XLIMIT_BASE = {
+    '癸丑':1,'壬子':2,'辛亥':3,'庚戌':4,'己酉':5,'戊申':6,
+    '丁未':7,'丙午':8,'乙巳':9,'甲辰':10,'癸卯':11,'壬寅':12
+  };
+
+  var brMap = {};
+  chart.palaces.forEach(function(p){ brMap[p.branch] = p; });
+
+  function xlimits(stem, branch, base) {
+    var nums = [];
+    for(var i=0;i<8;i++) nums.push(base + i*12);
+    return nums.slice(0,8).join(' ');
+  }
+
+  function starHtml(s) {
+    var n = s.name;
+    var b = s.brightness || '';
+    var m = s.mutagen || '';
+    var mTag = '';
+    if(m==='祿') mTag='<span class="fx-lu">祿</span>';
+    else if(m==='科') mTag='<span class="fx-ke">科</span>';
+    else if(m==='忌') mTag='<span class="fx-ji">忌</span>';
+    else if(m==='權') mTag='<span class="fx-qu">權</span>';
+    var cls = 'rd';
+    if(['左輔','右弼','文昌','文曲','天魁','天鉞','祿存','天馬'].indexOf(n)>-1) cls='bl';
+    if(['擎羊','陀羅','火星','鈴星','地空','地劫'].indexOf(n)>-1) cls='bk';
+    return '<span class="'+cls+'">'+n+(b?b:'')+mTag+'</span>';
+  }
+
+  // Build 4x4 grid as array
+  var cells = [];
+  for(var r=0;r<4;r++){cells.push([null,null,null,null]);}
+  chart.palaces.forEach(function(p){
+    var pos = POS[p.branch];
+    if(pos) cells[pos[0]][pos[1]] = p;
+  });
+
+  var h = '';
+  for(var row=0;row<4;row++){
+    for(var col=0;col<4;col++){
+      // Center 2x2
+      if((row===1||row===2)&&(col===1||col===2)){
+        if(row===1&&col===1){
+          h+='<div class="mp-cell center" style="grid-column:2/4;grid-row:2/4">';
+          h+='<div>陽曆：'+_lastName+'</div>';
+          h+='<div>農曆：'+chart.lunarDate+'</div>';
+          h+='<div>干支：'+chart.chinesePillars+'</div>';
+          h+='<div>五行局: '+chart.fiveElements+'</div>';
+          h+='<div>生年四化：天同化權,天機化科,太陰化祿,巨門化忌</div>';
+          h+='<div>命主:'+chart.lifeMaster+', 身主:'+chart.bodyMaster+'</div>';
+          h+='</div>';
+        }
+        continue;
+      }
+      var p = cells[row][col];
+      if(!p){h+='<div class="mp-cell"></div>';continue;}
+      var isLife = p.name==='命宮';
+      var isBody = p.isBodyPalace;
+      var cls = 'mp-cell'+(isLife?' life':'');
+      var decRange = p.decadeRange?p.decadeRange.toString().replace(',','-'):'';
+      var gz = p.stem+p.branch;
+      // small limits base
+      var xlBase = 1;
+      Object.keys(XLIMIT_BASE).forEach(function(k){if(k===gz) xlBase=XLIMIT_BASE[k];});
+      var xlArr=[];for(var i=0;i<8;i++) xlArr.push(xlBase+i*12);
+      h+='<div class="'+cls+'">';
+      h+='<div class="mp-gz">'+gz+'</div>';
+      h+='<div class="mp-name">【'+(isBody&&!isLife?p.name+'-身宮':p.name)+'】</div>';
+      h+='<div class="mp-decade">大限:'+decRange+'</div>';
+      h+='<div class="mp-xlimit">小限:'+xlArr.slice(0,8).join(' ')+'</div>';
+      h+='<div class="mp-stars">';
+      p.majorStars.forEach(function(s){h+=starHtml(s)+',';});
+      p.minorStars.forEach(function(s){h+=starHtml(s)+',';});
+      h=h.replace(/,$/,'');
+      h+='</div></div>';
+    }
+  }
+  return h;
+}
+
 function sec(t,tag){var m=t.match(new RegExp('==='+tag+'===\\n([\\s\\S]*?)(?====|$)'));return m?m[1].trim():'';}
 function bullets(r){return r.split('\n').map(function(l){return l.replace(/^[•·\-]\s*/,'').trim();}).filter(Boolean);}
 
 function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
+  _lastChart=chart;
+  _lastName=year+'年'+month+'月'+day+'日'+hrTxt+' 陰'+(gender==='Female'?'女':'男');
   var ml={};
   sec(text,'META').split('\n').forEach(function(l){var c=l.indexOf(':');if(c>-1)ml[l.slice(0,c).trim()]=l.slice(c+1).trim();});
   var palRows=sec(text,'PALACES').split('\n').filter(Boolean).map(function(l){var p=l.split('|');return p.length>=3?{palace:p[0].trim(),branch:p[1].trim(),stars:p[2].trim()}:null;}).filter(Boolean);
@@ -397,6 +531,14 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
     h+='<span class="pill">命主<b>'+chart.lifeMaster+'</b> &nbsp;·&nbsp; 身主<b>'+chart.bodyMaster+'</b></span>';
   }
   h+='</div></div>';
+
+  // 命盤 button (Chinese only)
+  if(LANG==='zh') {
+    h+='<div class="mingpan-wrap">';
+    h+='<button class="mingpan-btn" onclick="toggleMingpan()">命盤 ▸</button>';
+    h+='<div class="mp-grid" id="mp-grid"></div>';
+    h+='</div>';
+  }
 
   // 12 palace section
   var palacesRaw = sec(text,'PALACES');
