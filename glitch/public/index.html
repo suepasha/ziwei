@@ -291,7 +291,7 @@ async function generate(){
     var sharedChart =
 'Name: '+(name||'this person')+' | Gender: '+gender+' | Born: '+year+'/'+month+'/'+day+' | Hour: '+hrTxt+'\n'+
 'Lunar: '+chart.lunarDate+' | Pillars: '+chart.chinesePillars+'\n'+
-'Five Elements: '+chart.fiveElements+' | Life Master: '+chart.lifeMaster+' | Body Master: '+chart.bodyMaster+'\n\n'+
+(LANG==='en' ? 'Five Elements: '+chart.fiveElements+'\n\n' : 'Five Elements: '+chart.fiveElements+' | Life Master: '+chart.lifeMaster+' | Body Master: '+chart.bodyMaster+'\n\n')+
 'NATAL CHART (use these exact star placements, do NOT recalculate):\n'+palaceSummary+'\n\n';
 
     var enPalaceNote = '[12 lines. Format: Life Area | Key theme in plain English — e.g. "Life Palace | Decisive and intense — a natural leader who acts on instinct and holds firm under pressure"]';
@@ -299,7 +299,7 @@ async function generate(){
 
     var prompt = (LANG==='en' ? enInstructions : zhInstructions) + sharedChart +
 'Use EXACTLY these section markers:\n\n'+
-'===META===\nLunar: '+chart.lunarDate+'\nPillars: '+chart.chinesePillars+'\nLife Palace: '+lifePalace.branch+'\nBody Palace: '+bodyPalace.branch+'\n5-Element: '+chart.fiveElements+'\nLife Master: '+chart.lifeMaster+'\nBody Master: '+chart.bodyMaster+'\n\n'+
+(LANG==='en' ? '===META===\nLunar: '+chart.lunarDate+'\nLife Palace: '+lifePalace.branch+'\nBody Palace: '+bodyPalace.branch+'\n5-Element: '+chart.fiveElements+'\n\n' : '===META===\nLunar: '+chart.lunarDate+'\nPillars: '+chart.chinesePillars+'\nLife Palace: '+lifePalace.branch+'\nBody Palace: '+bodyPalace.branch+'\n5-Element: '+chart.fiveElements+'\nLife Master: '+chart.lifeMaster+'\nBody Master: '+chart.bodyMaster+'\n\n')+
 '===PALACES===\n'+(LANG==='en'?enPalaceNote:zhPalaceNote)+'\n\n'+
 '===INTRO===\n'+(LANG==='en'?'[2-3 sentences in plain English — describe who this person is in behavioral terms, no star names]':'[2-3句總結，使用命理術語]')+'\n\n'+
 '===CORE BEHAVIOR===\n• point\n• point\n• point\n\n'+
@@ -352,11 +352,9 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
     if (LANG !== 'en') return zh;
     return masterEN[zh] ? masterEN[zh] : zh;
   }
-  var lifeLabel = LANG==='en' ? 'Life Master' : '命主';
-  var bodyLabel = LANG==='en' ? 'Body Master' : '身主';
-  [[lifeLabel, masterVal(chart.lifeMaster)],[bodyLabel, masterVal(chart.bodyMaster)]].forEach(function(pair){
-    if(pair[1]) h+='<span class="pill">'+pair[0]+'<b>'+pair[1]+'</b></span>';
-  });
+  if(LANG !== 'en' && chart.lifeMaster && chart.bodyMaster) {
+    h+='<span class="pill">命主<b>'+chart.lifeMaster+'</b> &nbsp;·&nbsp; 身主<b>'+chart.bodyMaster+'</b></span>';
+  }
   h+='</div></div>';
 
   if(palRows.length){
