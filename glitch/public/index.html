@@ -52,7 +52,7 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
 .pal-tbl{width:100%;border-collapse:collapse;font-size:13px;background:var(--ink2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:1.5rem;table-layout:fixed}
 .pal-tbl th{text-align:left;padding:9px 14px;font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--cream3);background:var(--ink3);border-bottom:1px solid var(--border)}
 .pal-tbl td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--cream2);line-height:1.5;vertical-align:top;word-break:break-word}
-.pal-tbl td:first-child{color:var(--gold);font-weight:500;white-space:nowrap;width:22%}.pal-tbl td:nth-child(2){width:18%;white-space:nowrap}.pal-tbl td:nth-child(3){width:60%}
+.pal-tbl td:first-child{color:var(--gold);font-weight:500;white-space:nowrap;width:28%}.pal-tbl td:nth-child(2){width:72%;word-break:break-word}
 .pal-tbl tr:last-child td{border-bottom:none}
 .pal-tbl tr:hover td{background:var(--ink3)}
 .intro-blk{font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;color:var(--cream2);line-height:1.85;padding:1.25rem 1.5rem;border-left:3px solid var(--gold2);background:var(--ink2);margin-bottom:1.25rem}
@@ -84,8 +84,8 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
 <body>
 
 <header class="site-header">
-  <h1>紫微斗數</h1>
-  <div class="en-title">Purple Star Astrology</div>
+  <h1 id="main-title">Zi Wei Dou Shu</h1>
+  <div class="en-title" id="main-sub">Purple Star Astrology</div>
   <div class="lang-tog">
     <button id="btn-en" class="on" onclick="setLang('en')">English</button>
     <button id="btn-zh" onclick="setLang('zh')">中文</button>
@@ -113,11 +113,10 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
       </div>
     </div>
     <div class="field">
-      <label id="t-yr">Year</label><select id="f-yr" style="width:100%"></select>
-    </div>
-    <div class="field">
-      <label id="t-hr">Birth hour</label>
-      <select id="f-hr">
+      <div class="grid2">
+        <div><label id="t-yr">Year</label><select id="f-yr" style="width:100%"></select></div>
+        <div><label id="t-hr">Birth hour</label>
+        <select id="f-hr" style="width:100%">
         <option value="0">23:00 – 00:59</option>
         <option value="1">01:00 – 02:59</option>
         <option value="2">03:00 – 04:59</option>
@@ -130,7 +129,8 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
         <option value="9">17:00 – 18:59</option>
         <option value="10">19:00 – 20:59</option>
         <option value="11">21:00 – 22:59</option>
-      </select>
+      </select></div>
+      </div>
     </div>
   </div>
 
@@ -148,18 +148,48 @@ var MO={
 };
 var TX={
   en:{birth:'Birth information',name:'Name (optional)',ph:'Enter name…',gender:'Gender',male:'Male',female:'Female',yr:'Year',mo:'Month',dy:'Day',hr:'Birth hour',btn:'Generate'},
-  zh:{birth:'出生資料',name:'姓名（選填）',ph:'輸入姓名…',gender:'性別',male:'男',female:'女',yr:'年',mo:'月',dy:'日',hr:'出生時辰',btn:'生成'}
+  zh:{birth:'出生資料',name:'姓名（選填）',ph:'輸入姓名…',gender:'性別',male:'男',female:'女',yr:'年',mo:'月',dy:'日',hr:'出生時辰',btn:'排盤'}
 };
 var STEMS=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
 var BR=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
 function gz(y){return STEMS[(y-4)%10]+BR[(y-4)%12];}
+
+var STAR_EN = {
+  '紫微':'Emperor','天機':'Advisor','太陽':'Sun','武曲':'Marshal',
+  '天同':'Harmony','廉貞':'Virtue','天府':'Treasury','太陰':'Moon',
+  '貪狼':'Appetite','巨門':'Gate','天相':'Minister','天梁':'Pillar',
+  '七殺':'Warrior','破軍':'General',
+  '左輔':'Left Aid','右弼':'Right Aid','文昌':'Literary','文曲':'Arts',
+  '天魁':'Nobleman M','天鉞':'Nobleman F','祿存':'Wealth Star',
+  '天馬':'Pegasus','擎羊':'Ram','陀羅':'Grinding','火星':'Mars Fire',
+  '鈴星':'Bell Star','地空':'Earth Void','地劫':'Earth Rob',
+  '化祿':'Transform Wealth','化權':'Transform Power',
+  '化科':'Transform Fame','化忌':'Transform Obstacle'
+};
+
+function translateStars(text) {
+  if (LANG !== 'en') return text;
+  return text.replace(/([\u4e00-\u9fff]+)/g, function(match) {
+    // Check each star name
+    for (var key in STAR_EN) {
+      if (match.startsWith(key)) {
+        var rest = match.slice(key.length);
+        return key + ' (' + STAR_EN[key] + ')' + rest;
+      }
+    }
+    return match;
+  });
+}
+
 
 function setLang(l){
   LANG=l;
   localStorage.setItem('zwds_lang',l);
   document.getElementById('btn-en').classList.toggle('on',l==='en');
   document.getElementById('btn-zh').classList.toggle('on',l==='zh');
-  document.getElementById('page-title').textContent=l==='zh'?'紫微斗數 · 命盤分析':'Purple Star Astrology · Zi Wei Dou Shu';
+  document.getElementById('page-title').textContent=l==='zh'?'紫微斗數':'Zi Wei Dou Shu · Purple Star Astrology';
+  document.getElementById('main-title').textContent=l==='zh'?'紫微斗數':'Zi Wei Dou Shu';
+  document.getElementById('main-sub').textContent=l==='zh'?'':'Purple Star Astrology';
   document.getElementById('html-root')?document.getElementById('html-root').setAttribute('lang',l==='zh'?'zh-TW':'en'):null;
   var t=TX[l];
   document.getElementById('t-birth').textContent=t.birth;
@@ -228,7 +258,7 @@ async function generate(){
 
     // Step 2: Build palace summary for Claude
     var palaceSummary=chart.palaces.map(function(p){
-      var stars=[].concat(p.majorStars,p.minorStars).join(' ');
+      var stars=[].concat(p.majorStars,p.minorStars).join(' '); stars=translateStars(stars);
       return p.stem+p.branch+'【'+p.name+(p.isBodyPalace?' 身宮':'')+' 】大限:'+p.decadeRange+(stars?' '+stars:'');
     }).join('\n');
 
@@ -290,14 +320,14 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
   var h='<div class="prof-hdr"><div class="pname">'+(name?name+' — ':'')+'Behavioral &amp; Personality Profile</div>';
   h+='<div class="psub">'+gender+' · '+month+'/'+day+'/'+year+' · '+hrTxt+' · '+ganzhi+' year</div>';
   h+='<div class="pills">';
-  [['Lunar',chart.lunarDate],['Life Palace',lifePalaceFromChart(chart)],['Body Palace',bodyPalaceFromChart(chart)],['5-Element',chart.fiveElements],['Life Master',chart.lifeMaster],['Body Master',chart.bodyMaster]].forEach(function(pair){
+  [['Life Master',chart.lifeMaster],['Body Master',chart.bodyMaster]].forEach(function(pair){
     if(pair[1]) h+='<span class="pill">'+pair[0]+'<b>'+pair[1]+'</b></span>';
   });
   h+='</div></div>';
 
   if(palRows.length){
-    h+='<div class="stitle">12 palace overview</div><table class="pal-tbl"><thead><tr><th>Palace</th><th>Stem &amp; branch</th><th>Stars &amp; interpretation</th></tr></thead><tbody>';
-    palRows.forEach(function(r){h+='<tr><td>'+r.palace+'</td><td>'+r.branch+'</td><td>'+r.stars+'</td></tr>';});
+    h+='<div class="stitle">12 palace overview</div><table class="pal-tbl"><thead><tr><th>Palace</th><th>Stars &amp; interpretation</th></tr></thead><tbody>';
+    palRows.forEach(function(r){h+='<tr><td>'+r.palace+'</td><td>'+translateStars(r.stars)+'</td></tr>';});
     h+='</tbody></table>';
   }
 
@@ -310,17 +340,17 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
     return s+'</ul></div>';
   }
   h+='<div class="g2">'+
-    card('Core behavior',bullets(sec(text,'CORE BEHAVIOR')))+
-    card('Personality pattern',bullets(sec(text,'PERSONALITY PATTERN')))+
-    card('Work behavior',bullets(sec(text,'WORK BEHAVIOR')))+
-    card('Financial behavior',bullets(sec(text,'FINANCIAL BEHAVIOR')))+
-    card('Relationship behavior',bullets(sec(text,'RELATIONSHIP BEHAVIOR')))+
-    card('Energy pattern',bullets(sec(text,'ENERGY PATTERN')))+
+    card('Core Behavior',bullets(sec(text,'CORE BEHAVIOR')))+
+    card('Personality Pattern',bullets(sec(text,'PERSONALITY PATTERN')))+
+    card('Work Behavior',bullets(sec(text,'WORK BEHAVIOR')))+
+    card('Financial Behavior',bullets(sec(text,'FINANCIAL BEHAVIOR')))+
+    card('Relationship Behavior',bullets(sec(text,'RELATIONSHIP BEHAVIOR')))+
+    card('Energy Pattern',bullets(sec(text,'ENERGY PATTERN')))+
   '</div>';
-  h+=card('Decision style',bullets(sec(text,'DECISION STYLE')),true);
+  h+=card('Decision Style',bullets(sec(text,'DECISION STYLE')),true);
 
   if(cycRows.length){
-    h+='<div class="scard-full"><div class="sh">10 year life cycles</div><div class="cycles">';
+    h+='<div class="scard-full"><div class="sh">10 Year Life Cycles</div><div class="cycles">';
     cycRows.forEach(function(c){h+='<div class="cyc"><div class="cy-lbl">'+c.range+' · '+c.phase+'</div><div class="cy-txt">'+c.text+'</div></div>';});
     h+='</div></div>';
   }
