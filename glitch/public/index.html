@@ -590,18 +590,25 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
     if(ols) {
       h+='<div class="scard-full" style="margin-bottom:10px">';
       h+='<div class="sh">Overall Life Structure</div>';
-      // Split into narrative and bullets
-      var olsParts = ols.split(/\n(?=•|Life is shaped)/);
-      var narrative = olsParts[0].trim();
-      var bullets = olsParts.slice(1);
-      if(narrative) h+='<p style="font-size:13px;color:var(--cream2);line-height:1.8;margin-bottom:10px">'+narrative+'</p>';
-      if(bullets.length) {
+      var olsLines = ols.split('\n');
+      var olsNarrative = [];
+      var olsBulletItems = [];
+      var olsSubhead = '';
+      var olsInBullets = false;
+      olsLines.forEach(function(ln){
+        ln = ln.trim(); if(!ln) return;
+        var firstChar = ln.charCodeAt(0);
+        var isBullet = (firstChar === 8226) || ln.charAt(0) === '-';
+        var isSubhead = ln.toLowerCase().indexOf('life is shaped') > -1 || ln.toLowerCase().indexOf('shaped by') > -1;
+        if(isSubhead) { olsInBullets=true; olsSubhead=ln; }
+        else if(isBullet) { olsInBullets=true; olsBulletItems.push(ln.replace(/^[\u2022\-]\s*/,'')); }
+        else if(!olsInBullets) { olsNarrative.push(ln); }
+      });
+      if(olsNarrative.length) h+='<p style="font-size:13px;color:var(--cream2);line-height:1.8;margin-bottom:10px">'+olsNarrative.join(' ')+'</p>';
+      if(olsSubhead) h+='<div style="font-size:12px;font-weight:500;color:var(--gold);margin:6px 0 4px">'+olsSubhead+'</div>';
+      if(olsBulletItems.length) {
         h+='<ul class="blist">';
-        ols.split('\n').forEach(function(line){
-          line=line.replace(/^•\s*/,'').trim();
-          if(line && line!==narrative && !line.startsWith('Life is shaped')) h+='<li>'+line+'</li>';
-          if(line.startsWith('Life is shaped')) h+='<div style="font-size:12px;font-weight:500;color:var(--gold);margin:6px 0 4px">'+line+'</div>';
-        });
+        olsBulletItems.forEach(function(bl){ h+='<li>'+bl+'</li>'; });
         h+='</ul>';
       }
       h+='</div>';
@@ -628,7 +635,7 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
 
   if(cycRows.length){
     h+='<div class="scard-full"><div class="sh">10 Year Life Cycles</div><div class="cycles">';
-    cycRows.forEach(function(c){h+='<div class="cyc"><div class="cy-lbl">'+c.range+' · '+c.phase+'</div><div class="cy-txt">'+c.text+'</div></div>';});
+    cycRows.forEach(function(cyc){h+='<div class="cyc"><div class="cy-lbl">'+cyc.range+' · '+cyc.phase+'</div><div class="cy-txt">'+cyc.text+'</div></div>';});
     h+='</div></div>';
   }
 
