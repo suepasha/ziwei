@@ -344,11 +344,9 @@ async function generate(){
 'Use EXACTLY these section markers in this order:\n\n'+
 '===META===\n'+
 'Lunar: '+chart.lunarDate+'\nLife Palace: '+lifePalace.branch+'\nBody Palace: '+bodyPalace.branch+'\n5-Element: '+chart.fiveElements+'\n\n'+
-'===INTRO===\n'+
-'[One paragraph, 3-4 sentences. Who is this person at their core — what drives her, how she moves through the world, what makes her different. Specific and direct. No star names.]\n\n'+
-'===OVERALL LIFE STRUCTURE===\n'+
-'[One paragraph, 2-3 sentences describing the shape of her life path. Not personality — the actual pattern of how her life unfolds. Then:]\n'+
-'Life is shaped by:\n• [single phrase]\n• [single phrase]\n• [single phrase]\n• [single phrase]\n\n'+
+'===LIFE PORTRAIT===\n'+
+'[One paragraph, 4-5 sentences. Open with who she is at her core. Then describe the shape of her life — how it unfolds, what drives it, what pattern keeps repeating. End with one sentence that captures the thing most people would never guess about her. Specific, personal, direct. No star names.]\n'+
+'Life is shaped by:\n• [single phrase — a force or pattern]\n• [single phrase]\n• [single phrase]\n• [single phrase]\n\n'+
 '===PALACES===\n'+
 '[12 paragraphs — one per life area. Order: Life · Siblings · Spouse\/Partner · Children · Wealth · Health · Travel & Change · Friends & Network · Career · Home · Inner Life · Parents\n'+
 'Format: **[Name]** — [2-3 sentences. What actually happens in this area. Specific. No star names. No Chinese.]\n'+
@@ -399,11 +397,9 @@ async function generate(){
 '請依序使用以下段落標記：\n\n'+
 '===META===\n'+
 '農曆：'+chart.lunarDate+'\n干支：'+chart.chinesePillars+'\n命宮：'+lifePalace.branch+'\n身宮：'+bodyPalace.branch+'\n五行局：'+chart.fiveElements+'\n命主：'+chart.lifeMaster+'\n身主：'+chart.bodyMaster+'\n\n'+
-'===INTRO===\n'+
-'[3-4句開場白。直接點出此人的核心性格與人生方向。不用客套語。像是命理師第一次見到這張命盤時說的話。]\n\n'+
-'===OVERALL LIFE STRUCTURE===\n'+
-'[2-3句描述此人的人生格局——不是性格，是人生的走法與節奏。然後：]\n'+
-'人生的基調：\n• [短語]\n• [短語]\n• [短語]\n• [短語]\n\n'+
+'===LIFE PORTRAIT===\n'+
+'[4-5句。第一句點出此人最核心的性格本質。接著描述她人生的走法與節奏——不只是性格，是命運的形狀。最後一句說出旁人看不到、但她自己深知的那一面。直接、具體、有力。]\n'+
+'人生的基調：\n• [短語——一種力量或模式]\n• [短語]\n• [短語]\n• [短語]\n\n'+
 '===PALACES===\n'+
 '[12段，每宮一段。順序：命宮·兄弟·夫妻·子女·財帛·疾厄·遷移·僕役·官祿·田宅·福德·父母\n'+
 '格式：**[宮位名]** — [2-3句。說這個宮位在此人生命中實際展現的樣貌。引用主星與亮度。具體，不套用。]\n'+
@@ -585,30 +581,26 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
   }
   h+='</div></div>';
 
-  // ── OPENING — describe this person (INTRO for both languages) ──
-  var intro=sec(text,'INTRO');
-  if(intro) h+='<div class="intro-blk">'+intro+'</div>';
-
-  // ── OVERALL LIFE STRUCTURE (English) / 人生格局 (Chinese) ──
-  var ols=sec(text,'OVERALL LIFE STRUCTURE');
-  if(ols){
+  // ── LIFE PORTRAIT — single opening section ──
+  var portrait=sec(text,'LIFE PORTRAIT');
+  if(portrait){
     h+='<div class="scard-full" style="margin-bottom:10px">';
-    h+='<div class="sh">'+(LANG==='zh'?'人生格局':'Overall Life Structure')+'</div>';
-    var olsLines=ols.split('\n');
-    var olsNarrative=[],olsBulletItems=[],olsSubhead='',olsInBullets=false;
-    olsLines.forEach(function(ln){
+    h+='<div class="sh">'+(LANG==='zh'?'人物畫像':'Life Portrait')+'</div>';
+    var lpLines=portrait.split('\n');
+    var lpNarrative=[],lpBulletItems=[],lpSubhead='',lpInBullets=false;
+    lpLines.forEach(function(ln){
       ln=ln.trim(); if(!ln) return;
       var isBullet=(ln.charCodeAt(0)===8226)||ln.charAt(0)==='-';
-      var isSubhead=ln.toLowerCase().indexOf('life is shaped')>-1||ln.toLowerCase().indexOf('shaped by')>-1||ln.indexOf('人生由')>-1;
-      if(isSubhead){olsInBullets=true;olsSubhead=ln;}
-      else if(isBullet){olsInBullets=true;olsBulletItems.push(ln.replace(/^[•\-]\s*/,''));}
-      else if(!olsInBullets){olsNarrative.push(ln);}
+      var isSubhead=ln.toLowerCase().indexOf('life is shaped')>-1||ln.toLowerCase().indexOf('shaped by')>-1||ln.indexOf('人生的基調')>-1||ln.indexOf('基調')>-1;
+      if(isSubhead){lpInBullets=true;lpSubhead=ln;}
+      else if(isBullet){lpInBullets=true;lpBulletItems.push(ln.replace(/^[•\-]\s*/,''));}
+      else if(!lpInBullets){lpNarrative.push(ln);}
     });
-    if(olsNarrative.length) h+='<p style="font-size:13px;color:var(--cream2);line-height:1.8;margin-bottom:10px">'+olsNarrative.join(' ')+'</p>';
-    if(olsSubhead) h+='<div style="font-size:12px;font-weight:500;color:var(--gold);margin:6px 0 4px">'+olsSubhead+'</div>';
-    if(olsBulletItems.length){
+    if(lpNarrative.length) h+='<p style="font-size:14px;color:var(--cream2);line-height:1.85;margin-bottom:12px;font-family:\'Cormorant Garamond\',serif;font-style:italic">'+lpNarrative.join(' ')+'</p>';
+    if(lpSubhead) h+='<div style="font-size:11px;font-weight:500;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;margin:8px 0 6px">'+lpSubhead+'</div>';
+    if(lpBulletItems.length){
       h+='<ul class="blist">';
-      olsBulletItems.forEach(function(bl){h+='<li>'+bl+'</li>';});
+      lpBulletItems.forEach(function(bl){h+='<li>'+bl+'</li>';});
       h+='</ul>';
     }
     h+='</div>';
@@ -663,7 +655,7 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
   }
 
   // ── FINAL SUMMARY ──
-  var summaryItems=bullets(sec(text,'SUMMARY'));
+  var summaryItems=bullets(sec(text,'SUMMARY')).filter(function(b){return b.toLowerCase().indexOf('is someone who')<0 && b.indexOf('的特質')<0;});
   var strength=sec(text,'STRENGTH'),challenge=sec(text,'CHALLENGE');
   h+='<div class="scard-full">';
   h+='<div class="sh">'+(LANG==='zh'?'總結 — '+(name||'此人')+'的特質':'Final Summary — '+(name||'this person')+' is someone who')+'</div>';
