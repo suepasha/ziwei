@@ -90,17 +90,17 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
 .mingpan-btn:hover{background:var(--ink3)}
 .mp-grid{display:grid;grid-template-columns:repeat(4,1fr);border:2px solid #888;font-size:11px;background:#fff;display:none}
 .mp-grid.show{display:grid}
-.mp-cell{border:1px solid #aaa;padding:6px;min-height:120px;background:#d4e84a;vertical-align:top;position:relative}
-.mp-cell.life{background:#f0a830}
-.mp-cell.body{background:#d4e84a}
-.mp-cell.center{background:#f5f5f5;display:flex;flex-direction:column;justify-content:center;padding:10px 14px;font-size:12px;line-height:1.9;color:#222}
+.mp-cell{border:1px solid #c8b8a8;padding:6px;min-height:120px;background:#f0ece8;vertical-align:top;position:relative}
+.mp-cell.life{background:#c8a898}
+.mp-cell.sanfang{background:#dde8dc}
+.mp-cell.center{background:#faf8f5;display:flex;flex-direction:column;justify-content:center;padding:10px 14px;font-size:12px;line-height:1.9;color:#222}
 .mp-gz{color:#222;font-size:11px;font-weight:500;margin-bottom:1px}
 .mp-name{color:#00c;font-size:12px;font-weight:700;text-decoration:underline;margin-bottom:2px}
 .mp-decade{color:#00c;font-size:11px;margin-bottom:1px}
 .mp-xlimit{color:#00c;font-size:10px;margin-bottom:4px}
-.mp-stars{font-size:11px;line-height:1.6;color:#c00}
-.mp-stars .bl{color:#00a}
-.mp-stars .bk{color:#222}
+.mp-stars{font-size:11px;line-height:1.6;color:#5a4e3a}
+.mp-stars .bl{color:#3a5030}
+.mp-stars .bk{color:#8a3030}
 .mp-stars .rd{color:#c00}
 .mp-stars .fx-lu{color:#c00;background:#ffd;padding:0 2px}
 .mp-stars .fx-ke{color:#00a;background:#ddf;padding:0 2px}
@@ -355,8 +355,6 @@ async function generate(){
 '- No Chinese characters\n'+
 'Example:\n'+
 '**Children** — This area carries tension and miscommunication (Great Gate star, weakened with negative transformation). High expectations on both sides create friction. The gift is that she takes their development seriously — the work is learning to listen before guiding.]\n\n'+
-'===INTRO===\n'+
-'[2 sentences max. First sentence: what drives this person. Second sentence: what makes them consistent or inconsistent. No Chinese.]\n\n'+
 '===CORE BEHAVIOR===\n'+
 '• [one clear behavioral observation]\n'+
 '• [one clear behavioral observation]\n'+
@@ -422,7 +420,7 @@ async function generate(){
 'NATAL CHART (use these exact star placements, do NOT recalculate):\n'+palaceSummary+'\n\n'+
 'Palace English reference: 命宮=Life, 兄弟=Siblings, 夫妻=Spouse/Partner, 子女=Children, 財帛=Wealth, 疾厄=Health, 遷移=Travel/Change, 僕役=Friends/Network, 官祿=Career, 田宅=Home/Property, 福德=Wellbeing/Inner Life, 父母=Parents\n\n';
 
-    var enPalaceNote = '[Write 12 paragraphs, one per palace. Format each as:\n"**[Palace English name]** — [2-3 sentences describing what actually plays out in this life area. Be specific and personal, not abstract. Name the stars briefly in parentheses if helpful.]"\nExample: "**Life Palace** — She leads from conviction, not consensus. Decisive and intense (廉貞/Virtue Star at moderate strength), she acts before others have finished deliberating — and is usually right. Her challenge is trusting that slowing down does not mean losing ground."]';
+    var enPalaceNote = '[Write exactly 12 paragraphs, one per life area, in this order: Life · Siblings · Spouse\/Partner · Children · Wealth · Health · Travel & Change · Friends & Network · Career · Home & Property · Inner Life & Wellbeing · Parents\n\nEach paragraph:\n**[Palace name]** — [2-3 sentences in plain English. Real behaviors, patterns, gifts, tensions. Star names in English only in parentheses. Zero Chinese characters.]\n\nExamples:\n**Life** — She leads from conviction, not consensus. Decisive and intense (Virtue Star and Warrior Star at peak strength), she acts before others have finished deliberating. The challenge is trusting that slowing down does not mean losing ground.\n**Career** — She builds rather than maintains. Roles that let her initiate and create from scratch suit her far better than maintaining someone else\'s system. Progress requires sustained effort before recognition arrives.\n**Children** — This area carries tension and miscommunication (Great Gate star, weakened with negative transformation). High expectations on both sides create friction. The gift is that she takes their growth seriously.\n\nNow write all 12 paragraphs:]';
     var zhPalaceNote = '[12段，每宮格式：\n**[宮位名]**\n主星：[星曜+亮度+四化]\n解析：[2-3句，說明此宮位在人生中的具體展現，包含星曜特質與宮位互動]\n]';
 
     var prompt = (LANG==='en' ? enInstructions : zhInstructions) + sharedChart +
@@ -550,7 +548,8 @@ function buildMingpan() {
       if(!p){h+='<div class="mp-cell"></div>';continue;}
       var isLife = p.name==='命宮';
       var isBody = p.isBodyPalace;
-      var cls = 'mp-cell'+(isLife?' life':'');
+      var sanfang = ['巳','酉','亥'].indexOf(p.branch)>-1;
+      var cls = 'mp-cell'+(isLife?' life':(sanfang?' sanfang':''));
       var decRange = p.decadeRange?p.decadeRange.toString().replace(',','-'):'';
       var gz = p.stem+p.branch;
       // small limits base
@@ -579,89 +578,82 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
   _lastChart=chart;
   _lastName=year+'年'+month+'月'+day+'日'+hrTxt+' 陰'+(gender==='Female'?'女':'男');
   var ml={};
-  sec(text,'META').split('\n').forEach(function(l){var c=l.indexOf(':');if(c>-1)ml[l.slice(0,c).trim()]=l.slice(c+1).trim();});
-  var palRows=sec(text,'PALACES').split('\n').filter(Boolean).map(function(l){var p=l.split('|');return p.length>=3?{palace:p[0].trim(),branch:p[1].trim(),stars:p[2].trim()}:null;}).filter(Boolean);
+  sec(text,'META').split('\n').forEach(function(l){var ci=l.indexOf(':');if(ci>-1)ml[l.slice(0,ci).trim()]=l.slice(ci+1).trim();});
   var cycRows=sec(text,'CYCLES').split('\n').filter(Boolean).map(function(l){var p=l.split('|');return p.length>=3?{range:p[0].trim(),phase:p[1].trim(),text:p[2].trim()}:null;}).filter(Boolean);
 
-  var h='<div class="prof-hdr"><div class="pname">'+(name?name+' — ':'')+(LANG==='zh'?'命盤行為分析</div>':'Behavioral &amp; Personality Profile</div>');
+  var masterEN={'巨門':'Gate','天相':'Minister','祿存':'Wealth Star','文曲':'Arts','天梁':'Pillar','天機':'Advisor','紫微':'Emperor','太陽':'Sun','武曲':'Marshal','天同':'Harmony','廉貞':'Virtue','天府':'Treasury','太陰':'Moon','貪狼':'Appetite','天魁':'Nobleman','文昌':'Literary','火星':'Mars','鈴星':'Bell','左輔':'Left Aid','右弼':'Right Aid'};
+  function masterVal(zh){return LANG!=='en'?zh:(masterEN[zh]?masterEN[zh]:zh);}
+
   var genderLabel=LANG==='zh'?(gender==='Male'?'男':'女'):gender;
+  var h='';
+
+  // ── HEADER ──
+  h+='<div class="prof-hdr">';
+  h+='<div class="pname">'+(name?name+' — ':'')+(LANG==='zh'?'命盤行為分析':'Behavioral &amp; Personality Profile')+'</div>';
   h+='<div class="psub">'+genderLabel+' · '+month+'/'+day+'/'+year+' · '+hrTxt+'</div>';
   h+='<div class="pills">';
-  var masterEN = {'巨門': 'Gate', '天相': 'Minister', '祿存': 'Wealth Star', '文曲': 'Arts Star', '天梁': 'Pillar', '天機': 'Advisor', '紫微': 'Emperor', '太陽': 'Sun', '武曲': 'Marshal', '天同': 'Harmony', '廉貞': 'Virtue', '天府': 'Treasury', '太陰': 'Moon', '貪狼': 'Appetite', '天魁': 'Nobleman', '文昌': 'Literary', '火星': 'Mars', '鈴星': 'Bell', '左輔': 'Left Aid', '右弼': 'Right Aid'};
-  function masterVal(zh) {
-    if (LANG !== 'en') return zh;
-    return masterEN[zh] ? masterEN[zh] : zh;
-  }
-  if(LANG !== 'en' && chart.lifeMaster && chart.bodyMaster) {
+  if(LANG!=='en'&&chart.lifeMaster&&chart.bodyMaster){
     h+='<span class="pill">命主<b>'+chart.lifeMaster+'</b> &nbsp;·&nbsp; 身主<b>'+chart.bodyMaster+'</b></span>';
   }
   h+='</div></div>';
 
-  // 命盤 button (Chinese only)
-  if(LANG==='zh') {
+  // ── OPENING — describe this person (INTRO for both languages) ──
+  var intro=sec(text,'INTRO');
+  if(intro) h+='<div class="intro-blk">'+intro+'</div>';
+
+  // ── OVERALL LIFE STRUCTURE (English) / 人生格局 (Chinese) ──
+  var ols=sec(text,'OVERALL LIFE STRUCTURE');
+  if(ols){
+    h+='<div class="scard-full" style="margin-bottom:10px">';
+    h+='<div class="sh">'+(LANG==='zh'?'人生格局':'Overall Life Structure')+'</div>';
+    var olsLines=ols.split('\n');
+    var olsNarrative=[],olsBulletItems=[],olsSubhead='',olsInBullets=false;
+    olsLines.forEach(function(ln){
+      ln=ln.trim(); if(!ln) return;
+      var isBullet=(ln.charCodeAt(0)===8226)||ln.charAt(0)==='-';
+      var isSubhead=ln.toLowerCase().indexOf('life is shaped')>-1||ln.toLowerCase().indexOf('shaped by')>-1||ln.indexOf('人生由')>-1;
+      if(isSubhead){olsInBullets=true;olsSubhead=ln;}
+      else if(isBullet){olsInBullets=true;olsBulletItems.push(ln.replace(/^[•\-]\s*/,''));}
+      else if(!olsInBullets){olsNarrative.push(ln);}
+    });
+    if(olsNarrative.length) h+='<p style="font-size:13px;color:var(--cream2);line-height:1.8;margin-bottom:10px">'+olsNarrative.join(' ')+'</p>';
+    if(olsSubhead) h+='<div style="font-size:12px;font-weight:500;color:var(--gold);margin:6px 0 4px">'+olsSubhead+'</div>';
+    if(olsBulletItems.length){
+      h+='<ul class="blist">';
+      olsBulletItems.forEach(function(bl){h+='<li>'+bl+'</li>';});
+      h+='</ul>';
+    }
+    h+='</div>';
+  }
+
+  // ── 命盤 BUTTON (Chinese only) ──
+  if(LANG==='zh'){
     h+='<div class="mingpan-wrap">';
     h+='<button class="mingpan-btn" onclick="toggleMingpan()">命盤 ▸</button>';
     h+='<div class="mp-grid" id="mp-grid"></div>';
     h+='</div>';
   }
 
-  // 12 palace section
-  var palacesRaw = sec(text,'PALACES');
-  if(palacesRaw) {
+  // ── 12 PALACE OVERVIEW ──
+  var palacesRaw=sec(text,'PALACES');
+  if(palacesRaw){
     h+='<div class="stitle">'+(LANG==='zh'?'十二宮概覽':'12 Palace Overview')+'</div>';
-    if(LANG==='en') {
-      h+='<div class="pal-paras">';
-      palacesRaw.split(/\n(?=\*\*|[A-Z][a-z]+ Palace)/).forEach(function(para){
-        para=para.trim(); if(!para) return;
-        para=para.replace(/^\*\*([^*]+)\*\*/, '<span class="pal-name">$1</span>');
-        h+='<div class="pal-para">'+para+'</div>';
-      });
-      h+='</div>';
-    } else {
-      h+='<div class="pal-paras">';
-      palacesRaw.split(/\n(?=\*\*[^*])/).forEach(function(para){
-        para=para.trim(); if(!para) return;
-        para=para.replace(/^\*\*([^*]+)\*\*/, '<span class="pal-name">$1</span>');
-        h+='<div class="pal-para">'+para+'</div>';
-      });
-      h+='</div>';
-    }
+    h+='<div class="pal-paras">';
+        palacesRaw.split('\n').reduce(function(acc,line){
+      var trimmed=line.trim();
+      var isStart=(trimmed.charAt(0)==='*'&&trimmed.charAt(1)==='*')||(LANG==='en'&&/^[A-Z]/.test(trimmed)&&trimmed.indexOf('—')>-1);
+      if(isStart) acc.push(trimmed);
+      else if(acc.length&&trimmed) acc[acc.length-1]+=' '+trimmed;
+      return acc;
+    },[]).forEach(function(para){
+      para=para.trim(); if(!para) return;
+      para=para.replace(/^\*\*([^*]+)\*\*/,'<span class="pal-name">$1</span>');
+      h+='<div class="pal-para">'+para+'</div>';
+    });
+    h+='</div>';
   }
 
-  // Overall Life Structure (English only)
-  if(LANG==='en') {
-    var ols = sec(text,'OVERALL LIFE STRUCTURE');
-    if(ols) {
-      h+='<div class="scard-full" style="margin-bottom:10px">';
-      h+='<div class="sh">Overall Life Structure</div>';
-      var olsLines = ols.split('\n');
-      var olsNarrative = [];
-      var olsBulletItems = [];
-      var olsSubhead = '';
-      var olsInBullets = false;
-      olsLines.forEach(function(ln){
-        ln = ln.trim(); if(!ln) return;
-        var firstChar = ln.charCodeAt(0);
-        var isBullet = (firstChar === 8226) || ln.charAt(0) === '-';
-        var isSubhead = ln.toLowerCase().indexOf('life is shaped') > -1 || ln.toLowerCase().indexOf('shaped by') > -1;
-        if(isSubhead) { olsInBullets=true; olsSubhead=ln; }
-        else if(isBullet) { olsInBullets=true; olsBulletItems.push(ln.replace(/^[\u2022\-]\s*/,'')); }
-        else if(!olsInBullets) { olsNarrative.push(ln); }
-      });
-      if(olsNarrative.length) h+='<p style="font-size:13px;color:var(--cream2);line-height:1.8;margin-bottom:10px">'+olsNarrative.join(' ')+'</p>';
-      if(olsSubhead) h+='<div style="font-size:12px;font-weight:500;color:var(--gold);margin:6px 0 4px">'+olsSubhead+'</div>';
-      if(olsBulletItems.length) {
-        h+='<ul class="blist">';
-        olsBulletItems.forEach(function(bl){ h+='<li>'+bl+'</li>'; });
-        h+='</ul>';
-      }
-      h+='</div>';
-    }
-  }
-
-  var intro=sec(text,'INTRO');
-  if(intro) h+='<div class="intro-blk">'+intro+'</div>';
-
+  // ── BEHAVIORAL SECTIONS ──
   function card(title,arr,full){
     var s='<div class="'+(full?'scard-full':'scard')+'"><div class="sh">'+title+'</div><ul class="blist">';
     arr.forEach(function(b){s+='<li>'+b+'</li>';});
@@ -677,23 +669,29 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
   '</div>';
   h+=card('Decision Style',bullets(sec(text,'DECISION STYLE')),true);
 
+  // ── 10 YEAR CYCLES ──
   if(cycRows.length){
-    h+='<div class="scard-full"><div class="sh">10 Year Life Cycles</div><div class="cycles">';
+    h+='<div class="scard-full"><div class="sh">'+(LANG==='zh'?'大限流年':'10 Year Life Cycles')+'</div><div class="cycles">';
     cycRows.forEach(function(cyc){h+='<div class="cyc"><div class="cy-lbl">'+cyc.range+' · '+cyc.phase+'</div><div class="cy-txt">'+cyc.text+'</div></div>';});
     h+='</div></div>';
   }
 
-  var summary=bullets(sec(text,'SUMMARY')),strength=sec(text,'STRENGTH'),challenge=sec(text,'CHALLENGE');
-  h+='<div class="scard-full"><div class="sh">Final summary — '+(name||'this person')+' is someone who</div><ul class="blist">';
-  summary.forEach(function(b){h+='<li>'+b+'</li>';});
+  // ── FINAL SUMMARY ──
+  var summaryItems=bullets(sec(text,'SUMMARY'));
+  var strength=sec(text,'STRENGTH'),challenge=sec(text,'CHALLENGE');
+  h+='<div class="scard-full">';
+  h+='<div class="sh">'+(LANG==='zh'?'總結 — '+(name||'此人')+'的特質':'Final Summary — '+(name||'this person')+' is someone who')+'</div>';
+  h+='<ul class="blist">';
+  summaryItems.forEach(function(b){h+='<li>'+b+'</li>';});
   h+='</ul>';
   if(strength||challenge){
     h+='<div class="sfgrid">';
-    if(strength) h+='<div class="sfbox sf-s"><div class="sf-lbl">Strength</div><div class="sf-txt">'+strength+'</div></div>';
-    if(challenge) h+='<div class="sfbox sf-c"><div class="sf-lbl">Challenge</div><div class="sf-txt">'+challenge+'</div></div>';
+    if(strength) h+='<div class="sfbox sf-s"><div class="sf-lbl">'+(LANG==='zh'?'優勢':'Strength')+'</div><div class="sf-txt">'+strength+'</div></div>';
+    if(challenge) h+='<div class="sfbox sf-c"><div class="sf-lbl">'+(LANG==='zh'?'挑戰':'Challenge')+'</div><div class="sf-txt">'+challenge+'</div></div>';
     h+='</div>';
   }
-  h+='</div><button class="btn-new" onclick="newGen()">Generate for another person</button>';
+  h+='</div>';
+  h+='<button class="btn-new" onclick="newGen()">'+(LANG==='zh'?'為另一人生成':'Generate for another person')+'</button>';
 
   var el=document.getElementById('results');
   el.innerHTML=h; el.className='results on';
