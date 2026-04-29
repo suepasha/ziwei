@@ -190,7 +190,7 @@ var MO={
 };
 var TX={
   en:{birth:'Birth information',name:'Name (optional)',ph:'Enter name…',gender:'Gender',male:'Male',female:'Female',yr:'Year',mo:'Month',dy:'Day',hr:'Birth hour',btn:'Generate'},
-  zh:{birth:'出生資料',name:'姓名（選填）',ph:'輸入姓名…',gender:'性別',male:'男',female:'女',yr:'年',mo:'月',dy:'日',hr:'出生時辰',btn:'排盤',zi:'午夜後出生？(00:00–00:59)',zino:'否 (23:00–23:59)',ziyes:'是 (00:00–00:59)'}
+  zh:{birth:'出生資料',name:'姓名（選填）',ph:'輸入姓名…',gender:'性別',male:'男',female:'女',yr:'年',mo:'月',dy:'日',hr:'出生時辰',btn:'送出',zi:'午夜後出生？(00:00–00:59)',zino:'否 (23:00–23:59)',ziyes:'是 (00:00–00:59)'}
 };
 var STEMS=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
 var BR=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
@@ -327,39 +327,83 @@ async function generate(){
 
     // Step 3: Call Claude with real chart data
     var enInstructions =
-'You are a Zi Wei Dou Shu expert writing for a modern English-speaking audience who is curious but unfamiliar with Chinese astrology.\n\n'+
-'Star brightness levels: 廟/旺=peak power, 得/利=strong, 平=moderate, 陷=weakened. Use these to calibrate intensity.\n\n'+
-'CRITICAL ENGLISH RULES — strictly follow all of these:\n'+
-'- ZERO raw Chinese characters in the analysis text. No 廉貞, no 七殺, no 化忌, nothing. Fully translate everything.\n'+
-'- When referencing a star, use ONLY the English name in parentheses. Example: (Great Gate star, weakened) NOT 巨門陷\n'+
-'- Write like a sharp, warm life coach — specific, personal, behavioral\n'+
-'- Every sentence should feel true to this person — something they would nod at\n'+
-'- No "the stars indicate" or "this palace shows" — say what IS true\n'+
-'- Use: "She tends to...", "Her instinct is to...", "When under pressure, she..."\n\n'+
-'STRUCTURE — use EXACTLY this order of sections:\n\n'+
-'===META=== (chart data, no change)\n\n'+
+'You are a Zi Wei Dou Shu expert writing behavioral profiles for a modern English-speaking audience.\n\n'+
+'Star brightness: 廟/旺=peak strength, 得/利=strong, 平=moderate, 陷=weakened. Use this to calibrate how strongly each quality shows up.\n\n'+
+'CRITICAL: Zero Chinese characters anywhere in the output. Translate everything into plain English behavioral language.\n'+
+'When referencing a star, use English name only in parentheses — example: (Great Gate star, weakened) not 巨門陷\n\n'+
+'WRITING STYLE — follow this precisely:\n'+
+'- Write like a sharp behavioral analyst who knows this person deeply\n'+
+'- Be direct and specific. Not "she tends to be driven" but "she sets a goal and does not stop until it is done"\n'+
+'- Every bullet point should be one clear, standalone behavioral observation\n'+
+'- No fluff, no astrology jargon, no "the stars indicate" — state what IS true\n'+
+'- Use she/her pronouns throughout\n\n'+
+'OUTPUT FORMAT — use exactly this structure:\n\n'+
+'===META===\n[chart data]\n\n'+
 '===OVERALL LIFE STRUCTURE===\n'+
-'[Write 4-6 sentences describing the overarching shape of this person\'s life path — their fundamental orientation, how they move through the world, what drives them at the deepest level. This is NOT a list. It is a flowing narrative paragraph. Then add 3-5 bullet points like:\n'+
+'[2-3 sentences describing the fundamental shape of this person\'s life — their core orientation, what drives them, how they move through the world. Follow with:]\n'+
 'Life is shaped by:\n'+
-'• [one word or short phrase]\n'+
-'• [one word or short phrase]\n'+
-'• etc.]\n\n'+
+'• [single word or short phrase]\n'+
+'• [single word or short phrase]\n'+
+'• [single word or short phrase]\n'+
+'• [single word or short phrase]\n\n'+
 '===PALACES===\n'+
-'[12 paragraphs. Format each as:\n'+
-'"**[Palace English name]** — [1-2 sentences describing what plays out in this life area. Use ONLY English. Reference stars by English name in parentheses only if it adds meaning. Be warm and specific.]"\n'+
-'Example: "**Children** — This area carries tension and miscommunication (Great Gate star in weakened state with a negative transformation). High expectations on both sides create friction; the gift is that she takes their growth seriously."]\n\n'+
-'===INTRO===\n[2-3 sentence overall behavioral summary — NO Chinese]\n\n'+
-'===CORE BEHAVIOR===\n• point\n• point\n• point\n\n'+
-'===PERSONALITY PATTERN===\n• point\n• point\n• point\n• point\n\n'+
-'===WORK BEHAVIOR===\n• point\n• point\n• point\n\n'+
-'===FINANCIAL BEHAVIOR===\n• point\n• point\n• point\n\n'+
-'===RELATIONSHIP BEHAVIOR===\n• point\n• point\n• point\n\n'+
-'===ENERGY PATTERN===\n• point\n• point\n• point\n\n'+
-'===DECISION STYLE===\n• point\n• point\n• point\n\n'+
-'===CYCLES===\n3-12 | Formation | [2 sentences — NO Chinese]\n13-22 | Exploration | [2 sentences]\n23-32 | Acceleration | [2 sentences]\n33-42 | Structuring | [2 sentences]\n43-52 | Peak Output | [2 sentences]\n53-62 | Selection | [2 sentences]\n63-72 | Stabilization | [2 sentences]\n73-82 | Maintenance | [2 sentences]\n\n'+
-'===SUMMARY===\n• point\n• point\n• point\n• point\n\n'+
-'===STRENGTH===\n[one line — NO Chinese]\n\n'+
-'===CHALLENGE===\n[one line — NO Chinese]\n\n';
+'[Write 12 short paragraphs, one per life area. Each paragraph:\n'+
+'- Start with the English palace name in bold: **Life**, **Wealth**, **Career**, etc.\n'+
+'- 2-3 sentences maximum\n'+
+'- Describe what actually plays out in that area of life — behaviors, patterns, gifts, tensions\n'+
+'- Reference stars by English name in parentheses only if it adds clarity\n'+
+'- No Chinese characters\n'+
+'Example:\n'+
+'**Children** — This area carries tension and miscommunication (Great Gate star, weakened with negative transformation). High expectations on both sides create friction. The gift is that she takes their development seriously — the work is learning to listen before guiding.]\n\n'+
+'===INTRO===\n'+
+'[2 sentences max. First sentence: what drives this person. Second sentence: what makes them consistent or inconsistent. No Chinese.]\n\n'+
+'===CORE BEHAVIOR===\n'+
+'• [one clear behavioral observation]\n'+
+'• [one clear behavioral observation]\n'+
+'• [one clear behavioral observation]\n\n'+
+'===PERSONALITY PATTERN===\n'+
+'• [one clear trait]\n'+
+'• [one clear trait]\n'+
+'• [one clear trait]\n'+
+'• [one clear trait]\n\n'+
+'===WORK BEHAVIOR===\n'+
+'• [one clear work pattern]\n'+
+'• [one clear work pattern]\n'+
+'• [one clear work pattern]\n\n'+
+'===FINANCIAL BEHAVIOR===\n'+
+'• [one clear financial pattern]\n'+
+'• [one clear financial pattern]\n'+
+'• [one clear financial pattern]\n\n'+
+'===RELATIONSHIP BEHAVIOR===\n'+
+'• [one clear relationship pattern]\n'+
+'• [one clear relationship pattern]\n'+
+'• [one clear relationship pattern]\n\n'+
+'===ENERGY PATTERN===\n'+
+'• [one clear energy pattern]\n'+
+'• [one clear energy pattern]\n'+
+'• [one clear energy pattern]\n\n'+
+'===DECISION STYLE===\n'+
+'• [one clear decision pattern]\n'+
+'• [one clear decision pattern]\n\n'+
+'===CYCLES===\n'+
+'3-12 | Early Formation | [2 sentences — what shapes this person early, how they develop self-reliance]\n'+
+'13-22 | Exposure & Exploration | [2 sentences — identity, direction, what drives movement]\n'+
+'23-32 | Acceleration | [2 sentences — ambition, momentum, what builds and what shifts]\n'+
+'33-42 | Structuring | [2 sentences — responsibility, tension between freedom and obligation]\n'+
+'43-52 | Peak Output | [2 sentences — what this window produces, what determines success]\n'+
+'53-62 | Selection | [2 sentences — what gets removed, what remains, how focus sharpens]\n'+
+'63-72 | Stabilization | [2 sentences — rhythm, reduced conflict, what life looks like now]\n'+
+'73-82 | Maintenance | [2 sentences — priorities, simplicity, what matters most]\n\n'+
+'===SUMMARY===\n'+
+'[Name] is someone who:\n'+
+'• [core behavioral truth]\n'+
+'• [core behavioral truth]\n'+
+'• [core behavioral truth]\n'+
+'• [core behavioral truth]\n\n'+
+'===STRENGTH===\n'+
+'[one line — specific strengths, comma separated, no Chinese]\n\n'+
+'===CHALLENGE===\n'+
+'[one line — specific challenge, no Chinese]\n\n';
 
     var zhInstructions =
 '你是一位紫微斗數專家，請以繁體中文撰寫完整的命盤分析。\n\n'+
