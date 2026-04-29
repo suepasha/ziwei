@@ -56,6 +56,27 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
 .pal-tbl td:first-child{color:var(--gold);font-weight:600;white-space:nowrap;width:1%;padding-right:6px}.pal-tbl td:nth-child(2){word-break:break-word;font-size:12px}
 .pal-tbl tr:last-child td{border-bottom:none}
 .pal-tbl tr:hover td{background:var(--ink3)}
+.pal-paras{display:flex;flex-direction:column;gap:10px;margin-bottom:1.5rem}
+.zwds-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-bottom:1.5rem;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.zwds-cell{background:var(--ink2);padding:8px;min-height:100px;font-size:11px;position:relative;display:flex;flex-direction:column;gap:3px}
+.zwds-cell.life{background:#f5f0e8;border:1.5px solid var(--gold)}
+.zwds-cell.body{background:#f0f5f0;border:1.5px solid #7a9a7a}
+.zwds-cell.center{background:var(--ink3);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:4px}
+.zwds-cell-ganzhi{font-size:10px;color:var(--cream3)}
+.zwds-cell-decade{font-size:9px;color:var(--cream3)}
+.zwds-cell-name{font-size:11px;font-weight:600;color:var(--gold);margin-bottom:2px}
+.zwds-badge{font-size:9px;padding:1px 5px;border-radius:3px;display:inline-block;margin-bottom:2px}
+.zwds-badge-life{background:#e8d8a0;color:#5a4500}
+.zwds-badge-body{background:#c8e0c8;color:#1a4a1a}
+.zwds-stars{display:flex;flex-wrap:wrap;gap:2px}
+.zwds-star-main{font-size:10px;font-weight:500;color:var(--cream);background:var(--gold);padding:1px 4px;border-radius:3px}
+.zwds-star-fx{font-size:10px;color:#8a6000;background:#f0e0a0;padding:1px 4px;border-radius:3px}
+.zwds-star-neg{font-size:10px;color:#8a0000;background:#f0c0c0;padding:1px 4px;border-radius:3px}
+.zwds-star-minor{font-size:10px;color:var(--cream3);background:var(--ink3);padding:1px 4px;border-radius:3px}
+.zwds-center-title{font-family:"Cormorant Garamond",serif;font-size:14px;font-weight:500;color:var(--gold)}
+.zwds-center-sub{font-size:10px;color:var(--cream3);line-height:1.5}
+.pal-para{background:var(--ink2);border:1px solid var(--border);border-radius:8px;padding:0.875rem 1rem;font-size:13px;color:var(--cream2);line-height:1.75;border-left:3px solid var(--border2)}
+.pal-name{font-weight:600;color:var(--gold);margin-right:4px}
 .intro-blk{font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;color:var(--cream2);line-height:1.85;padding:1.25rem 1.5rem;border-left:3px solid var(--gold2);background:var(--ink2);margin-bottom:1.25rem}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
 .scard{background:var(--ink2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.125rem}
@@ -301,28 +322,38 @@ async function generate(){
 
     // Step 3: Call Claude with real chart data
     var enInstructions =
-'You are a Zi Wei Dou Shu expert translating an ancient Chinese astrological chart into modern English behavioral psychology.\n\n'+
-'IMPORTANT — English audience rules:\n'+'Star brightness levels are included: 廟/旺=peak power, 得/利=strong, 平=moderate, 陷=weakened. Use these to calibrate the intensity of each star\'s influence in your interpretation.\n'+
-'- NEVER use raw Chinese star names alone (廉貞, 七殺, etc.) in the analysis text — always translate to behavioral meaning\n'+
-'- Describe what each star MEANS in plain English: behavior, personality, tendencies, patterns\n'+
-'- Use modern relatable language: "driven by ambition", "struggles with trust", "thrives under pressure"\n'+
-'- You may briefly reference the star name in the palace overview column only\n'+
-'- Write like a psychologist or executive coach, not an astrologer\n'+
-'- Make every point feel like something the person would recognize about themselves\n\n';
+'You are a Zi Wei Dou Shu expert writing for a modern English-speaking audience who is curious but unfamiliar with Chinese astrology.\n\n'+
+'Star brightness levels: 廟/旺=peak power, 得/利=strong, 平=moderate, 陷=weakened. Let brightness shape HOW STRONGLY each quality shows up.\n\n'+
+'ENGLISH WRITING RULES:\n'+
+'- Write like a sharp, warm life coach who deeply understands human behavior\n'+
+'- Every sentence should feel personally true — something the person would nod at\n'+
+'- Be specific and concrete, not vague. NOT "she is driven" but "she sets a goal and does not stop until it is done, even when others have given up"\n'+
+'- For the 12 palace analysis: each palace is a life area. Describe what actually plays out in that area of their life — what they experience, how they behave, what challenges or gifts show up\n'+
+'- You MAY briefly name the Chinese star in parentheses for reference, but always lead with what it MEANS in real life\n'+
+'- Avoid generic astrology language. No "the stars indicate". Say what IS true about this person\n'+
+'- Use second-person-style phrasing in the profile sections: "She tends to...", "Her instinct is to...", "When under pressure, she..."\n\n'+
+'PALACE ANALYSIS FORMAT (one paragraph per palace, 2-3 sentences):\n'+
+'Lead with the life area name in plain English, then describe what this person actually experiences there. Be warm, direct, and specific.\n\n';
 
     var zhInstructions =
 '你是一位紫微斗數專家，請以繁體中文撰寫完整的命盤分析。\n\n'+
-'使用正統紫微斗數術語，引用星曜特質、四化、宮位交互關係。\n'+
-'分析應深入、具體，讓熟悉命理的讀者能充分理解。\n\n';
+'星曜亮度：廟/旺=極強，得/利=強，平=中等，陷=弱。請依亮度調整詮釋力度。\n\n'+
+'寫作要求：\n'+
+'- 使用正統紫微斗數術語，引用星曜特質、四化飛星、宮位三方四正交互關係\n'+
+'- 每個宮位分析需包含：主星特質、亮度影響、與命宮或其他宮位的互動\n'+
+'- 十二宮分析每宮2-3句，先點出宮位主題，再解析星曜組合帶來的具體影響\n'+
+'- 分析應深入具體，讓讀者能清楚了解該宮位在人生中的實際展現\n'+
+'- 行為側寫部分請結合命宮主星、身宮、生年四化，給出立體的人格描述\n\n';
 
     var sharedChart =
 'Name: '+(name||'this person')+' | Gender: '+gender+' | Born: '+year+'/'+month+'/'+day+' | Hour: '+hrTxt+'\n'+
 'Lunar: '+chart.lunarDate+' | Pillars: '+chart.chinesePillars+'\n'+
 (LANG==='en' ? 'Five Elements: '+chart.fiveElements+'\n\n' : 'Five Elements: '+chart.fiveElements+' | Life Master: '+chart.lifeMaster+' | Body Master: '+chart.bodyMaster+'\n\n')+
-'NATAL CHART (use these exact star placements, do NOT recalculate):\n'+palaceSummary+'\n\n';
+'NATAL CHART (use these exact star placements, do NOT recalculate):\n'+palaceSummary+'\n\n'+
+'Palace English reference: 命宮=Life, 兄弟=Siblings, 夫妻=Spouse/Partner, 子女=Children, 財帛=Wealth, 疾厄=Health, 遷移=Travel/Change, 僕役=Friends/Network, 官祿=Career, 田宅=Home/Property, 福德=Wellbeing/Inner Life, 父母=Parents\n\n';
 
-    var enPalaceNote = '[12 lines. Format: Life Area | Key theme in plain English — e.g. "Life Palace | Decisive and intense — a natural leader who acts on instinct and holds firm under pressure"]';
-    var zhPalaceNote = '[12行，格式：宮位名 | 干支 | 主要星曜與解析]';
+    var enPalaceNote = '[Write 12 paragraphs, one per palace. Format each as:\n"**[Palace English name]** — [2-3 sentences describing what actually plays out in this life area. Be specific and personal, not abstract. Name the stars briefly in parentheses if helpful.]"\nExample: "**Life Palace** — She leads from conviction, not consensus. Decisive and intense (廉貞/Virtue Star at moderate strength), she acts before others have finished deliberating — and is usually right. Her challenge is trusting that slowing down does not mean losing ground."]';
+    var zhPalaceNote = '[12段，每宮格式：\n**[宮位名]**\n主星：[星曜+亮度+四化]\n解析：[2-3句，說明此宮位在人生中的具體展現，包含星曜特質與宮位互動]\n]';
 
     var prompt = (LANG==='en' ? enInstructions : zhInstructions) + sharedChart +
 'Use EXACTLY these section markers:\n\n'+
@@ -361,6 +392,67 @@ async function generate(){
   document.getElementById('btn-gen').disabled=false;
 }
 
+function renderPalaceGrid(chart, name) {
+  // Traditional ZWDS grid layout by branch
+  // Row 0: 巳午未申, Row 1: 辰_酉, Row 2: 卯_戌, Row 3: 寅丑子亥
+  var layout = [
+    ['巳','午','未','申'],
+    ['辰',null,null,'酉'],
+    ['卯',null,null,'戌'],
+    ['寅','丑','子','亥']
+  ];
+  var branchMap = {};
+  chart.palaces.forEach(function(p){ branchMap[p.branch] = p; });
+
+  var NEG = ['擎羊','陀羅','火星','鈴星','地空','地劫'];
+  var FX  = ['化祿','化權','化科','化忌'];
+
+  function starTag(s) {
+    var n = s.name + (s.mutagen||'') + (s.brightness?'·'+s.brightness:'');
+    var isFx = FX.some(function(f){return s.name.includes(f)||（s.mutagen&&s.mutagen.length>0);});
+    var isNeg = NEG.some(function(f){return s.name.startsWith(f);});
+    if(s.type==='major'||(!s.type)) return '<span class="zwds-star-main">'+n+'</span>';
+    if(isNeg) return '<span class="zwds-star-neg">'+n+'</span>';
+    if(s.mutagen) return '<span class="zwds-star-fx">'+n+'</span>';
+    return '<span class="zwds-star-minor">'+s.name+(s.brightness?'·'+s.brightness:'')+'</span>';
+  }
+
+  var h = '<div class="zwds-grid">';
+  for(var row=0; row<4; row++) {
+    for(var col=0; col<4; col++) {
+      var br = layout[row][col];
+      // Center cells
+      if(br === null) {
+        if(row===1 && col===1) {
+          h += '<div class="zwds-cell center" style="grid-column:2/4;grid-row:2/4">';
+          h += '<div class="zwds-center-title">紫微斗數</div>';
+          h += '<div class="zwds-center-title" style="font-size:11px">'+(name||'命盤')+'</div>';
+          h += '<div class="zwds-center-sub">'+chart.lunarDate+'<br>'+chart.chinesePillars+'<br>'+chart.fiveElements+'</div>';
+          h += '</div>';
+        }
+        continue;
+      }
+      var p = branchMap[br];
+      if(!p) { h += '<div class="zwds-cell"></div>'; continue; }
+      var cls = 'zwds-cell';
+      if(p.isLifePalace) cls += ' life';
+      else if(p.isBodyPalace) cls += ' body';
+      h += '<div class="'+cls+'">';
+      h += '<div class="zwds-cell-ganzhi">'+p.stem+p.branch+'</div>';
+      if(p.isLifePalace) h += '<span class="zwds-badge zwds-badge-life">命宮</span>';
+      if(p.isBodyPalace) h += '<span class="zwds-badge zwds-badge-body">身宮</span>';
+      h += '<div class="zwds-cell-name">'+p.name.replace('命宮','').replace('身宮','')+'</div>';
+      h += '<div class="zwds-cell-decade">大限:'+p.decadeRange+'</div>';
+      h += '<div class="zwds-stars">';
+      p.majorStars.forEach(function(s){ h += starTag(s); });
+      p.minorStars.slice(0,4).forEach(function(s){ h += starTag(s); });
+      h += '</div></div>';
+    }
+  }
+  h += '</div>';
+  return h;
+}
+
 function sec(t,tag){var m=t.match(new RegExp('==='+tag+'===\\n([\\s\\S]*?)(?====|$)'));return m?m[1].trim():'';}
 function bullets(r){return r.split('\n').map(function(l){return l.replace(/^[•·\-]\s*/,'').trim();}).filter(Boolean);}
 
@@ -384,10 +476,33 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
   }
   h+='</div></div>';
 
-  if(palRows.length){
-    h+='<div class="stitle">12 Palace Overview</div><table class="pal-tbl"><tbody>';
-    palRows.forEach(function(r){h+='<tr><td>'+r.palace+'</td><td>'+translateStars(r.stars,true)+'</td></tr>';});
-    h+='</tbody></table>';
+  // 12 palace section
+  var palacesRaw = sec(text,'PALACES');
+  if(palacesRaw) {
+    h+='<div class="stitle">'+(LANG==='zh'?'十二宮命盤':'12 Palace Overview')+'</div>';
+    if(LANG==='zh') {
+      // Visual grid for Chinese mode
+      h += renderPalaceGrid(chart, name);
+    }
+    if(LANG==='en') {
+      // English: paragraph style
+      h+='<div class="pal-paras">';
+      palacesRaw.split(/\n(?=\*\*|[A-Z][a-z]+ Palace)/).forEach(function(para){
+        para=para.trim(); if(!para) return;
+        para=para.replace(/^\*\*([^*]+)\*\*/, '<span class="pal-name">$1</span>');
+        h+='<div class="pal-para">'+para+'</div>';
+      });
+      h+='</div>';
+    } else {
+      // Chinese: text paragraphs below grid
+      h+='<div class="pal-paras">';
+      palacesRaw.split(/\n(?=\*\*[^*])/).forEach(function(para){
+        para=para.trim(); if(!para) return;
+        para=para.replace(/^\*\*([^*]+)\*\*/, '<span class="pal-name">$1</span>');
+        h+='<div class="pal-para">'+para+'</div>';
+      });
+      h+='</div>';
+    }
   }
 
   var intro=sec(text,'INTRO');
