@@ -57,24 +57,7 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
 .pal-tbl tr:last-child td{border-bottom:none}
 .pal-tbl tr:hover td{background:var(--ink3)}
 .pal-paras{display:flex;flex-direction:column;gap:10px;margin-bottom:1.5rem}
-.zwds-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-bottom:1.5rem;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden}
-.zwds-cell{background:var(--ink2);padding:8px;min-height:100px;font-size:11px;position:relative;display:flex;flex-direction:column;gap:3px}
-.zwds-cell.life{background:#f5f0e8;border:1.5px solid var(--gold)}
-.zwds-cell.body{background:#f0f5f0;border:1.5px solid #7a9a7a}
-.zwds-cell.center{background:var(--ink3);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:4px}
-.zwds-cell-ganzhi{font-size:10px;color:var(--cream3)}
-.zwds-cell-decade{font-size:9px;color:var(--cream3)}
-.zwds-cell-name{font-size:11px;font-weight:600;color:var(--gold);margin-bottom:2px}
-.zwds-badge{font-size:9px;padding:1px 5px;border-radius:3px;display:inline-block;margin-bottom:2px}
-.zwds-badge-life{background:#e8d8a0;color:#5a4500}
-.zwds-badge-body{background:#c8e0c8;color:#1a4a1a}
-.zwds-stars{display:flex;flex-wrap:wrap;gap:2px}
-.zwds-star-main{font-size:10px;font-weight:500;color:var(--cream);background:var(--gold);padding:1px 4px;border-radius:3px}
-.zwds-star-fx{font-size:10px;color:#8a6000;background:#f0e0a0;padding:1px 4px;border-radius:3px}
-.zwds-star-neg{font-size:10px;color:#8a0000;background:#f0c0c0;padding:1px 4px;border-radius:3px}
-.zwds-star-minor{font-size:10px;color:var(--cream3);background:var(--ink3);padding:1px 4px;border-radius:3px}
-.zwds-center-title{font-family:"Cormorant Garamond",serif;font-size:14px;font-weight:500;color:var(--gold)}
-.zwds-center-sub{font-size:10px;color:var(--cream3);line-height:1.5}
+
 .pal-para{background:var(--ink2);border:1px solid var(--border);border-radius:8px;padding:0.875rem 1rem;font-size:13px;color:var(--cream2);line-height:1.75;border-left:3px solid var(--border2)}
 .pal-name{font-weight:600;color:var(--gold);margin-right:4px}
 .intro-blk{font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;color:var(--cream2);line-height:1.85;padding:1.25rem 1.5rem;border-left:3px solid var(--gold2);background:var(--ink2);margin-bottom:1.25rem}
@@ -392,67 +375,6 @@ async function generate(){
   document.getElementById('btn-gen').disabled=false;
 }
 
-function renderPalaceGrid(chart, name) {
-  // Traditional ZWDS grid layout by branch
-  // Row 0: 巳午未申, Row 1: 辰_酉, Row 2: 卯_戌, Row 3: 寅丑子亥
-  var layout = [
-    ['巳','午','未','申'],
-    ['辰',null,null,'酉'],
-    ['卯',null,null,'戌'],
-    ['寅','丑','子','亥']
-  ];
-  var branchMap = {};
-  chart.palaces.forEach(function(p){ branchMap[p.branch] = p; });
-
-  var NEG = ['擎羊','陀羅','火星','鈴星','地空','地劫'];
-  var FX  = ['化祿','化權','化科','化忌'];
-
-  function starTag(s) {
-    var n = s.name + (s.mutagen||'') + (s.brightness?'·'+s.brightness:'');
-    var isFx = FX.some(function(f){return s.name.includes(f)||（s.mutagen&&s.mutagen.length>0);});
-    var isNeg = NEG.some(function(f){return s.name.startsWith(f);});
-    if(s.type==='major'||(!s.type)) return '<span class="zwds-star-main">'+n+'</span>';
-    if(isNeg) return '<span class="zwds-star-neg">'+n+'</span>';
-    if(s.mutagen) return '<span class="zwds-star-fx">'+n+'</span>';
-    return '<span class="zwds-star-minor">'+s.name+(s.brightness?'·'+s.brightness:'')+'</span>';
-  }
-
-  var h = '<div class="zwds-grid">';
-  for(var row=0; row<4; row++) {
-    for(var col=0; col<4; col++) {
-      var br = layout[row][col];
-      // Center cells
-      if(br === null) {
-        if(row===1 && col===1) {
-          h += '<div class="zwds-cell center" style="grid-column:2/4;grid-row:2/4">';
-          h += '<div class="zwds-center-title">紫微斗數</div>';
-          h += '<div class="zwds-center-title" style="font-size:11px">'+(name||'命盤')+'</div>';
-          h += '<div class="zwds-center-sub">'+chart.lunarDate+'<br>'+chart.chinesePillars+'<br>'+chart.fiveElements+'</div>';
-          h += '</div>';
-        }
-        continue;
-      }
-      var p = branchMap[br];
-      if(!p) { h += '<div class="zwds-cell"></div>'; continue; }
-      var cls = 'zwds-cell';
-      if(p.isLifePalace) cls += ' life';
-      else if(p.isBodyPalace) cls += ' body';
-      h += '<div class="'+cls+'">';
-      h += '<div class="zwds-cell-ganzhi">'+p.stem+p.branch+'</div>';
-      if(p.isLifePalace) h += '<span class="zwds-badge zwds-badge-life">命宮</span>';
-      if(p.isBodyPalace) h += '<span class="zwds-badge zwds-badge-body">身宮</span>';
-      h += '<div class="zwds-cell-name">'+p.name.replace('命宮','').replace('身宮','')+'</div>';
-      h += '<div class="zwds-cell-decade">大限:'+p.decadeRange+'</div>';
-      h += '<div class="zwds-stars">';
-      p.majorStars.forEach(function(s){ h += starTag(s); });
-      p.minorStars.slice(0,4).forEach(function(s){ h += starTag(s); });
-      h += '</div></div>';
-    }
-  }
-  h += '</div>';
-  return h;
-}
-
 function sec(t,tag){var m=t.match(new RegExp('==='+tag+'===\\n([\\s\\S]*?)(?====|$)'));return m?m[1].trim():'';}
 function bullets(r){return r.split('\n').map(function(l){return l.replace(/^[•·\-]\s*/,'').trim();}).filter(Boolean);}
 
@@ -479,13 +401,8 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
   // 12 palace section
   var palacesRaw = sec(text,'PALACES');
   if(palacesRaw) {
-    h+='<div class="stitle">'+(LANG==='zh'?'十二宮命盤':'12 Palace Overview')+'</div>';
-    if(LANG==='zh') {
-      // Visual grid for Chinese mode
-      h += renderPalaceGrid(chart, name);
-    }
+    h+='<div class="stitle">'+(LANG==='zh'?'十二宮概覽':'12 Palace Overview')+'</div>';
     if(LANG==='en') {
-      // English: paragraph style
       h+='<div class="pal-paras">';
       palacesRaw.split(/\n(?=\*\*|[A-Z][a-z]+ Palace)/).forEach(function(para){
         para=para.trim(); if(!para) return;
@@ -494,7 +411,6 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
       });
       h+='</div>';
     } else {
-      // Chinese: text paragraphs below grid
       h+='<div class="pal-paras">';
       palacesRaw.split(/\n(?=\*\*[^*])/).forEach(function(para){
         para=para.trim(); if(!para) return;
