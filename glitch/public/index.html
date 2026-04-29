@@ -52,7 +52,7 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
 .pal-tbl{width:100%;border-collapse:collapse;font-size:13px;background:var(--ink2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:1.5rem;table-layout:fixed}
 .pal-tbl th{text-align:left;padding:9px 14px;font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--cream3);background:var(--ink3);border-bottom:1px solid var(--border)}
 .pal-tbl td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--cream2);line-height:1.5;vertical-align:top;word-break:break-word}
-.pal-tbl td:first-child{color:var(--gold);font-weight:500;white-space:nowrap;width:28%}.pal-tbl td:nth-child(2){width:72%;word-break:break-word}
+.pal-tbl td:first-child{color:var(--gold);font-weight:500;white-space:nowrap;width:10%}.pal-tbl td:nth-child(2){width:90%;word-break:break-word;font-size:12px}
 .pal-tbl tr:last-child td{border-bottom:none}
 .pal-tbl tr:hover td{background:var(--ink3)}
 .intro-blk{font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;color:var(--cream2);line-height:1.85;padding:1.25rem 1.5rem;border-left:3px solid var(--gold2);background:var(--ink2);margin-bottom:1.25rem}
@@ -318,15 +318,22 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
   var cycRows=sec(text,'CYCLES').split('\n').filter(Boolean).map(function(l){var p=l.split('|');return p.length>=3?{range:p[0].trim(),phase:p[1].trim(),text:p[2].trim()}:null;}).filter(Boolean);
 
   var h='<div class="prof-hdr"><div class="pname">'+(name?name+' — ':'')+'Behavioral &amp; Personality Profile</div>';
-  h+='<div class="psub">'+gender+' · '+month+'/'+day+'/'+year+' · '+hrTxt+' · '+ganzhi+' year</div>';
+  h+='<div class="psub">'+gender+' · '+month+'/'+day+'/'+year+' · '+hrTxt+'</div>';
   h+='<div class="pills">';
-  [['Life Master',chart.lifeMaster],['Body Master',chart.bodyMaster]].forEach(function(pair){
+  var masterEN = {'巨門': 'Gate', '天相': 'Minister', '祿存': 'Wealth Star', '文曲': 'Arts Star', '天梁': 'Pillar', '天機': 'Advisor', '紫微': 'Emperor', '太陽': 'Sun', '武曲': 'Marshal', '天同': 'Harmony', '廉貞': 'Virtue', '天府': 'Treasury', '太陰': 'Moon', '貪狼': 'Appetite', '天魁': 'Nobleman', '文昌': 'Literary', '火星': 'Mars', '鈴星': 'Bell', '左輔': 'Left Aid', '右弼': 'Right Aid'};
+  function masterVal(zh) {
+    if (LANG !== 'en') return zh;
+    return zh + (masterEN[zh] ? ' (' + masterEN[zh] + ')' : '');
+  }
+  var lifeLabel = LANG==='en' ? 'Life Master (命主)' : '命主';
+  var bodyLabel = LANG==='en' ? 'Body Master (身主)' : '身主';
+  [[lifeLabel, masterVal(chart.lifeMaster)],[bodyLabel, masterVal(chart.bodyMaster)]].forEach(function(pair){
     if(pair[1]) h+='<span class="pill">'+pair[0]+'<b>'+pair[1]+'</b></span>';
   });
   h+='</div></div>';
 
   if(palRows.length){
-    h+='<div class="stitle">12 palace overview</div><table class="pal-tbl"><thead><tr><th>Palace</th><th>Stars &amp; interpretation</th></tr></thead><tbody>';
+    h+='<div class="stitle">12 Palace Overview</div><table class="pal-tbl"><thead><tr><th style="width:10%">Palace</th><th style="width:90%">Stars &amp; interpretation</th></tr></thead><tbody>';
     palRows.forEach(function(r){h+='<tr><td>'+r.palace+'</td><td>'+translateStars(r.stars)+'</td></tr>';});
     h+='</tbody></table>';
   }
