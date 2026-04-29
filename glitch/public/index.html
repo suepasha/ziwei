@@ -328,58 +328,55 @@ async function generate(){
 
     if(LANG==='en') {
       prompt =
-'You are a Zi Wei Dou Shu expert writing a deeply personal behavioral profile for an English-speaking audience.\n\n'+
+'You are a Zi Wei Dou Shu expert writing a deeply personal behavioral profile.\n\n'+
 'Star brightness: 廟/旺=peak, 得/利=strong, 平=moderate, 陷=weakened. Use this to calibrate intensity.\n\n'+
-'RULES:\n'+
-'- Zero Chinese characters in the output\n'+
-'- No star name references in the text — write purely from behavioral knowledge\n'+
-'- Write directly TO this person — not about them. Use "She" but make every line feel personal\n'+
-'- Be specific. Not "she is independent" but "she does not need consensus to act — she decides, then moves"\n'+
-'- No section should repeat what another section already said. Each covers different ground.\n'+
-'- No filler phrases like "it is worth noting" or "this suggests"\n\n'+
+'RULES — non-negotiable:\n'+
+'- Zero Chinese characters anywhere\n'+
+'- No star name references in any text — write purely from behavioral insight\n'+
+'- Write directly about this specific person. Every line must feel like it could only be written for her\n'+
+'- Be specific. Not "she is independent" — "she does not wait for agreement before acting"\n'+
+'- No filler. No "it is worth noting". No "this suggests". State what is true.\n'+
+'- Each section covers DIFFERENT ground. No repeating across sections.\n\n'+
 'Birth: '+(name||'this person')+' | '+gender+' | '+year+'/'+month+'/'+day+' | '+hrTxt+'\n'+
 'Lunar: '+chart.lunarDate+' | Five Elements: '+chart.fiveElements+'\n'+
-'Chart (do not recalculate): '+palaceSummary+'\n'+
+'Chart: '+palaceSummary+'\n'+
 'Palace names: 命宮=Life, 兄弟=Siblings, 夫妻=Spouse\/Partner, 子女=Children, 財帛=Wealth, 疾厄=Health, 遷移=Travel\/Change, 僕役=Friends\/Network, 官祿=Career, 田宅=Home, 福德=Inner Life, 父母=Parents\n\n'+
-'Use EXACTLY these section markers in this order:\n\n'+
+'OUTPUT — use exactly these 5 sections:\n\n'+
 '===META===\n'+
 'Lunar: '+chart.lunarDate+'\nLife Palace: '+lifePalace.branch+'\nBody Palace: '+bodyPalace.branch+'\n5-Element: '+chart.fiveElements+'\n\n'+
 '===LIFE PORTRAIT===\n'+
-'[One paragraph, 4-5 sentences. Open with who she is at her core. Then describe the shape of her life — how it unfolds, what drives it, what pattern keeps repeating. End with one sentence that captures the thing most people would never guess about her. Specific, personal, direct. No star names.]\n'+
-'Life is shaped by:\n• [single phrase — a force or pattern]\n• [single phrase]\n• [single phrase]\n• [single phrase]\n\n'+
+'[One paragraph, 4-5 sentences. Sentence 1: her core nature — what drives her, not who she appears to be. Sentence 2-3: the shape of her life — how it actually unfolds, what pattern keeps repeating. Sentence 4-5: something true about her that most people miss. Direct, specific, no hedging.]\n'+
+'Life is shaped by:\n• [single force or pattern]\n• [single force or pattern]\n• [single force or pattern]\n• [single force or pattern]\n\n'+
 '===PALACES===\n'+
-'[12 paragraphs — one per life area. Order: Life · Siblings · Spouse\/Partner · Children · Wealth · Health · Travel & Change · Friends & Network · Career · Home · Inner Life · Parents\n'+
-'Format: **[Name]** — [2-3 sentences. What actually happens in this area. Specific. No star names. No Chinese.]\n'+
-'Cover DIFFERENT ground from the behavioral sections below — focus on what plays out in that life area, not personality traits.]\n\n'+
-'===CORE BEHAVIOR===\n'+
-'[3 bullets. Observable actions — what she actually DOES, not who she is. Verbs over adjectives.]\n• \n• \n• \n\n'+
-'===PERSONALITY PATTERN===\n'+
-'[4 bullets. Inner patterns — how she experiences and processes the world. Different from behavior above.]\n• \n• \n• \n• \n\n'+
-'===WORK BEHAVIOR===\n'+
-'[3 bullets. Specific to professional context — what she does well, what environment fits, what does not.]\n• \n• \n• \n\n'+
-'===FINANCIAL BEHAVIOR===\n'+
-'[3 bullets. How she earns, spends, builds wealth — specific patterns.]\n• \n• \n• \n\n'+
-'===RELATIONSHIP BEHAVIOR===\n'+
-'[3 bullets. How she connects, what she needs, how she shows up — not repeating personality above.]\n• \n• \n• \n\n'+
-'===ENERGY PATTERN===\n'+
-'[2 bullets. How her energy moves — cycles, rhythms, what depletes and restores. Not personality.]\n• \n• \n\n'+
-'===DECISION STYLE===\n'+
-'[2 bullets. How she makes decisions — process, speed, what influences her. Specific.]\n• \n• \n\n'+
+'[12 paragraphs. One per life area in this order: Life · Siblings · Spouse\/Partner · Children · Wealth · Health · Travel & Change · Friends & Network · Career · Home · Inner Life · Parents\n'+
+'Format: **[Name]** — [2-3 sentences. What actually plays out in this area. Specific to this person. No star names. No Chinese. Each palace should say something the person would immediately recognize as true.]\n'+
+'These 12 paragraphs are the main substance — cover work, money, relationships, health here. The next section does NOT repeat this.]\n\n'+
+'===HOW SHE OPERATES===\n'+
+'[5-6 bullets covering: how she acts, how she thinks, how she makes decisions, how her energy moves, what depletes her, what restores her. Each bullet is a different dimension. No overlap with the palaces above. No overlap between bullets.]\n'+
+'• [observable action or behavior]\n'+
+'• [inner pattern or processing style]\n'+
+'• [decision-making approach]\n'+
+'• [energy pattern — what fuels or drains]\n'+
+'• [something about how she relates to others]\n'+
+'• [something about her relationship to time, pressure, or change]\n\n'+
 '===CYCLES===\n'+
-'3-12 | Early Formation | [What shapes her early. One specific insight.]\n'+
-'13-22 | Exposure & Exploration | [Identity and direction. What moves her.]\n'+
-'23-32 | Acceleration | [What builds. What the decade demands.]\n'+
-'33-42 | Structuring | [Responsibility vs freedom. The core tension.]\n'+
-'43-52 | Peak Output | [What converges. What this window produces.]\n'+
-'53-62 | Selection | [What gets released. What she keeps.]\n'+
-'63-72 | Stabilization | [What life becomes. How she carries it.]\n'+
-'73-82 | Maintenance | [What matters now. How she lives it.]\n\n'+
+'3-12 | Early Formation | [One specific sentence about what shapes her early.]\n'+
+'13-22 | Exploration | [One sentence about identity and direction.]\n'+
+'23-32 | Acceleration | [One sentence about what builds and what is demanded.]\n'+
+'33-42 | Structuring | [One sentence about the core tension of this decade.]\n'+
+'43-52 | Peak Output | [One sentence about what converges and what it produces.]\n'+
+'53-62 | Selection | [One sentence about what gets released.]\n'+
+'63-72 | Stabilization | [One sentence about what life becomes.]\n'+
+'73-82 | Maintenance | [One sentence about what matters and how she carries it.]\n\n'+
 '===SUMMARY===\n'+
-(name||'She')+' is someone who:\n• [behavioral truth — specific, not general]\n• [behavioral truth]\n• [behavioral truth]\n• [behavioral truth]\n\n'+
+(name||'She')+' is someone who:\n'+
+'• [one behavioral truth — the most essential thing]\n'+
+'• [one behavioral truth — different from above]\n'+
+'• [one behavioral truth — different from above]\n\n'+
 '===STRENGTH===\n'+
-'[One line. 2-3 specific qualities, comma separated. Not generic. What makes her formidable.]\n\n'+
+'[One line. 2-3 specific qualities. What makes her genuinely formidable.]\n\n'+
 '===CHALLENGE===\n'+
-'[One line. The one real obstacle. Specific. Not "balance" or "stress".]';
+'[One line. The one real friction point. Specific to her. Not generic.]';
 
     } else {
       prompt =
@@ -387,37 +384,31 @@ async function generate(){
 '星曜亮度：廟/旺=極強，得/利=強，平=中等，陷=弱。請依亮度精準調整詮釋力道。\n\n'+
 '寫作原則：\n'+
 '- 每一句話都要像是專門為這個人說的，不能套用到任何人身上\n'+
-'- 直接、具體、有觀點。不要說「可能」「或許」「有時」——說的就是這個人\n'+
+'- 直接、具體、有觀點。不說「可能」「或許」——說的就是這個人\n'+
 '- 各段落不重複，每個區塊涵蓋不同面向\n'+
-'- 用繁體中文，語氣親切但精準\n\n'+
+'- 十二宮是主要內容，行為分析不重複宮位已說的事\n\n'+
 '出生資料：'+(name||'此人')+' | '+gender+' | '+year+'年'+month+'月'+day+'日 | '+hrTxt+'\n'+
 '農曆：'+chart.lunarDate+' | 干支：'+chart.chinesePillars+' | 五行：'+chart.fiveElements+'\n'+
 '命主：'+chart.lifeMaster+' | 身主：'+chart.bodyMaster+'\n'+
 '命盤（請使用以下星曜，勿重新計算）：\n'+palaceSummary+'\n\n'+
-'請依序使用以下段落標記：\n\n'+
+'請依序使用以下六個段落標記：\n\n'+
 '===META===\n'+
 '農曆：'+chart.lunarDate+'\n干支：'+chart.chinesePillars+'\n命宮：'+lifePalace.branch+'\n身宮：'+bodyPalace.branch+'\n五行局：'+chart.fiveElements+'\n命主：'+chart.lifeMaster+'\n身主：'+chart.bodyMaster+'\n\n'+
 '===LIFE PORTRAIT===\n'+
-'[4-5句。第一句點出此人最核心的性格本質。接著描述她人生的走法與節奏——不只是性格，是命運的形狀。最後一句說出旁人看不到、但她自己深知的那一面。直接、具體、有力。]\n'+
-'人生的基調：\n• [短語——一種力量或模式]\n• [短語]\n• [短語]\n• [短語]\n\n'+
+'[4-5句人物畫像。第一句：她的核心本質——驅動她的力量，不是她的外在形象。第二三句：她人生的走法與節奏——實際展現的模式。第四五句：旁人看不到、但她自己深知的那一面。直接，不客套，不說廢話。]\n'+
+'人生的基調：\n• [一個詞或短語——一種力量]\n• [一個詞或短語]\n• [一個詞或短語]\n• [一個詞或短語]\n\n'+
 '===PALACES===\n'+
 '[12段，每宮一段。順序：命宮·兄弟·夫妻·子女·財帛·疾厄·遷移·僕役·官祿·田宅·福德·父母\n'+
-'格式：**[宮位名]** — [2-3句。說這個宮位在此人生命中實際展現的樣貌。引用主星與亮度。具體，不套用。]\n'+
-'此段涵蓋各宮位實際展現，不重複下方行為分析的內容。]\n\n'+
-'===CORE BEHAVIOR===\n'+
-'[3點。可觀察的行為——她實際做什麼，不是性格特質。]\n• \n• \n• \n\n'+
-'===PERSONALITY PATTERN===\n'+
-'[4點。內在模式——她如何感受與處理世界。與上方行為不重複。]\n• \n• \n• \n• \n\n'+
-'===WORK BEHAVIOR===\n'+
-'[3點。職場中的具體模式——她在什麼環境發光，什麼環境消耗她。]\n• \n• \n• \n\n'+
-'===FINANCIAL BEHAVIOR===\n'+
-'[3點。財務的具體模式——她如何賺、如何用、如何積累。]\n• \n• \n• \n\n'+
-'===RELATIONSHIP BEHAVIOR===\n'+
-'[3點。她在關係中的實際樣貌——不重複上方性格。]\n• \n• \n• \n\n'+
-'===ENERGY PATTERN===\n'+
-'[2點。她的能量節奏——消耗與恢復的模式。]\n• \n• \n\n'+
-'===DECISION STYLE===\n'+
-'[2點。她如何做決定——過程、速度、影響她的因素。]\n• \n• \n\n'+
+'格式：**[宮位名]** — [2-3句。引用主星與亮度。說這個宮位在此人生命中的實際展現。具體，不套用，這個人看了要點頭。]\n'+
+'此段涵蓋職業、財富、感情等所有人生面向。下方行為分析不重複這裡的內容。]\n\n'+
+'===HOW SHE OPERATES===\n'+
+'[5-6點，涵蓋：她如何行動、如何思考、如何做決定、能量的節奏、什麼耗損她、什麼恢復她。每點不同面向，不重複上方宮位內容。]\n'+
+'• [可觀察的行為模式]\n'+
+'• [內在處理方式或思維模式]\n'+
+'• [決策風格]\n'+
+'• [能量節奏——什麼驅動或耗損她]\n'+
+'• [與他人的關係模式]\n'+
+'• [她與時間、壓力或變化的關係]\n\n'+
 '===CYCLES===\n'+
 '3-12 | 成形期 | [一句話，說這個時期對她的具體影響。]\n'+
 '13-22 | 探索期 | [一句話。]\n'+
@@ -428,11 +419,14 @@ async function generate(){
 '63-72 | 穩定期 | [一句話。]\n'+
 '73-82 | 沉澱期 | [一句話。]\n\n'+
 '===SUMMARY===\n'+
-(name||'她')+'的特質：\n• [一個核心真相——具體，不套用]\n• [一個核心真相]\n• [一個核心真相]\n• [一個核心真相]\n\n'+
+(name||'她')+'的特質：\n'+
+'• [一個核心真相——最根本的那一個]\n'+
+'• [一個核心真相——與上面不同]\n'+
+'• [一個核心真相——與上面不同]\n\n'+
 '===STRENGTH===\n'+
-'[一句話。2-3個具體優勢，用逗號分隔。說的是她，不是任何人。]\n\n'+
+'[一句話。2-3個具體優勢，逗號分隔。說的是她，不是任何人。]\n\n'+
 '===CHALLENGE===\n'+
-'[一句話。一個真正的挑戰。具體。不說「平衡」「壓力」這種廢話。]';
+'[一句話。一個真正的摩擦點。具體，不說「平衡」或「壓力」。]';
     }
 
         var res=await fetch('/proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:6000,messages:[{role:'user',content:prompt}]})});
@@ -561,12 +555,10 @@ function bullets(r){return r.split('\n').map(function(l){return l.replace(/^[•
 function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
   _lastChart=chart;
   _lastName=year+'年'+month+'月'+day+'日'+hrTxt+' 陰'+(gender==='Female'?'女':'男');
-  var ml={};
-  sec(text,'META').split('\n').forEach(function(l){var ci=l.indexOf(':');if(ci>-1)ml[l.slice(0,ci).trim()]=l.slice(ci+1).trim();});
-  var cycRows=sec(text,'CYCLES').split('\n').filter(Boolean).map(function(l){var p=l.split('|');return p.length>=3?{range:p[0].trim(),phase:p[1].trim(),text:p[2].trim()}:null;}).filter(Boolean);
 
-  var masterEN={'巨門':'Gate','天相':'Minister','祿存':'Wealth Star','文曲':'Arts','天梁':'Pillar','天機':'Advisor','紫微':'Emperor','太陽':'Sun','武曲':'Marshal','天同':'Harmony','廉貞':'Virtue','天府':'Treasury','太陰':'Moon','貪狼':'Appetite','天魁':'Nobleman','文昌':'Literary','火星':'Mars','鈴星':'Bell','左輔':'Left Aid','右弼':'Right Aid'};
-  function masterVal(zh){return LANG!=='en'?zh:(masterEN[zh]?masterEN[zh]:zh);}
+  var cycRows=sec(text,'CYCLES').split('\n').filter(Boolean).map(function(l){
+    var p=l.split('|'); return p.length>=3?{range:p[0].trim(),phase:p[1].trim(),text:p[2].trim()}:null;
+  }).filter(Boolean);
 
   var genderLabel=LANG==='zh'?(gender==='Male'?'男':'女'):gender;
   var h='';
@@ -574,30 +566,25 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
   // ── HEADER ──
   h+='<div class="prof-hdr">';
   h+='<div class="pname">'+(name?name+' — ':'')+(LANG==='zh'?'命盤行為分析':'Behavioral &amp; Personality Profile')+'</div>';
-  h+='<div class="psub">'+genderLabel+' · '+month+'/'+day+'/'+year+' · '+hrTxt+'</div>';
-  h+='<div class="pills">';
-  if(LANG!=='en'&&chart.lifeMaster&&chart.bodyMaster){
-    h+='<span class="pill">命主<b>'+chart.lifeMaster+'</b> &nbsp;·&nbsp; 身主<b>'+chart.bodyMaster+'</b></span>';
-  }
-  h+='</div></div>';
+  h+='<div class="psub">'+genderLabel+' · '+month+'/'+day+'/'+year+' · '+hrTxt+(LANG!=='en'&&chart.lifeMaster?' · 命主'+chart.lifeMaster+' · 身主'+chart.bodyMaster:'')+'</div>';
+  h+='</div>';
 
-  // ── 命盤 GRID (Chinese only — auto rendered at top) ──
+  // ── 命盤 GRID (Chinese only — before portrait) ──
   if(LANG==='zh'){
     h+='<div class="stitle">命盤</div>';
     h+='<div class="mp-grid show" id="mp-grid" style="margin-bottom:1.5rem">'+buildMingpan()+'</div>';
   }
 
-  // ── LIFE PORTRAIT — single opening section ──
+  // ── LIFE PORTRAIT ──
   var portrait=sec(text,'LIFE PORTRAIT');
   if(portrait){
     h+='<div class="scard-full" style="margin-bottom:10px;margin-top:0">';
     h+='<div class="sh">'+(LANG==='zh'?'人物畫像':'Life Portrait')+'</div>';
-    var lpLines=portrait.split('\n');
-    var lpNarrative=[],lpBulletItems=[],lpSubhead='',lpInBullets=false;
+    var lpLines=portrait.split('\n'),lpNarrative=[],lpBulletItems=[],lpSubhead='',lpInBullets=false;
     lpLines.forEach(function(ln){
       ln=ln.trim(); if(!ln) return;
       var isBullet=(ln.charCodeAt(0)===8226)||ln.charAt(0)==='-';
-      var isSubhead=ln.toLowerCase().indexOf('life is shaped')>-1||ln.toLowerCase().indexOf('shaped by')>-1||ln.indexOf('人生的基調')>-1||ln.indexOf('基調')>-1;
+      var isSubhead=ln.toLowerCase().indexOf('life is shaped')>-1||ln.indexOf('人生的基調')>-1||ln.indexOf('基調')>-1;
       if(isSubhead){lpInBullets=true;lpSubhead=ln;}
       else if(isBullet){lpInBullets=true;lpBulletItems.push(ln.replace(/^[•\-]\s*/,''));}
       else if(!lpInBullets){lpNarrative.push(ln);}
@@ -617,7 +604,7 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
   if(palacesRaw){
     h+='<div class="stitle">'+(LANG==='zh'?'十二宮概覽':'12 Palace Overview')+'</div>';
     h+='<div class="pal-paras">';
-        palacesRaw.split('\n').reduce(function(acc,line){
+    palacesRaw.split('\n').reduce(function(acc,line){
       var trimmed=line.trim();
       var isStart=(trimmed.charAt(0)==='*'&&trimmed.charAt(1)==='*')||(LANG==='en'&&/^[A-Z]/.test(trimmed)&&trimmed.indexOf('—')>-1);
       if(isStart) acc.push(trimmed);
@@ -631,34 +618,30 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
     h+='</div>';
   }
 
-  // ── BEHAVIORAL SECTIONS ──
-  function card(title,arr,full){
-    var s='<div class="'+(full?'scard-full':'scard')+'"><div class="sh">'+title+'</div><ul class="blist">';
-    arr.forEach(function(b){s+='<li>'+b+'</li>';});
-    return s+'</ul></div>';
+  // ── HOW SHE OPERATES ──
+  var howRaw=sec(text,'HOW SHE OPERATES');
+  if(howRaw){
+    h+='<div class="scard-full">';
+    h+='<div class="sh">'+(LANG==='zh'?'性格與行為':'How She Operates')+'</div>';
+    h+='<ul class="blist">';
+    bullets(howRaw).forEach(function(b){h+='<li>'+b+'</li>';});
+    h+='</ul></div>';
   }
-  h+='<div class="g2">'+
-    card('Core Behavior',bullets(sec(text,'CORE BEHAVIOR')))+
-    card('Personality Pattern',bullets(sec(text,'PERSONALITY PATTERN')))+
-    card('Work Behavior',bullets(sec(text,'WORK BEHAVIOR')))+
-    card('Financial Behavior',bullets(sec(text,'FINANCIAL BEHAVIOR')))+
-    card('Relationship Behavior',bullets(sec(text,'RELATIONSHIP BEHAVIOR')))+
-    card('Energy Pattern',bullets(sec(text,'ENERGY PATTERN')))+
-  '</div>';
-  h+=card('Decision Style',bullets(sec(text,'DECISION STYLE')),true);
 
-  // ── 10 YEAR CYCLES ──
+  // ── LIFE CYCLES ──
   if(cycRows.length){
-    h+='<div class="scard-full"><div class="sh">'+(LANG==='zh'?'大限流年':'10 Year Life Cycles')+'</div><div class="cycles">';
+    h+='<div class="scard-full"><div class="sh">'+(LANG==='zh'?'大限流年':'Life Cycles')+'</div><div class="cycles">';
     cycRows.forEach(function(cyc){h+='<div class="cyc"><div class="cy-lbl">'+cyc.range+' · '+cyc.phase+'</div><div class="cy-txt">'+cyc.text+'</div></div>';});
     h+='</div></div>';
   }
 
   // ── FINAL SUMMARY ──
-  var summaryItems=bullets(sec(text,'SUMMARY')).filter(function(b){return b.toLowerCase().indexOf('is someone who')<0 && b.indexOf('的特質')<0;});
+  var summaryItems=bullets(sec(text,'SUMMARY')).filter(function(b){
+    return b.toLowerCase().indexOf('is someone who')<0&&b.indexOf('的特質')<0;
+  });
   var strength=sec(text,'STRENGTH'),challenge=sec(text,'CHALLENGE');
   h+='<div class="scard-full">';
-  h+='<div class="sh">'+(LANG==='zh'?'總結 — '+(name||'此人')+'的特質':'Final Summary — '+(name||'this person')+' is someone who')+'</div>';
+  h+='<div class="sh">'+(LANG==='zh'?'總結 — '+(name||'她')+'的特質':'Final Summary — '+(name||'this person')+' is someone who')+'</div>';
   h+='<ul class="blist">';
   summaryItems.forEach(function(b){h+='<li>'+b+'</li>';});
   h+='</ul>';
