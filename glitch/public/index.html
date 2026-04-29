@@ -328,89 +328,80 @@ async function generate(){
 
     if(LANG==='en') {
       prompt =
-'You are a Zi Wei Dou Shu expert writing a deeply personal behavioral profile.\n\n'+
-'Star brightness: 廟/旺=peak, 得/利=strong, 平=moderate, 陷=weakened. Use this to calibrate intensity.\n\n'+
-'RULES — non-negotiable:\n'+
-'- Zero Chinese characters anywhere\n'+
-'- No star name references in any text — write purely from behavioral insight\n'+
-'- Write directly about this specific person. Every line must feel like it could only be written for her\n'+
-'- Be specific. Not "she is independent" — "she does not wait for agreement before acting"\n'+
-'- No filler. No "it is worth noting". No "this suggests". State what is true.\n'+
-'- Each section covers DIFFERENT ground. No repeating across sections.\n\n'+
+'You are a Zi Wei Dou Shu expert. Your job is to write an accurate English behavioral profile based on the actual Chinese astrological chart data provided.\n\n'+
+'CRITICAL PRINCIPLE: Chinese astrology is the source of truth. Read the star placements carefully and derive all insights FROM the actual chart — not from general personality archetypes. The English profile must reflect what the stars actually say, translated into behavioral language an English speaker can feel and relate to.\n\n'+
+'Star brightness: 廟/旺=peak power, 得/利=strong, 平=moderate, 陷=weakened.\n\n'+
+'RULES:\n'+
+'- Zero Chinese characters in output\n'+
+'- No star name references in text — translate star meanings into pure behavior\n'+
+'- Every insight must trace back to an actual star placement in this chart\n'+
+'- Be specific to THIS person. Generic observations that could apply to anyone are rejected\n'+
+'- No hedging. State what is true.\n'+
+'- Sections do not repeat each other\n\n'+
 'Birth: '+(name||'this person')+' | '+gender+' | '+year+'/'+month+'/'+day+' | '+hrTxt+'\n'+
 'Lunar: '+chart.lunarDate+' | Five Elements: '+chart.fiveElements+'\n'+
-'Chart: '+palaceSummary+'\n'+
-'Palace names: 命宮=Life, 兄弟=Siblings, 夫妻=Spouse\/Partner, 子女=Children, 財帛=Wealth, 疾厄=Health, 遷移=Travel\/Change, 僕役=Friends\/Network, 官祿=Career, 田宅=Home, 福德=Inner Life, 父母=Parents\n\n'+
-'OUTPUT — use exactly these 5 sections:\n\n'+
+'Chart (use exactly, do not recalculate): '+palaceSummary+'\n'+
+'Palace reference: 命宮=Life, 兄弟=Siblings, 夫妻=Spouse\/Partner, 子女=Children, 財帛=Wealth, 疾厄=Health, 遷移=Travel\/Change, 僕役=Friends\/Network, 官祿=Career, 田宅=Home, 福德=Inner Life, 父母=Parents\n\n'+
 '===META===\n'+
 'Lunar: '+chart.lunarDate+'\nLife Palace: '+lifePalace.branch+'\nBody Palace: '+bodyPalace.branch+'\n5-Element: '+chart.fiveElements+'\n\n'+
 '===LIFE PORTRAIT===\n'+
-'[One paragraph, 4-5 sentences. Sentence 1: her core nature — what drives her, not who she appears to be. Sentence 2-3: the shape of her life — how it actually unfolds, what pattern keeps repeating. Sentence 4-5: something true about her that most people miss. Direct, specific, no hedging.]\n'+
-'Life is shaped by:\n• [single force or pattern]\n• [single force or pattern]\n• [single force or pattern]\n• [single force or pattern]\n\n'+
+'[One paragraph 4-5 sentences derived from the actual Life Palace stars and chart configuration. What do the specific stars in her Life Palace say about her core nature? Translate that into behavioral language. End with something true about her that most people miss. No star names, no Chinese.]\n'+
+'Life is shaped by:\n• [derived from actual chart — a specific force or pattern this chart shows]\n• [derived from actual chart]\n• [derived from actual chart]\n• [derived from actual chart]\n\n'+
 '===PALACES===\n'+
-'[12 paragraphs. One per life area in this order: Life · Siblings · Spouse\/Partner · Children · Wealth · Health · Travel & Change · Friends & Network · Career · Home · Inner Life · Parents\n'+
-'Format: **[Name]** — [2-3 sentences. What actually plays out in this area. Specific to this person. No star names. No Chinese. Each palace should say something the person would immediately recognize as true.]\n'+
-'These 12 paragraphs are the main substance — cover work, money, relationships, health here. The next section does NOT repeat this.]\n\n'+
+'[12 paragraphs. One per life area in order: Life · Siblings · Spouse\/Partner · Children · Wealth · Health · Travel & Change · Friends & Network · Career · Home · Inner Life · Parents\n'+
+'Each paragraph: **[Name]** — [2-3 sentences. Translate what the ACTUAL stars in that palace mean for this person behaviorally. If a palace has weakened stars or negative transformations, say what actually happens there — tension, friction, or difficulty. If strong, say what gifts or patterns emerge. Specific to this chart, not generic.]\n'+
+'The Strength and Challenge below must be consistent with what you write here.]\n\n'+
 '===HOW SHE OPERATES===\n'+
-'[5-6 bullets covering: how she acts, how she thinks, how she makes decisions, how her energy moves, what depletes her, what restores her. Each bullet is a different dimension. No overlap with the palaces above. No overlap between bullets.]\n'+
-'• [observable action or behavior]\n'+
-'• [inner pattern or processing style]\n'+
-'• [decision-making approach]\n'+
-'• [energy pattern — what fuels or drains]\n'+
-'• [something about how she relates to others]\n'+
-'• [something about her relationship to time, pressure, or change]\n\n'+
+'[5-6 bullets derived from the chart — behavior, thinking, decisions, energy, relationships, time\/pressure. Each must trace to actual star placements. No overlap with palaces above.]\n'+
+'• \n• \n• \n• \n• \n• \n\n'+
 '===CYCLES===\n'+
-'3-12 | Early Formation | [One specific sentence about what shapes her early.]\n'+
-'13-22 | Exploration | [One sentence about identity and direction.]\n'+
-'23-32 | Acceleration | [One sentence about what builds and what is demanded.]\n'+
-'33-42 | Structuring | [One sentence about the core tension of this decade.]\n'+
-'43-52 | Peak Output | [One sentence about what converges and what it produces.]\n'+
-'53-62 | Selection | [One sentence about what gets released.]\n'+
-'63-72 | Stabilization | [One sentence about what life becomes.]\n'+
-'73-82 | Maintenance | [One sentence about what matters and how she carries it.]\n\n'+
+'3-12 | Early Formation | [One sentence derived from the actual decade stars.]\n'+
+'13-22 | Exploration | [One sentence.]\n'+
+'23-32 | Acceleration | [One sentence.]\n'+
+'33-42 | Structuring | [One sentence.]\n'+
+'43-52 | Peak Output | [One sentence.]\n'+
+'53-62 | Selection | [One sentence.]\n'+
+'63-72 | Stabilization | [One sentence.]\n'+
+'73-82 | Maintenance | [One sentence.]\n\n'+
 '===SUMMARY===\n'+
 (name||'She')+' is someone who:\n'+
-'• [one behavioral truth — the most essential thing]\n'+
-'• [one behavioral truth — different from above]\n'+
-'• [one behavioral truth — different from above]\n\n'+
+'• [most essential behavioral truth from the chart]\n'+
+'• [second truth — different dimension]\n'+
+'• [third truth — different dimension]\n\n'+
 '===STRENGTH===\n'+
-'[One line. 2-3 specific qualities. What makes her genuinely formidable.]\n\n'+
+'[One line. The genuine strengths THIS chart shows — derived from the strongest star placements. Not generic. 2-3 specific qualities.]\n\n'+
 '===CHALLENGE===\n'+
-'[One line. The one real friction point. Specific to her. Not generic.]';
+'[One line. The real friction point THIS chart shows — derived from the weakened stars, negative transformations, or difficult palace configurations. NOT generic impatience or stress. What does this specific chart say is hard for her?]';
 
     } else {
       prompt =
 '你是一位紫微斗數命理師，為真實客戶撰寫深度個人命盤分析。\n\n'+
 '星曜亮度：廟/旺=極強，得/利=強，平=中等，陷=弱。請依亮度精準調整詮釋力道。\n\n'+
 '寫作原則：\n'+
-'- 每一句話都要像是專門為這個人說的，不能套用到任何人身上\n'+
-'- 直接、具體、有觀點。不說「可能」「或許」——說的就是這個人\n'+
-'- 各段落不重複，每個區塊涵蓋不同面向\n'+
-'- 十二宮是主要內容，行為分析不重複宮位已說的事\n\n'+
+'- 所有分析必須來自實際星曜配置，不能套用一般性描述\n'+
+'- 每一句話都要像是專門為這個人說的\n'+
+'- 直接、具體、有觀點。不說「可能」「或許」\n'+
+'- 優勢與挑戰必須從實際星曜中推導，特別是化忌、陷落、三方四正的衝突\n'+
+'- 各段落不重複，十二宮是主要內容，行為分析不重複宮位已說的事\n\n'+
 '出生資料：'+(name||'此人')+' | '+gender+' | '+year+'年'+month+'月'+day+'日 | '+hrTxt+'\n'+
 '農曆：'+chart.lunarDate+' | 干支：'+chart.chinesePillars+' | 五行：'+chart.fiveElements+'\n'+
 '命主：'+chart.lifeMaster+' | 身主：'+chart.bodyMaster+'\n'+
 '命盤（請使用以下星曜，勿重新計算）：\n'+palaceSummary+'\n\n'+
-'請依序使用以下六個段落標記：\n\n'+
+'請依序使用以下段落標記：\n\n'+
 '===META===\n'+
 '農曆：'+chart.lunarDate+'\n干支：'+chart.chinesePillars+'\n命宮：'+lifePalace.branch+'\n身宮：'+bodyPalace.branch+'\n五行局：'+chart.fiveElements+'\n命主：'+chart.lifeMaster+'\n身主：'+chart.bodyMaster+'\n\n'+
 '===LIFE PORTRAIT===\n'+
-'[4-5句人物畫像。第一句：她的核心本質——驅動她的力量，不是她的外在形象。第二三句：她人生的走法與節奏——實際展現的模式。第四五句：旁人看不到、但她自己深知的那一面。直接，不客套，不說廢話。]\n'+
-'人生的基調：\n• [一個詞或短語——一種力量]\n• [一個詞或短語]\n• [一個詞或短語]\n• [一個詞或短語]\n\n'+
+'[4-5句。從命宮主星與整體命盤配置推導。第一句：命宮星曜說明她的核心本質。第二三句：命盤格局呈現的人生走法與節奏。第四五句：旁人看不到、但命盤清楚顯示的那一面。直接，不客套。]\n'+
+'人生的基調：\n• [從實際命盤推導的力量或模式]\n• [從實際命盤推導]\n• [從實際命盤推導]\n• [從實際命盤推導]\n\n'+
 '===PALACES===\n'+
-'[12段，每宮一段。順序：命宮·兄弟·夫妻·子女·財帛·疾厄·遷移·僕役·官祿·田宅·福德·父母\n'+
-'格式：**[宮位名]** — [2-3句。引用主星與亮度。說這個宮位在此人生命中的實際展現。具體，不套用，這個人看了要點頭。]\n'+
-'此段涵蓋職業、財富、感情等所有人生面向。下方行為分析不重複這裡的內容。]\n\n'+
+'[12段。順序：命宮·兄弟·夫妻·子女·財帛·疾厄·遷移·僕役·官祿·田宅·福德·父母\n'+
+'格式：**[宮位名]** — [2-3句。引用主星與亮度。說明此宮位在此人命盤中的實際展現。若有化忌、陷落或煞星，直接說明帶來的困難或張力。若星曜強旺，說明帶來的能力或機遇。具體，不套用。]\n'+
+'下方優勢與挑戰必須與此段分析一致。]\n\n'+
 '===HOW SHE OPERATES===\n'+
-'[5-6點，涵蓋：她如何行動、如何思考、如何做決定、能量的節奏、什麼耗損她、什麼恢復她。每點不同面向，不重複上方宮位內容。]\n'+
-'• [可觀察的行為模式]\n'+
-'• [內在處理方式或思維模式]\n'+
-'• [決策風格]\n'+
-'• [能量節奏——什麼驅動或耗損她]\n'+
-'• [與他人的關係模式]\n'+
-'• [她與時間、壓力或變化的關係]\n\n'+
+'[5-6點，從實際星曜推導。涵蓋：行為模式、思維方式、決策風格、能量節奏、關係模式、與時間\/壓力\/變化的關係。每點來自不同星曜或宮位，不重複上方十二宮內容。]\n'+
+'• \n• \n• \n• \n• \n• \n\n'+
 '===CYCLES===\n'+
-'3-12 | 成形期 | [一句話，說這個時期對她的具體影響。]\n'+
+'3-12 | 成形期 | [一句話，從大限星曜推導。]\n'+
 '13-22 | 探索期 | [一句話。]\n'+
 '23-32 | 加速期 | [一句話。]\n'+
 '33-42 | 架構期 | [一句話。]\n'+
@@ -420,13 +411,13 @@ async function generate(){
 '73-82 | 沉澱期 | [一句話。]\n\n'+
 '===SUMMARY===\n'+
 (name||'她')+'的特質：\n'+
-'• [一個核心真相——最根本的那一個]\n'+
-'• [一個核心真相——與上面不同]\n'+
-'• [一個核心真相——與上面不同]\n\n'+
+'• [最根本的一個核心真相，從命盤推導]\n'+
+'• [第二個核心真相，不同面向]\n'+
+'• [第三個核心真相，不同面向]\n\n'+
 '===STRENGTH===\n'+
-'[一句話。2-3個具體優勢，逗號分隔。說的是她，不是任何人。]\n\n'+
+'[一句話。從命盤最強的星曜配置推導出的真實優勢。2-3個具體特質，逗號分隔。不套用。]\n\n'+
 '===CHALLENGE===\n'+
-'[一句話。一個真正的摩擦點。具體，不說「平衡」或「壓力」。]';
+'[一句話。從此命盤的化忌、陷落星曜或困難宮位配置推導出的真實挑戰。具體說明哪個人生面向反覆受挫，以及背後的命理原因。不說「平衡」或「壓力」這種廢話。]';
     }
 
         var res=await fetch('/proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:6000,messages:[{role:'user',content:prompt}]})});
