@@ -141,6 +141,13 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
       </select></div>
       </div>
     </div>
+    <div class="field" id="zi-toggle" style="display:none">
+      <label id="t-zi">Born after midnight? (00:00–00:59)</label>
+      <div class="radios">
+        <label><input type="radio" name="nightzi" value="false" checked> <span id="t-zi-no">No (23:00–23:59)</span></label>
+        <label><input type="radio" name="nightzi" value="true"> <span id="t-zi-yes">Yes (00:00–00:59)</span></label>
+      </div>
+    </div>
   </div>
 
   <button class="btn-generate" id="btn-gen" onclick="generate()">Generate</button>
@@ -157,7 +164,7 @@ var MO={
 };
 var TX={
   en:{birth:'Birth information',name:'Name (optional)',ph:'Enter name…',gender:'Gender',male:'Male',female:'Female',yr:'Year',mo:'Month',dy:'Day',hr:'Birth hour',btn:'Generate'},
-  zh:{birth:'出生資料',name:'姓名（選填）',ph:'輸入姓名…',gender:'性別',male:'男',female:'女',yr:'年',mo:'月',dy:'日',hr:'出生時辰',btn:'排盤'}
+  zh:{birth:'出生資料',name:'姓名（選填）',ph:'輸入姓名…',gender:'性別',male:'男',female:'女',yr:'年',mo:'月',dy:'日',hr:'出生時辰',btn:'排盤',zi:'午夜後出生？(00:00–00:59)',zino:'否 (23:00–23:59)',ziyes:'是 (00:00–00:59)'}
 };
 var STEMS=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
 var BR=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
@@ -210,6 +217,9 @@ function setLang(l){
   document.getElementById('t-dy').textContent=t.dy;
   document.getElementById('t-hr').textContent=t.hr;
   document.getElementById('btn-gen').textContent=t.btn;
+  document.getElementById('t-zi').textContent=t.zi;
+  document.getElementById('t-zi-no').textContent=t.zino;
+  document.getElementById('t-zi-yes').textContent=t.ziyes;
   rebuildMonths();
 }
 
@@ -228,6 +238,11 @@ function rebuildMonths(){
   document.getElementById('f-mo').value='7';
   var sn=localStorage.getItem('zwds_name'); if(sn) document.getElementById('f-name').value=sn;
   setLang(localStorage.getItem('zwds_lang')||'en');
+  // Show midnight toggle only for 子時
+  document.getElementById('f-hr').addEventListener('change', function(){
+    document.getElementById('zi-toggle').style.display = this.value==='0' ? 'block' : 'none';
+    if(this.value!=='0') document.querySelector('input[name=nightzi][value=false]').checked=true;
+  });
   // Wake up Render server immediately on page load
   fetch('/chart?year=2000&month=1&day=1&hour=5&gender=female').catch(function(){});
 })();
@@ -258,15 +273,27 @@ async function generate(){
 
   try{
     // Step 1: Get chart from iztro
-    var chartRes=await fetch('/chart?year='+year+'&month='+month+'&day='+day+'&hour='+hourIndex+'&gender='+iztroGender);
+    var nightZi=document.querySelector('input[name=nightzi]:checked');
+    var isNightZi=hourIndex===0&&nightZi&&nightZi.value==='true'?'true':'false';
+    var chartRes=await fetch('/chart?year='+year+'&month='+month+'&day='+day+'&hour='+hourIndex+'&gender='+iztroGender+'&isNightZi='+isNightZi);
     var chart=await chartRes.json();
     if(chart.error) throw new Error('Chart error: '+chart.error);
     if(!chart.palaces||chart.palaces.length<12) throw new Error('Incomplete chart data');
 
     // Step 2: Build palace summary for Claude
     var palaceSummary=chart.palaces.map(function(p){
-      var stars=[].concat(p.majorStars,p.minorStars).join(' ');
-      return p.stem+p.branch+'【'+p.name+(p.isBodyPalace?' 身宮':'')+' 】大限:'+p.decadeRange+(stars?' '+stars:'');
+      var ms=p.majorStars.map(function(s){
+        var b=s.brightness?'('+s.brightness+')':'';
+        var m=s.mutagen?s.mutagen:'';
+        return s.name+m+b;
+      }).join(' ');
+      var mi=p.minorStars.map(function(s){
+        var b=s.brightness?'('+s.brightness+')':'';
+        var m=s.mutagen?s.mutagen:'';
+        return s.name+m+b;
+      }).join(' ');
+      var stars=[ms,mi].filter(Boolean).join(' | 輔: ');
+      return p.stem+p.branch+'【'+p.name+(p.isBodyPalace?' 身宮':'')+' 】大限:'+p.decadeRange+(stars?' 主: '+stars:'');
     }).join('\n');
 
     var lifePalace=chart.palaces.find(function(p){return p.isLifePalace;})||{branch:'?'};
@@ -275,7 +302,7 @@ async function generate(){
     // Step 3: Call Claude with real chart data
     var enInstructions =
 'You are a Zi Wei Dou Shu expert translating an ancient Chinese astrological chart into modern English behavioral psychology.\n\n'+
-'IMPORTANT — English audience rules:\n'+
+'IMPORTANT — English audience rules:\n'+'Star brightness levels are included: 廟/旺=peak power, 得/利=strong, 平=moderate, 陷=weakened. Use these to calibrate the intensity of each star\'s influence in your interpretation.\n'+
 '- NEVER use raw Chinese star names alone (廉貞, 七殺, etc.) in the analysis text — always translate to behavioral meaning\n'+
 '- Describe what each star MEANS in plain English: behavior, personality, tendencies, patterns\n'+
 '- Use modern relatable language: "driven by ambition", "struggles with trust", "thrives under pressure"\n'+
