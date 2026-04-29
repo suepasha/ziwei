@@ -17,43 +17,62 @@ app.use((req, res, next) => {
 // ── Calculate ZWDS chart using iztro ──
 app.get('/chart', (req, res) => {
   try {
-    const { year, month, day, hour, gender } = req.query;
+    const { year, month, day, hour, gender, isNightZi } = req.query;
     if (!year || !month || !day || !hour || !gender) {
       return res.status(400).json({ error: 'Missing parameters' });
     }
-    const chart = astro.bySolar(year+'-'+month+'-'+day, parseInt(hour), gender==='male'?'女':'男'==='男'?'男':'女', true, 'zh-TW');
-    // fix: female=女 male=男
+
     const iztroGender = gender === 'male' ? '男' : '女';
-    const chart2 = astro.bySolar(year+'-'+month+'-'+day, parseInt(hour), iztroGender, true, 'zh-TW');
-    res.json({
-      lunarDate: chart2.lunarDate,
-      chinesePillars: chart2.chineseDate,
-      fiveElements: chart2.fiveElementsClass,
-      lifeMaster: chart2.soul,
-      bodyMaster: chart2.body,
-      palaces: chart2.palaces.map(p => ({
-        stem: p.heavenlyStem,
-        branch: p.earthlyBranch,
-        name: p.name,
-        isLifePalace: p.name === '命宮',
-        isBodyPalace: p.isBodyPalace,
-        decadeRange: p.decadal ? p.decadal.range : '',
-        majorStars: p.majorStars.map(s => s.name+(s.mutagen||'')),
-        minorStars: p.minorStars.map(s => s.name+(s.mutagen||''))
+    let dateStr = year + '-' + month + '-' + day;
+
+    // Handle midnight 子時 (hour=0): if isNightZi=true, use next day
+    let hourIndex = parseInt(hour);
+    if (hourIndex === 0 && isNightZi === 'true') {
+      const d = new Date(parseInt(year), parseInt(month) - 1, parseInt(day) + 1);
+      dateStr = d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
+    }
+
+    const chart = astro.bySolar(dateStr, hourIndex, iztroGender, true, 'zh-TW');
+
+    const palaces = chart.palaces.map(p => ({
+      stem: p.heavenlyStem,
+      branch: p.earthlyBranch,
+      name: p.name,
+      isLifePalace: p.name === '命宮',
+      isBodyPalace: p.isBodyPalace,
+      decadeRange: p.decadal ? p.decadal.range : '',
+      majorStars: p.majorStars.map(s => ({
+        name: s.name,
+        brightness: s.brightness || '',
+        mutagen: s.mutagen || ''
+      })),
+      minorStars: p.minorStars.map(s => ({
+        name: s.name,
+        brightness: s.brightness || '',
+        mutagen: s.mutagen || ''
       }))
+    }));
+
+    res.json({
+      lunarDate: chart.lunarDate,
+      chinesePillars: chart.chineseDate,
+      fiveElements: chart.fiveElementsClass,
+      lifeMaster: chart.soul,
+      bodyMaster: chart.body,
+      palaces: palaces
     });
+
   } catch(e) {
     console.error('Chart error:', e.message);
     res.status(500).json({ error: e.message });
   }
 });
 
-// ── Proxy Anthropic API — uses server-side key ──
+// ── Proxy Anthropic API ──
 app.post('/proxy', (req, res) => {
-  // Use server env key first, fall back to client-supplied key
   const apiKey = process.env.ANTHROPIC_API_KEY || req.headers['x-api-key'];
   if (!apiKey) {
-    return res.status(400).json({ error: { message: 'No API key configured. Add ANTHROPIC_API_KEY to Render environment variables.' } });
+    return res.status(400).json({ error: { message: 'No API key configured.' } });
   }
 
   const body = JSON.stringify(req.body);
