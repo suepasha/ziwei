@@ -366,60 +366,69 @@ async function generate(){
       '- When the same star appears in both 命宮 and 三方四正, its qualities are amplified significantly';
 
     if(LANG==='en') {
-      // Build English-friendly fingerprint (no Chinese)
       var enFingerprint =
-        'CHART FINGERPRINT (do not output this — use it to derive insights):\n'+
+        'CHART FINGERPRINT (use to derive all insights — do not output this section):\n'+
         'Patterns: '+patternsStr+'\n'+
         'Life Palace stars: '+lifePalaceStars+'\n'+
         'Body Palace: '+bodyPalaceStr+'\n'+
-        'Harmonious palaces (三方四正): '+sfPalaces+'\n'+
+        'Harmonious palaces: '+sfPalaces+'\n'+
         'Life-long transformations: '+ymStr+'\n'+
-        (flyJiStr?'Key friction chains (飛化忌): '+flyJiStr+'\n':'')+
-        (flyLuStr?'Key resource chains (飛化祿): '+flyLuStr+'\n':'')+
+        (flyJiStr?'Key friction chains: '+flyJiStr+'\n':'')+
+        (flyLuStr?'Key resource chains: '+flyLuStr+'\n':'')+
         'Life Master: '+chart.lifeMaster+' | Body Master: '+chart.bodyMaster+' | Five Elements: '+chart.fiveElements;
 
       var enRules =
         'INTERPRETATION RULES:\n'+
-        '- Chart patterns (格局) define the fundamental life theme — lead with this\n'+
-        '- 化忌 = recurring friction/blockage in that life area; name what specifically keeps happening\n'+
-        '- Flying transformations (飛化) = cross-palace chain reactions; name the actual dynamic created\n'+
-        '- Weakened stars (陷) = energy frustrated; requires more effort to express\n'+
-        '- Peak stars (廟/旺) = quality expresses fully and naturally\n'+
-        '- Life-long 化忌 palace = the persistent challenge theme of this life\n'+
-        '- Life-long 化祿 palace = where resources flow most naturally\n'+
-        '- Decade transformations (大限四化) = what activates and shifts in each 10-year window\n'+
-        '- The four harmonious palaces must be read as one system, not individually\n'+
-        '- 50% TEST: if an insight could apply to half of all people, discard it and derive something more specific';
+        '- Chart patterns define the fundamental life theme — everything flows from this\n'+
+        '- 化忌 = a recurring friction in that life area — something that keeps happening no matter what\n'+
+        '- Flying friction chains = one life area pulling another into difficulty\n'+
+        '- Weakened stars = real energy that struggles to express; effort required\n'+
+        '- Peak stars = the quality is fully alive and natural\n'+
+        '- Life-long 化忌 palace = the persistent challenge woven into this life\n'+
+        '- Life-long 化祿 palace = where things flow with least resistance\n'+
+        '- Decade transformations = what gets activated and tested in each 10-year window\n'+
+        '- 50% TEST: if a line could describe half of all people, cut it and go deeper into this chart';
 
       prompt = enFingerprint+'\n\n'+enRules+'\n\n'+
-'You are a Zi Wei Dou Shu expert. Write a personal behavioral profile in English for the person above.\n\n'+
-'RULES:\n'+
-'- Zero Chinese characters anywhere in output\n'+
-'- No star names in text — translate everything into behavioral language\n'+
-'- Use the chart fingerprint above to derive all insights — do not use generic personality descriptions\n'+
-'- Every insight must trace to an actual placement in this specific chart\n'+
-'- Write so the person reads it and thinks "this could only have been written about me"\n'+
-'- Each section covers different ground — no overlap\n\n'+
+'You are a Zi Wei Dou Shu master giving a personal reading. You speak directly to the person — second person, present tense, no hedging.\n\n'+
+'VOICE — this is everything:\n'+
+'- Speak as YOU, not "she". Always second person: "You do not wait." "Your instinct is always first."\n'+
+'- State facts, not observations. Not "you tend to" — just "you do." Not "you may find" — just "you know."\n'+
+'- Write like revelation. Short, striking sentences. The kind that make someone stop and re-read.\n'+
+'- A fortune teller does not explain. They reveal. They do not say "because of X star" — they say what IS.\n'+
+'- No hedging words anywhere: no "tends to", "often", "may", "can be", "sometimes", "suggests"\n'+
+'- No analytical language: no "this indicates", "this shows", "this palace reveals"\n'+
+'- Zero Chinese characters\n'+
+'- No star names\n\n'+
+'EXAMPLE of wrong voice:\n'+
+'"She tends to be independent and may move forward without waiting for consensus from others."\n\n'+
+'EXAMPLE of right voice:\n'+
+'"You do not wait for agreement. You never have. By the time the room has finished deliberating, you have already decided — and moved."\n\n'+
 'Birth: '+(name||'this person')+' | '+gender+' | '+year+'/'+month+'/'+day+' | '+hrTxt+'\n'+
 'Five Elements: '+chart.fiveElements+'\n'+
-'Full chart data:\n'+palaceSummary+'\n'+
+'Full chart:\n'+palaceSummary+'\n'+
 'Palace names: 命宮=Life, 兄弟=Siblings, 夫妻=Spouse\/Partner, 子女=Children, 財帛=Wealth, 疾厄=Health, 遷移=Travel\/Change, 僕役=Friends\/Network, 官祿=Career, 田宅=Home, 福德=Inner Life, 父母=Parents\n\n'+
-'Use EXACTLY these section markers — Claude must output every section:\n\n'+
+'Output EXACTLY these sections:\n\n'+
 '===META===\n'+
 'Lunar: '+chart.lunarDate+'\nLife Palace: '+lifePalace.branch+'\nBody Palace: '+(bodyPal?bodyPal.branch:'')+'\n5-Element: '+chart.fiveElements+'\n\n'+
 '===LIFE PORTRAIT===\n'+
-'[4-5 sentences. Open with what the chart pattern means for this person behaviorally. Then the specific dynamic of her Life Palace stars. Close with one thing true about her that only this chart reveals. No Chinese, no star names.]\n'+
-'Life is shaped by:\n• [specific force from chart pattern or三方四正]\n• [from化祿 or化權 placement]\n• [from化忌 or key friction chain]\n• [from命主/身主 or五行]\n\n'+
+'[3-4 sentences. Start with the boldest, most specific truth about who this person is — derived from the chart pattern. No warm-up. No introduction. Just the truth. Then what their life keeps returning to. Second person throughout. Short sentences. Revelation, not description.]\n'+
+'Life is shaped by:\n'+
+'• [one word or very short phrase — a force, not a trait]\n'+
+'• [one word or short phrase]\n'+
+'• [one word or short phrase]\n'+
+'• [one word or short phrase]\n\n'+
 '===PALACES===\n'+
-'[12 paragraphs in order: Life · Siblings · Spouse\/Partner · Children · Wealth · Health · Travel & Change · Friends & Network · Career · Home · Inner Life · Parents\n'+
-'Major palaces (Life, Spouse, Wealth, Career, Inner Life, Health): 2-3 sentences.\n'+
+'[12 paragraphs. Order: Life · Siblings · Spouse\/Partner · Children · Wealth · Health · Travel & Change · Friends & Network · Career · Home · Inner Life · Parents\n'+
+'Major palaces (Life, Spouse, Wealth, Career, Inner Life, Health): 2-3 short, direct sentences.\n'+
 'Minor palaces (Siblings, Children, Travel, Friends, Home, Parents): 1 sentence.\n'+
-'Format: **[Name]** — [behavioral description. No star names. No Chinese. Name the recurring pattern if化忌 is present. Name the real gift if strong stars are present.]\n\n'+
+'Format: **[Name]** — [speak directly to them. Second person. What is true about this area of their life — not what might be true. If there is a recurring friction, name it plainly. If there is a gift, name it plainly.]\n'+
+'Every line should make the person stop and think "how did they know that."]\n\n'+
 '===HOW SHE OPERATES===\n'+
-'[3 bullets only. Cross-cutting behavioral patterns derived from chart pattern and friction chains. Not personality traits — patterns only this chart would produce.]\n'+
+'[3 bullets. Second person. Short, striking. Cross-cutting patterns from the chart — not personality traits. The kind of lines that hit.]\n'+
 '• \n• \n• \n\n'+
 '===CYCLES===\n'+
-'[Both sentences on ONE line per decade. Sentence 1: what activates and what life area lights up based on decade stars. Sentence 2: what this specifically means for her.]\n'+
+'[Both sentences on ONE line. Second person. Present tense where possible. No "this decade brings" — just "you build" "you release" "you face."]\n'+
 '3-12 | Early Formation | [Sentence 1. Sentence 2.]\n'+
 '13-22 | Exploration | [Sentence 1. Sentence 2.]\n'+
 '23-32 | Acceleration | [Sentence 1. Sentence 2.]\n'+
@@ -429,45 +438,48 @@ async function generate(){
 '63-72 | Stabilization | [Sentence 1. Sentence 2.]\n'+
 '73-82 | Maintenance | [Sentence 1. Sentence 2.]\n\n'+
 '===SUMMARY===\n'+
-(name||'She')+' is someone who:\n'+
-'• [most essential truth — rooted in chart pattern or Life Palace, specific to this chart]\n'+
-'• [second truth — from a key friction chain or cross-palace dynamic]\n'+
-'• [third truth — captures the distinctive gift and friction of this chart in one honest line]';
+(name||'You')+' are someone who:\n'+
+'• [one truth — the most essential, most specific to this chart. Second person. No hedging.]\n'+
+'• [second truth — different dimension. Hit harder than the first.]\n'+
+'• [third truth — the one line that would make them put the phone down and sit with it.]';
+
+      prompt = prompt.replace('===HOW SHE OPERATES===', '===HOW YOU OPERATE===');
 
     } else {
-      prompt =
-'你是一位紫微斗數命理師，為真實客戶撰寫深度個人命盤分析。\n\n'+
-'命盤特徵——這張命盤的獨特指紋：\n'+
-chartSignature+'\n\n'+
-zwdsRules+'\n\n'+
-'關鍵指示：在開始撰寫之前，先找出這張命盤最獨特的2-3個特徵——罕見的星曜組合、特殊的亮度配置、或不尋常的四化落點。整份分析必須圍繞這些獨特特徵展開。如果一個觀察可以套用在50%的人身上，丟棄它，找更具體的。\n\n'+
-'星曜亮度：廟/旺=極強，得/利=強，平=中等，陷=弱。\n\n'+
-'出生資料：'+(name||'此人')+' | '+gender+' | '+year+'年'+month+'月'+day+'日 | '+hrTxt+'\n'+
+      prompt = fingerprint+'\n\n'+zwdsRules+'\n\n'+
+'你是一位紫微斗數命理師，直接對面前的客戶說話。用第二人稱，當下時態，說命運，不是分析。\n\n'+
+'聲音——這是一切：\n'+
+'- 用「你」，不用「她」。永遠第二人稱：「你不等待。」「你的本能永遠走在前面。」\n'+
+'- 說事實，不說觀察。不說「你傾向於」——就說「你就是這樣」。\n'+
+'- 像啟示，不像報告。短句，有力量。讓人讀了停下來重讀的那種。\n'+
+'- 命理師不解釋。他們揭示。不說「因為某星」——說「就是這樣」。\n'+
+'- 零廢話：不說「可能」「或許」「有時」「傾向於」"顯示"\n'+
+'- 讓這個人讀了覺得「他怎麼知道」\n\n'+
+'錯誤示範：「她傾向於獨立，可能在沒有共識的情況下向前推進。」\n'+
+'正確示範：「你不等人。從來不等。當所有人還在討論的時候，你已經決定了，也已經動了。」\n\n'+
+'出生：'+(name||'此人')+' | '+gender+' | '+year+'年'+month+'月'+day+'日 | '+hrTxt+'\n'+
 '農曆：'+chart.lunarDate+' | 干支：'+chart.chinesePillars+' | 五行：'+chart.fiveElements+'\n'+
 '命主：'+chart.lifeMaster+' | 身主：'+chart.bodyMaster+'\n'+
-'完整命盤（請使用以下星曜，勿重新計算）：\n'+palaceSummary+'\n\n'+
-'原則：讓這個人讀了說「這只能是寫給我的」——不是「這說的是我」，是「這只有了解我這張命盤的人才能說出來」。\n\n'+
+'完整命盤：\n'+palaceSummary+'\n\n'+
 '===META===\n'+
-'農曆：'+chart.lunarDate+'\n干支：'+chart.chinesePillars+'\n命宮：'+lifePalace.branch+'\n身宮：'+bodyPalace.branch+'\n五行局：'+chart.fiveElements+'\n命主：'+chart.lifeMaster+'\n身主：'+chart.bodyMaster+'\n\n'+
+'農曆：'+chart.lunarDate+'\n干支：'+chart.chinesePillars+'\n命宮：'+lifePalace.branch+'\n身宮：'+(bodyPal?bodyPal.branch:'')+'\n五行局：'+chart.fiveElements+'\n命主：'+chart.lifeMaster+'\n身主：'+chart.bodyMaster+'\n\n'+
 '===LIFE PORTRAIT===\n'+
-'[4-5句。從你找到的獨特特徵出發——這張命盤有什麼不尋常的地方。第一句從命宮的具體星曜組合說她最深層的驅動力。後幾句說這張命盤創造的具體人生模式。最後一句說只有讀過這張命盤的人才能說出的那句話。]\n'+
+'[3-4句。第一句就說最大膽、最具體的真相——從格局推導。不要暖場。不要介紹。直接說。第二人稱，短句，啟示，不是描述。]\n'+
 '人生的基調：\n'+
-'• [從這張命盤的獨特之處推導——不是適用於大多數人的特質]\n'+
-'• [從實際的特殊配置推導]\n'+
-'• [從命盤推導]\n'+
-'• [從命盤推導]\n\n'+
+'• [一個詞或極短的短語——一種力量，不是特質]\n'+
+'• [一個詞或短語]\n'+
+'• [一個詞或短語]\n'+
+'• [一個詞或短語]\n\n'+
 '===PALACES===\n'+
-'[12段。順序：命宮·兄弟·夫妻·子女·財帛·疾厄·遷移·僕役·官祿·田宅·福德·父母\n\n'+
-'長度規則：\n'+
-'- 主要宮位（命宮、夫妻、財帛、官祿、福德、疾厄）：每宮2-3句\n'+
-'- 次要宮位（兄弟、子女、遷移、僕役、田宅、父母）：每宮1句\n\n'+
-'每個宮位：這個宮位的具體星曜在這個亮度下，對這個人的這個人生面向產生什麼具體影響？若有化忌或陷落星，說明這個面向反覆出現的具體困難。若有強旺組合，說明這個面向具體產生的能力或模式。不套用，不說廢話。]\n\n'+
-'===HOW SHE OPERATES===\n'+
-'[只寫3點。必須來自命盤特徵——這張命盤的獨特星曜組合。每點說一個跨越多個人生面向、只有這張命盤配置才會產生的行為模式。如果聽起來像是可以套用在很多人身上的，丟棄重寫。]\n'+
+'[12段。順序：命宮·兄弟·夫妻·子女·財帛·疾厄·遷移·僕役·官祿·田宅·福德·父母\n'+
+'主要宮位（命宮、夫妻、財帛、官祿、福德、疾厄）：2-3句，短，直接。\n'+
+'次要宮位（兄弟、子女、遷移、僕役、田宅、父母）：1句。\n'+
+'格式：**[宮位名]** — [直接對他們說。第二人稱。說這個人生面向是什麼——不是可能是什麼。有反覆出現的摩擦就直說。有天賦就直說。每一行都要讓人覺得「他怎麼知道」。]\n\n'+
+'===HOW YOU OPERATE===\n'+
+'[3點。第二人稱。短，有力。從命盤的跨宮動態推導。不是性格特質——是命運的模式。]\n'+
 '• \n• \n• \n\n'+
 '===CYCLES===\n'+
-'[重要：每個大限的兩句話寫在同一行。]\n'+
-'[使用每個大限提供的大限四化資料。第一句：這個大限啟動哪個宮位，四化（化祿/化權/化科/化忌）對這個時期意味著什麼。第二句：結合她的命盤特徵，這對她具體意味著什麼——建立什麼、啟動什麼、或帶來什麼困難。]\n'+
+'[每個大限兩句寫在同一行。第二人稱。現在式。不說「這個時期帶來」——就說「你建立」「你釋放」「你面對」。]\n'+
 '3-12 | 成形期 | [第一句。第二句。]\n'+
 '13-22 | 探索期 | [第一句。第二句。]\n'+
 '23-32 | 加速期 | [第一句。第二句。]\n'+
@@ -477,10 +489,10 @@ zwdsRules+'\n\n'+
 '63-72 | 穩定期 | [第一句。第二句。]\n'+
 '73-82 | 沉澱期 | [第一句。第二句。]\n\n'+
 '===SUMMARY===\n'+
-(name||'她')+'的特質：\n'+
-'• [最核心的真相——只能寫給這張命盤，不能套用在任何其他人]\n'+
-'• [第二個真相——不同面向，同樣具體]\n'+
-'• [第三個真相——同時包含這張命盤獨有的天賦與摩擦]';
+(name||'你')+'是這樣一個人：\n'+
+'• [一個真相——最核心的，最具體的。第二人稱。不說廢話。]\n'+
+'• [第二個真相——不同面向。比第一個更狠。]\n'+
+'• [第三個真相——讓人讀了放下手機坐著想的那一行。]';
     }
 
         var res=await fetch('/proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:6000,messages:[{role:'user',content:prompt}]})});
@@ -684,7 +696,7 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
   }
 
   // ── HOW SHE OPERATES ──
-  var howRaw=sec(text,'HOW SHE OPERATES');
+  var howRaw=sec(text,'HOW YOU OPERATE')||sec(text,'HOW SHE OPERATES');
   if(howRaw){
     h+='<div class="scard-full">';
     h+='<div class="sh">'+(LANG==='zh'?'性格與行為':'How She Operates')+'</div>';
@@ -721,7 +733,7 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
     else if(isBullet && !inShaped){ summaryItems.push(l.replace(/^[•\-]\s*/,'')); }
   });
   h+='<div class="scard-full">';
-  h+='<div class="sh">'+(LANG==='zh'?'總結 — '+(name||'她')+'的特質':'Final Summary — '+(name||'this person')+' is someone who')+'</div>';
+  h+='<div class="sh">'+(LANG==='zh'?'總結 — '+(name||'她')+'的特質':LANG==='en'?(name?name+' is someone who':'You are someone who'):'總結 — '+(name||'你')+'是這樣一個人')+'</div>';
   h+='<ul class="blist">';
   summaryItems.forEach(function(b){h+='<li>'+b+'</li>';});
   h+='</ul>';
