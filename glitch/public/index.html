@@ -306,19 +306,24 @@ async function generate(){
     if(!chart.palaces||chart.palaces.length<12) throw new Error('Incomplete chart data');
 
     // Step 2: Build palace summary for Claude
+    // Build enriched year mutagen summary
+    var ymStr = '';
+    if(chart.yearMutagen) {
+      var ym=chart.yearMutagen;
+      ymStr = [ym.lu,ym.quan,ym.ke,ym.ji].filter(Boolean).join('·');
+    }
+
     var palaceSummary=chart.palaces.map(function(p){
       var ms=p.majorStars.map(function(s){
-        var b=s.brightness?'('+s.brightness+')':'';
-        var m=s.mutagen?s.mutagen:'';
-        return s.name+m+b;
-      }).join(' ');
+        return s.name+(s.mutagen?s.mutagen:'')+(s.brightness?'('+s.brightness+')':'');
+      }).join('·');
       var mi=p.minorStars.map(function(s){
-        var b=s.brightness?'('+s.brightness+')':'';
-        var m=s.mutagen?s.mutagen:'';
-        return s.name+m+b;
-      }).join(' ');
-      var stars=[ms,mi].filter(Boolean).join(' | 輔: ');
-      return p.stem+p.branch+'【'+p.name+(p.isBodyPalace?' 身宮':'')+' 】大限:'+p.decadeRange+(stars?' 主: '+stars:'');
+        return s.name+(s.mutagen?s.mutagen:'')+(s.brightness?'('+s.brightness+')':'');
+      }).join('·');
+      var dm=p.decadeMutagen&&p.decadeMutagen.length?
+        ' 大限四化:[化祿:'+p.decadeMutagen[0]+'·化權:'+p.decadeMutagen[1]+'·化科:'+p.decadeMutagen[2]+'·化忌:'+p.decadeMutagen[3]+']':'';
+      return p.stem+p.branch+'【'+p.name+(p.isBodyPalace?' 身宮':'')+' 】大限:'+p.decadeRange+'('+p.decadeStem+')'+
+        (ms?' 主:'+ms:'')+(mi?' 輔:'+mi:'')+dm;
     }).join('\n');
 
     var lifePalace=chart.palaces.find(function(p){return p.isLifePalace;})||{branch:'?'};
@@ -344,13 +349,28 @@ async function generate(){
       var fx=p.majorStars.filter(function(s){return s.mutagen;}).concat(p.minorStars.filter(function(s){return s.mutagen;}));
       return fx.map(function(s){return s.name+s.mutagen+'在'+p.name;}).join('');
     }).filter(Boolean).join('·');
-    var chartSignature = '命宮主星:'+lifePalaceStars+' | 身宮:'+bodyPalaceStars+' | 三方四正:'+sanfangStars+' | 四化:'+jiHua+' | 五行:'+chart.fiveElements+' | 命主:'+chart.lifeMaster+'·身主:'+chart.bodyMaster;
+    var ymSig = chart.yearMutagen ? '生年化祿:'+chart.yearMutagen.lu+' | 生年化權:'+chart.yearMutagen.quan+' | 生年化科:'+chart.yearMutagen.ke+' | 生年化忌:'+chart.yearMutagen.ji : '';
+    var chartSignature = '命宮主星:'+lifePalaceStars+' | 身宮:'+bodyPalaceStars+' | 三方四正:'+sanfangStars+' | '+ymSig+' | 五行:'+chart.fiveElements+' | 命主:'+chart.lifeMaster+'·身主:'+chart.bodyMaster;
+
+    // ZWDS interpretation rules for Claude
+    var zwdsRules = 'KEY ZWDS RULES:\n'+
+      '- 化忌 = recurring friction/blockage in that palace\'s life area; not disaster, but repeated difficulty\n'+
+      '- 陷落星 = weakened star, energy present but frustrated; creates tension and the need to work harder\n'+
+      '- 廟/旺星 = peak power; that quality expresses fully and naturally\n'+
+      '- 命宮主星 defines core nature; 身宮主星 defines how that nature is expressed in the world\n'+
+      '- 三方四正 stars all influence the Life Palace — read them as a system, not individually\n'+
+      '- 生年化忌 = the life-long challenge theme; the palace it lands in is where friction concentrates\n'+
+      '- 生年化祿 = the life-long resource theme; the palace it lands in is where flow comes naturally\n'+
+      '- 大限四化 = the transformations active in each decade window; determines what shifts and activates\n'+
+      '- When 化忌 lands in a palace, the STARS in that palace become conflicted and blocked\n'+
+      '- When the same star appears in both 命宮 and 三方四正, its qualities are amplified significantly';
 
     if(LANG==='en') {
       prompt =
 'You are a Zi Wei Dou Shu expert writing a deeply personal behavioral profile.\n\n'+
 'CHART SIGNATURE — the distinctive fingerprint of this specific chart:\n'+
 chartSignature+'\n\n'+
+zwdsRules+'\n\n'+
 'CRITICAL INSTRUCTION: Before writing anything, identify the 2-3 most unusual or distinctive features of this chart — star combinations, brightness levels, or 四化 placements that are rare or create unusual dynamics. Build the ENTIRE profile around these distinctive features. If an insight could apply to 50% of people, discard it and find something more specific to THIS chart.\n\n'+
 'Star brightness: 廟/旺=peak, 得/利=strong, 平=moderate, 陷=weakened.\n\n'+
 'RULES:\n'+
@@ -384,7 +404,7 @@ chartSignature+'\n\n'+
 '• \n• \n• \n\n'+
 '===CYCLES===\n'+
 '[IMPORTANT: Both sentences on ONE line per decade.]\n'+
-'[Sentence 1: what actual stars are active in this decade window and what life area lights up. Sentence 2: what this specifically means for her given her chart signature — what she builds, faces, or discovers.]\n'+
+'[Use the 大限四化 data provided for each decade. Sentence 1: which palace is activated and what the 四化 transformations (化祿/化權/化科/化忌) mean for that period. Sentence 2: how this intersects with her chart signature — what specifically builds, activates, or becomes difficult.]\n'+
 '3-12 | Early Formation | [Sentence 1. Sentence 2.]\n'+
 '13-22 | Exploration | [Sentence 1. Sentence 2.]\n'+
 '23-32 | Acceleration | [Sentence 1. Sentence 2.]\n'+
@@ -404,6 +424,7 @@ chartSignature+'\n\n'+
 '你是一位紫微斗數命理師，為真實客戶撰寫深度個人命盤分析。\n\n'+
 '命盤特徵——這張命盤的獨特指紋：\n'+
 chartSignature+'\n\n'+
+zwdsRules+'\n\n'+
 '關鍵指示：在開始撰寫之前，先找出這張命盤最獨特的2-3個特徵——罕見的星曜組合、特殊的亮度配置、或不尋常的四化落點。整份分析必須圍繞這些獨特特徵展開。如果一個觀察可以套用在50%的人身上，丟棄它，找更具體的。\n\n'+
 '星曜亮度：廟/旺=極強，得/利=強，平=中等，陷=弱。\n\n'+
 '出生資料：'+(name||'此人')+' | '+gender+' | '+year+'年'+month+'月'+day+'日 | '+hrTxt+'\n'+
@@ -431,7 +452,7 @@ chartSignature+'\n\n'+
 '• \n• \n• \n\n'+
 '===CYCLES===\n'+
 '[重要：每個大限的兩句話寫在同一行。]\n'+
-'[第一句：這個大限實際啟動的星曜與被點亮的人生面向。第二句：結合她的命盤特徵，這對她具體意味著什麼——建立什麼、面對什麼、釋放什麼。]\n'+
+'[使用每個大限提供的大限四化資料。第一句：這個大限啟動哪個宮位，四化（化祿/化權/化科/化忌）對這個時期意味著什麼。第二句：結合她的命盤特徵，這對她具體意味著什麼——建立什麼、啟動什麼、或帶來什麼困難。]\n'+
 '3-12 | 成形期 | [第一句。第二句。]\n'+
 '13-22 | 探索期 | [第一句。第二句。]\n'+
 '23-32 | 加速期 | [第一句。第二句。]\n'+
