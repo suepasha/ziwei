@@ -325,46 +325,66 @@ async function generate(){
     var bodyPalace=chart.palaces.find(function(p){return p.isBodyPalace;})||{branch:'?'};
 
     // Step 3: Call Claude with real chart data
-    var prompt;
+
+    // Build chart signature — the distinctive fingerprint of this chart
+    var lifePalaceStars = chart.palaces.filter(function(p){return p.isLifePalace;}).map(function(p){
+      return p.majorStars.map(function(s){return s.name+(s.mutagen||'')+'('+s.brightness+')';}).join('·');
+    }).join('');
+    var bodyPalaceStars = chart.palaces.filter(function(p){return p.isBodyPalace;}).map(function(p){
+      return p.name+' '+p.majorStars.map(function(s){return s.name+(s.mutagen||'')+'('+s.brightness+')';}).join('·');
+    }).join('');
+    var sanfangStars = chart.palaces.filter(function(p){
+      var SFMAP={'子':['辰','申','午'],'丑':['巳','酉','未'],'寅':['午','戌','申'],'卯':['未','亥','酉'],'辰':['申','子','戌'],'巳':['酉','丑','亥'],'午':['戌','寅','子'],'未':['亥','卯','丑'],'申':['子','辰','寅'],'酉':['丑','巳','卯'],'戌':['寅','午','辰'],'亥':['卯','未','巳']};
+      var lp=chart.palaces.find(function(x){return x.isLifePalace;});
+      return lp && (SFMAP[lp.branch]||[]).indexOf(p.branch)>-1;
+    }).map(function(p){
+      return p.name+'('+p.branch+'):'+p.majorStars.map(function(s){return s.name+(s.mutagen||'')+'('+s.brightness+')';}).join('·');
+    }).join(' | ');
+    var jiHua = chart.palaces.map(function(p){
+      var fx=p.majorStars.filter(function(s){return s.mutagen;}).concat(p.minorStars.filter(function(s){return s.mutagen;}));
+      return fx.map(function(s){return s.name+s.mutagen+'在'+p.name;}).join('');
+    }).filter(Boolean).join('·');
+    var chartSignature = '命宮主星:'+lifePalaceStars+' | 身宮:'+bodyPalaceStars+' | 三方四正:'+sanfangStars+' | 四化:'+jiHua+' | 五行:'+chart.fiveElements+' | 命主:'+chart.lifeMaster+'·身主:'+chart.bodyMaster;
 
     if(LANG==='en') {
       prompt =
-'You are a Zi Wei Dou Shu expert writing a personal behavioral profile in English.\n\n'+
-'PRINCIPLE: Chinese astrology is the source of truth. Every insight must come from the actual star placements — translate what the stars say into behavioral language that feels immediately personal and true.\n\n'+
+'You are a Zi Wei Dou Shu expert writing a deeply personal behavioral profile.\n\n'+
+'CHART SIGNATURE — the distinctive fingerprint of this specific chart:\n'+
+chartSignature+'\n\n'+
+'CRITICAL INSTRUCTION: Before writing anything, identify the 2-3 most unusual or distinctive features of this chart — star combinations, brightness levels, or 四化 placements that are rare or create unusual dynamics. Build the ENTIRE profile around these distinctive features. If an insight could apply to 50% of people, discard it and find something more specific to THIS chart.\n\n'+
 'Star brightness: 廟/旺=peak, 得/利=strong, 平=moderate, 陷=weakened.\n\n'+
 'RULES:\n'+
 '- Zero Chinese characters\n'+
 '- No star name references — translate star meanings into behavioral observation\n'+
-'- Every insight traces to an actual placement in this chart\n'+
-'- Write so the person reads it and thinks "yes, that is exactly me"\n'+
-'- No hedging. No filler. Each section covers different ground.\n\n'+
+'- Every single insight must trace to an actual placement in this chart\n'+
+'- Write so the person reads it and thinks "this could only be written about me"\n'+
+'- If it sounds like a horoscope, rewrite it\n'+
+'- Each section covers different ground — no overlap\n\n'+
 'Birth: '+(name||'this person')+' | '+gender+' | '+year+'/'+month+'/'+day+' | '+hrTxt+'\n'+
 'Lunar: '+chart.lunarDate+' | Five Elements: '+chart.fiveElements+'\n'+
-'Chart (use exactly, do not recalculate): '+palaceSummary+'\n'+
+'Full chart (do not recalculate): '+palaceSummary+'\n'+
 'Palace reference: 命宮=Life, 兄弟=Siblings, 夫妻=Spouse\/Partner, 子女=Children, 財帛=Wealth, 疾厄=Health, 遷移=Travel\/Change, 僕役=Friends\/Network, 官祿=Career, 田宅=Home, 福德=Inner Life, 父母=Parents\n\n'+
 '===META===\n'+
 'Lunar: '+chart.lunarDate+'\nLife Palace: '+lifePalace.branch+'\nBody Palace: '+bodyPalace.branch+'\n5-Element: '+chart.fiveElements+'\n\n'+
 '===LIFE PORTRAIT===\n'+
-'[One paragraph, 4-5 sentences. Open with her core nature. Move into the pattern her life keeps returning to. Close with one thing true about her that most people never see. Personal and specific — not generic.]\n'+
+'[One paragraph 4-5 sentences. Start from the DISTINCTIVE FEATURES you identified — what makes this chart unusual. Open with what drives her at the deepest level (derived from Life Palace star combination specifically). Move into the specific life pattern this chart creates. Close with something true about her that only someone reading THIS chart could say — not a generic insight.]\n'+
 'Life is shaped by:\n'+
-'• [one specific force from this chart]\n'+
-'• [one specific force]\n'+
-'• [one specific force]\n'+
-'• [one specific force]\n\n'+
+'• [specific force from this chart — not a trait that applies to most people]\n'+
+'• [specific force — derived from an actual unusual placement]\n'+
+'• [specific force]\n'+
+'• [specific force]\n\n'+
 '===PALACES===\n'+
-'[12 paragraphs in order: Life · Siblings · Spouse\/Partner · Children · Wealth · Health · Travel & Change · Friends & Network · Career · Home · Inner Life · Parents\n\n'+
-'IMPORTANT length rule:\n'+
-'- Major palaces (Life, Spouse\/Partner, Wealth, Career, Inner Life, Health): 2-3 sentences each\n'+
-'- Minor palaces (Siblings, Children, Travel, Friends, Home, Parents): 1 sentence each\n\n'+
-'Format: **[Name]** — [sentences. No star names. No Chinese. What actually plays out in this life area for this specific person.]\n'+
-'If a palace has weakened or challenged stars, say what actually happens there. If strong, say the real gift.]\n\n'+
+'[12 paragraphs. Order: Life · Siblings · Spouse\/Partner · Children · Wealth · Health · Travel & Change · Friends & Network · Career · Home · Inner Life · Parents\n\n'+
+'Length rule:\n'+
+'- Major palaces (Life, Spouse\/Partner, Wealth, Career, Inner Life, Health): 2-3 sentences\n'+
+'- Minor palaces (Siblings, Children, Travel, Friends, Home, Parents): 1 sentence\n\n'+
+'For each palace: What do the SPECIFIC stars at their SPECIFIC brightness levels in this palace mean for this person behaviorally? If there is a negative transformation (化忌) or weakened star (陷), name the specific recurring difficulty this creates in that life area. If there is a strong combination, name the specific capability or pattern it creates. No star names in text. No generic descriptions.]\n\n'+
 '===HOW SHE OPERATES===\n'+
-'[Exactly 3 bullets. These must cover ground NOT already said in the palaces above. Pick the 3 most revealing behavioral patterns that cut across multiple life areas — things that explain HOW she moves through the world, not what happens in any single area.]\n'+
-'• [most revealing cross-cutting behavioral pattern]\n'+
-'• [second pattern — different dimension]\n'+
-'• [third pattern — different dimension]\n\n'+
+'[Exactly 3 bullets. Must come from the chart signature — the distinctive star combinations. Each bullet names a cross-cutting behavioral pattern that only this chart configuration would produce. If it sounds like something you could say about many people, discard it.]\n'+
+'• \n• \n• \n\n'+
 '===CYCLES===\n'+
-'[IMPORTANT: Put both sentences on ONE line. Sentence 1: what energy\/stars are active and what life area is lit up. Sentence 2: what this means for her specifically.]\n'+
+'[IMPORTANT: Both sentences on ONE line per decade.]\n'+
+'[Sentence 1: what actual stars are active in this decade window and what life area lights up. Sentence 2: what this specifically means for her given her chart signature — what she builds, faces, or discovers.]\n'+
 '3-12 | Early Formation | [Sentence 1. Sentence 2.]\n'+
 '13-22 | Exploration | [Sentence 1. Sentence 2.]\n'+
 '23-32 | Acceleration | [Sentence 1. Sentence 2.]\n'+
@@ -375,47 +395,43 @@ async function generate(){
 '73-82 | Maintenance | [Sentence 1. Sentence 2.]\n\n'+
 '===SUMMARY===\n'+
 (name||'She')+' is someone who:\n'+
-'• [most essential truth — specific to this chart]\n'+
-'• [second truth — different dimension]\n'+
-'• [third truth — captures both gift and friction in one honest line]';
+'• [most essential truth — could only be written about this chart, not any other]\n'+
+'• [second truth — different dimension, equally specific]\n'+
+'• [third truth — captures both the distinctive gift and the distinctive friction of this chart]';
 
     } else {
       prompt =
 '你是一位紫微斗數命理師，為真實客戶撰寫深度個人命盤分析。\n\n'+
-'原則：所有分析必須來自實際星曜配置。讓這個人讀了說「對，這就是我」。\n\n'+
+'命盤特徵——這張命盤的獨特指紋：\n'+
+chartSignature+'\n\n'+
+'關鍵指示：在開始撰寫之前，先找出這張命盤最獨特的2-3個特徵——罕見的星曜組合、特殊的亮度配置、或不尋常的四化落點。整份分析必須圍繞這些獨特特徵展開。如果一個觀察可以套用在50%的人身上，丟棄它，找更具體的。\n\n'+
 '星曜亮度：廟/旺=極強，得/利=強，平=中等，陷=弱。\n\n'+
-'寫作原則：\n'+
-'- 所有觀察從實際星曜推導，不套用一般命理套語\n'+
-'- 直接、具體、有觀點，不說「可能」「或許」\n'+
-'- 各段落不重複，十二宮是主要內容，行為分析不重複宮位已說的事\n\n'+
 '出生資料：'+(name||'此人')+' | '+gender+' | '+year+'年'+month+'月'+day+'日 | '+hrTxt+'\n'+
 '農曆：'+chart.lunarDate+' | 干支：'+chart.chinesePillars+' | 五行：'+chart.fiveElements+'\n'+
 '命主：'+chart.lifeMaster+' | 身主：'+chart.bodyMaster+'\n'+
-'命盤（請使用以下星曜，勿重新計算）：\n'+palaceSummary+'\n\n'+
-'請依序使用以下段落標記：\n\n'+
+'完整命盤（請使用以下星曜，勿重新計算）：\n'+palaceSummary+'\n\n'+
+'原則：讓這個人讀了說「這只能是寫給我的」——不是「這說的是我」，是「這只有了解我這張命盤的人才能說出來」。\n\n'+
 '===META===\n'+
 '農曆：'+chart.lunarDate+'\n干支：'+chart.chinesePillars+'\n命宮：'+lifePalace.branch+'\n身宮：'+bodyPalace.branch+'\n五行局：'+chart.fiveElements+'\n命主：'+chart.lifeMaster+'\n身主：'+chart.bodyMaster+'\n\n'+
 '===LIFE PORTRAIT===\n'+
-'[4-5句。從命宮主星與整體命盤推導。第一句：核心本質。第二三句：人生反覆呈現的模式。最後一句：旁人看不到但她深知的那一面。直接，讓她讀了覺得被看見。]\n'+
+'[4-5句。從你找到的獨特特徵出發——這張命盤有什麼不尋常的地方。第一句從命宮的具體星曜組合說她最深層的驅動力。後幾句說這張命盤創造的具體人生模式。最後一句說只有讀過這張命盤的人才能說出的那句話。]\n'+
 '人生的基調：\n'+
-'• [從命盤推導的具體力量，不套用]\n'+
-'• [從命盤推導]\n'+
+'• [從這張命盤的獨特之處推導——不是適用於大多數人的特質]\n'+
+'• [從實際的特殊配置推導]\n'+
 '• [從命盤推導]\n'+
 '• [從命盤推導]\n\n'+
 '===PALACES===\n'+
 '[12段。順序：命宮·兄弟·夫妻·子女·財帛·疾厄·遷移·僕役·官祿·田宅·福德·父母\n\n'+
-'重要長度規則：\n'+
-'- 主要宮位（命宮、夫妻、財帛、官祿、福德、疾厄）：每宮2-3句，引用主星與亮度\n'+
-'- 次要宮位（兄弟、子女、遷移、僕役、田宅、父母）：每宮1句，點出最關鍵的星曜特質\n\n'+
-'格式：**[宮位名]** — [若有化忌、陷落或煞星，直接說明帶來的實際困難。若星曜強旺，說明實際的能力或機遇。讓人讀了認出自己的人生。]\n'+
-'此段涵蓋所有人生面向。下方行為分析不重複這裡的內容。]\n\n'+
+'長度規則：\n'+
+'- 主要宮位（命宮、夫妻、財帛、官祿、福德、疾厄）：每宮2-3句\n'+
+'- 次要宮位（兄弟、子女、遷移、僕役、田宅、父母）：每宮1句\n\n'+
+'每個宮位：這個宮位的具體星曜在這個亮度下，對這個人的這個人生面向產生什麼具體影響？若有化忌或陷落星，說明這個面向反覆出現的具體困難。若有強旺組合，說明這個面向具體產生的能力或模式。不套用，不說廢話。]\n\n'+
 '===HOW SHE OPERATES===\n'+
-'[只寫3點。這3點必須涵蓋十二宮分析中未說到的內容——選擇跨越多個人生面向、最能解釋她如何在這個世界中移動的行為模式。]\n'+
-'• [最具揭示性的跨領域行為模式]\n'+
-'• [第二個模式——不同面向]\n'+
-'• [第三個模式——不同面向]\n\n'+
+'[只寫3點。必須來自命盤特徵——這張命盤的獨特星曜組合。每點說一個跨越多個人生面向、只有這張命盤配置才會產生的行為模式。如果聽起來像是可以套用在很多人身上的，丟棄重寫。]\n'+
+'• \n• \n• \n\n'+
 '===CYCLES===\n'+
-'[重要：每個大限的兩句話必須寫在同一行。第一句：這個大限的主星能量與被點亮的人生面向。第二句：這對她具體意味著什麼。從大限星曜推導，不套用。]\n'+
+'[重要：每個大限的兩句話寫在同一行。]\n'+
+'[第一句：這個大限實際啟動的星曜與被點亮的人生面向。第二句：結合她的命盤特徵，這對她具體意味著什麼——建立什麼、面對什麼、釋放什麼。]\n'+
 '3-12 | 成形期 | [第一句。第二句。]\n'+
 '13-22 | 探索期 | [第一句。第二句。]\n'+
 '23-32 | 加速期 | [第一句。第二句。]\n'+
@@ -426,9 +442,9 @@ async function generate(){
 '73-82 | 沉澱期 | [第一句。第二句。]\n\n'+
 '===SUMMARY===\n'+
 (name||'她')+'的特質：\n'+
-'• [這張命盤最核心的真相——具體、個人]\n'+
-'• [第二個真相——不同面向]\n'+
-'• [第三個真相——同時包含她的天賦與摩擦，誠實而有力]';
+'• [最核心的真相——只能寫給這張命盤，不能套用在任何其他人]\n'+
+'• [第二個真相——不同面向，同樣具體]\n'+
+'• [第三個真相——同時包含這張命盤獨有的天賦與摩擦]';
     }
 
         var res=await fetch('/proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:6000,messages:[{role:'user',content:prompt}]})});
@@ -578,7 +594,7 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
 
   // ── HEADER ──
   h+='<div class="prof-hdr">';
-  h+='<div class="pname">'+(name?name+' — ':'')+(LANG==='zh'?'命盤行為分析':'Behavioral &amp; Personality Profile')+'</div>';
+  h+='<div class="pname">'+(LANG==='zh'?'命盤行為分析':'Behavioral &amp; Personality Profile')+'</div>';
   h+='<div class="psub">'+genderLabel+' · '+month+'/'+day+'/'+year+' · '+hrTxt+(LANG!=='en'&&chart.lifeMaster?' · 命主'+chart.lifeMaster+' · 身主'+chart.bodyMaster:'')+'</div>';
   h+='</div>';
 
@@ -643,7 +659,7 @@ function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
 
   // ── LIFE CYCLES ──
   if(cycRows.length){
-    h+='<div class="scard-full"><div class="sh">'+(LANG==='zh'?'大限流年':'Life Cycles')+'</div><div class="cycles">';
+    h+='<div class="scard-full"><div class="sh">'+(LANG==='zh'?'大限流年':'10 Year Life Cycles')+'</div><div class="cycles">';
     cycRows.forEach(function(cyc){
       var sentences = cyc.text.split(/(?<=[.。])\s+/).filter(Boolean);
       var textHtml = sentences.length > 1
