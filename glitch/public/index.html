@@ -412,7 +412,7 @@ async function generate(){
 '===META===\n'+
 'Lunar: '+chart.lunarDate+'\nLife Palace: '+lifePalace.branch+'\nBody Palace: '+(bodyPal?bodyPal.branch:'')+'\n5-Element: '+chart.fiveElements+'\n\n'+
 '===LIFE PORTRAIT===\n'+
-'[3-4 sentences. Start with the boldest, most specific truth about who this person is — derived from the chart pattern. No warm-up. No introduction. Just the truth. Then what their life keeps returning to. Second person throughout. Short sentences. Revelation, not description.]\n'+
+'[5-6 sentences. No warm-up — open with the boldest truth about who this person is. Then go deeper: what drives them at the core, what their life keeps returning to, what they carry that most people never see. Each sentence should hit. Second person. Short sentences. Revelation, not description.]\n'+
 'Life is shaped by:\n'+
 '• [one word or very short phrase — a force, not a trait]\n'+
 '• [one word or short phrase]\n'+
@@ -420,15 +420,14 @@ async function generate(){
 '• [one word or short phrase]\n\n'+
 '===PALACES===\n'+
 '[12 paragraphs. Order: Life · Siblings · Spouse\/Partner · Children · Wealth · Health · Travel & Change · Friends & Network · Career · Home · Inner Life · Parents\n'+
-'Major palaces (Life, Spouse, Wealth, Career, Inner Life, Health): 2-3 short, direct sentences.\n'+
-'Minor palaces (Siblings, Children, Travel, Friends, Home, Parents): 1 sentence.\n'+
-'Format: **[Name]** — [speak directly to them. Second person. What is true about this area of their life — not what might be true. If there is a recurring friction, name it plainly. If there is a gift, name it plainly.]\n'+
-'Every line should make the person stop and think "how did they know that."]\n\n'+
+'Major palaces (Life, Spouse, Wealth, Career, Inner Life, Health): 3-4 sentences each. Go deep. Name what happens in this life area, what keeps repeating, what the gift is, what the friction is. Make it feel like someone who has known them for years.\n'+
+'Minor palaces (Siblings, Children, Travel, Friends, Home, Parents): 2 sentences. One for the gift or pattern, one for the friction or dynamic.\n'+
+'Format: **[Name]** — [second person, direct, specific. If there is recurring difficulty, name it plainly and personally. If there is a real strength, state it as fact. Every line should make them stop and think "how did they know that."]\n\n'+
 '===HOW SHE OPERATES===\n'+
-'[3 bullets. Second person. Short, striking. Cross-cutting patterns from the chart — not personality traits. The kind of lines that hit.]\n'+
+'[5 bullets. Second person. Each bullet is 2 sentences — one that states the pattern, one that goes deeper into what it means for this person. Cross-cutting patterns from the chart. The kind that hit and stay with you.]\n'+
 '• \n• \n• \n\n'+
 '===CYCLES===\n'+
-'[Both sentences on ONE line. Second person. Present tense where possible. No "this decade brings" — just "you build" "you release" "you face."]\n'+
+'[Both sentences on ONE line per decade — do not break across lines. Second person. Present tense. Direct. Sentence 1: what activates and what life area is lit up. Sentence 2: what this means for this specific person — what they build, face, release or discover in this window. Make each decade feel distinct.]\n'+
 '3-12 | Early Formation | [Sentence 1. Sentence 2.]\n'+
 '13-22 | Exploration | [Sentence 1. Sentence 2.]\n'+
 '23-32 | Acceleration | [Sentence 1. Sentence 2.]\n'+
@@ -439,9 +438,9 @@ async function generate(){
 '73-82 | Maintenance | [Sentence 1. Sentence 2.]\n\n'+
 '===SUMMARY===\n'+
 (name||'You')+' are someone who:\n'+
-'• [one truth — the most essential, most specific to this chart. Second person. No hedging.]\n'+
-'• [second truth — different dimension. Hit harder than the first.]\n'+
-'• [third truth — the one line that would make them put the phone down and sit with it.]';
+'• [one truth — the most essential, most specific to this chart. Second person. No hedging. 1-2 sentences.]\n'+
+'• [second truth — different dimension. Hit harder than the first. 1-2 sentences.]\n'+
+'• [third truth — the one line that would make them put the phone down and sit with it. 1-2 sentences.]';
 
       prompt = prompt.replace('===HOW SHE OPERATES===', '===HOW YOU OPERATE===');
 
@@ -464,7 +463,7 @@ async function generate(){
 '===META===\n'+
 '農曆：'+chart.lunarDate+'\n干支：'+chart.chinesePillars+'\n命宮：'+lifePalace.branch+'\n身宮：'+(bodyPal?bodyPal.branch:'')+'\n五行局：'+chart.fiveElements+'\n命主：'+chart.lifeMaster+'\n身主：'+chart.bodyMaster+'\n\n'+
 '===LIFE PORTRAIT===\n'+
-'[3-4句。第一句就說最大膽、最具體的真相——從格局推導。不要暖場。不要介紹。直接說。第二人稱，短句，啟示，不是描述。]\n'+
+'[5-6句。不要暖場——第一句就說最大膽的真相。然後深入：什麼在核心驅動你，你的人生反覆回到什麼，你帶著什麼是多數人永遠看不到的。每一句都要有力量。第二人稱，短句，啟示，不是描述。]\n'+
 '人生的基調：\n'+
 '• [一個詞或極短的短語——一種力量，不是特質]\n'+
 '• [一個詞或短語]\n'+
@@ -476,10 +475,10 @@ async function generate(){
 '次要宮位（兄弟、子女、遷移、僕役、田宅、父母）：1句。\n'+
 '格式：**[宮位名]** — [直接對他們說。第二人稱。說這個人生面向是什麼——不是可能是什麼。有反覆出現的摩擦就直說。有天賦就直說。每一行都要讓人覺得「他怎麼知道」。]\n\n'+
 '===HOW YOU OPERATE===\n'+
-'[3點。第二人稱。短，有力。從命盤的跨宮動態推導。不是性格特質——是命運的模式。]\n'+
+'[5點。第二人稱。每點2句——第一句說模式，第二句深入說對這個人意味著什麼。從命盤推導。有力量，留得下來的那種。]\n'+
 '• \n• \n• \n\n'+
 '===CYCLES===\n'+
-'[每個大限兩句寫在同一行。第二人稱。現在式。不說「這個時期帶來」——就說「你建立」「你釋放」「你面對」。]\n'+
+'[每個大限兩句寫在同一行——不要換行。第二人稱，現在式，直接。第一句：什麼被啟動，哪個人生面向被點亮。第二句：這對這個人具體意味著什麼——你建立什麼、面對什麼、釋放什麼或發現什麼。讓每個大限都感覺不一樣。]\n'+
 '3-12 | 成形期 | [第一句。第二句。]\n'+
 '13-22 | 探索期 | [第一句。第二句。]\n'+
 '23-32 | 加速期 | [第一句。第二句。]\n'+
@@ -490,9 +489,9 @@ async function generate(){
 '73-82 | 沉澱期 | [第一句。第二句。]\n\n'+
 '===SUMMARY===\n'+
 (name||'你')+'是這樣一個人：\n'+
-'• [一個真相——最核心的，最具體的。第二人稱。不說廢話。]\n'+
-'• [第二個真相——不同面向。比第一個更狠。]\n'+
-'• [第三個真相——讓人讀了放下手機坐著想的那一行。]';
+'• [一個真相——最核心的，最具體的。第二人稱。1-2句。]\n'+
+'• [第二個真相——不同面向。比第一個更有力。1-2句。]\n'+
+'• [第三個真相——讓人讀了放下手機坐著想的那一行。1-2句。]';
     }
 
         var res=await fetch('/proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:6000,messages:[{role:'user',content:prompt}]})});
