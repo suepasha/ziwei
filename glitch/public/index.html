@@ -733,4 +733,144 @@ function newGen(){
 }
 </script>
 </body>
-</html>
+</html>    var prompt;
+
+    // ── Build enriched palace summary ──
+    var palaceSummary = chart.palaces.map(function(p){
+      var ms = p.majorStars.map(function(s){ return s.name+(s.mutagen||'')+'('+s.brightness+')'; }).join('·');
+      var mi = p.minorStars.map(function(s){ return s.name+(s.mutagen||'')+(s.brightness?'('+s.brightness+')':''); }).join('·');
+      var psf = p.palaceStemFx && p.palaceStemFx.length ? ' 宮干四化[祿'+p.palaceStemFx[0]+'·權'+p.palaceStemFx[1]+'·科'+p.palaceStemFx[2]+'·忌'+p.palaceStemFx[3]+']' : '';
+      var dm = p.decadeMutagen && p.decadeMutagen.length ? ' 大限四化[祿'+p.decadeMutagen[0]+'·權'+p.decadeMutagen[1]+'·科'+p.decadeMutagen[2]+'·忌'+p.decadeMutagen[3]+']' : '';
+      return p.stem+p.branch+'【'+p.name+(p.isBodyPalace?'/身宮':'')+' 大限'+p.decadeRange+'('+p.decadeStem+')】'+(ms?' 主:'+ms:'')+(mi?' 輔:'+mi:'')+psf+dm;
+    }).join('\n');
+
+    // ── Build chart fingerprint ──
+    var lifePalaceStars = chart.palaces.filter(function(p){return p.isLifePalace;}).map(function(p){
+      return p.majorStars.map(function(s){return s.name+(s.mutagen||'')+'('+s.brightness+')';}).join('·');
+    }).join('');
+    var bodyPal = chart.palaces.find(function(p){return p.isBodyPalace;});
+    var bodyPalaceStr = bodyPal ? bodyPal.name+'('+bodyPal.branch+') '+bodyPal.majorStars.map(function(s){return s.name+'('+s.brightness+')';}).join('·') : '';
+    var sfPalaces = chart.palaces.filter(function(p){
+      var SFMAP={'子':['辰','申','午'],'丑':['巳','酉','未'],'寅':['午','戌','申'],'卯':['未','亥','酉'],'辰':['申','子','戌'],'巳':['酉','丑','亥'],'午':['戌','寅','子'],'未':['亥','卯','丑'],'申':['子','辰','寅'],'酉':['丑','巳','卯'],'戌':['寅','午','辰'],'亥':['卯','未','巳']};
+      var lp=chart.palaces.find(function(x){return x.isLifePalace;});
+      return lp && (SFMAP[lp.branch]||[]).indexOf(p.branch)>-1;
+    }).map(function(p){return p.name+'['+p.majorStars.map(function(s){return s.name+'('+s.brightness+')';}).join('·')+']';}).join(' | ');
+    var ym = chart.yearMutagen;
+    var ymStr = ym ? '生年化祿→'+ym.lu+' | 化權→'+ym.quan+' | 化科→'+ym.ke+' | 化忌→'+ym.ji : '';
+    var patternsStr = chart.patterns && chart.patterns.length ? chart.patterns.join('·') : '無特殊格局';
+    var flyJiStr = chart.flyingJi && chart.flyingJi.length ? chart.flyingJi.join(' | ') : '';
+    var flyLuStr = chart.flyingLu && chart.flyingLu.length ? chart.flyingLu.slice(0,4).join(' | ') : '';
+
+    var fingerprint =
+      '【命盤指紋】\n'+
+      '格局: '+patternsStr+'\n'+
+      '命宮主星: '+lifePalaceStars+'\n'+
+      '身宮: '+bodyPalaceStr+'\n'+
+      '三方四正: '+sfPalaces+'\n'+
+      ymStr+'\n'+
+      (flyJiStr?'關鍵飛化忌: '+flyJiStr+'\n':'')+
+      (flyLuStr?'關鍵飛化祿: '+flyLuStr+'\n':'')+
+      '命主:'+chart.lifeMaster+' | 身主:'+chart.bodyMaster+' | 五行:'+chart.fiveElements;
+
+    var zwdsRules =
+      '【紫微斗數核心解讀規則】\n'+
+      '- 格局優先: 有格局者，格局定基調，再看各宮細節\n'+
+      '- 化忌=該宮位人生面向的反覆阻礙，非災難，是持續的摩擦\n'+
+      '- 宮干化忌飛入他宮=阻礙從源宮飛向目標宮，製造跨宮連動影響\n'+
+      '- 陷落星=能量存在但受挫，需加倍努力才能發揮\n'+
+      '- 廟/旺=能量充沛，特質自然且完整表現\n'+
+      '- 三方四正需整體看: 四個宮位的星曜合力影響命宮\n'+
+      '- 生年化忌所在宮=此生最核心的挑戰主題\n'+
+      '- 生年化祿所在宮=此生最自然的資源來源\n'+
+      '- 大限四化=該十年啟動的轉化力量，決定該期的主要走向\n'+
+      '- 宮干化忌飛入命宮=外部環境對命主核心的衝擊\n'+
+      '- 同一星曜同時出現在命宮三方=特質被大幅放大';
+
+    if(LANG==='en') {
+      prompt = fingerprint+'\n\n'+zwdsRules+'\n\n'+
+'You are a Zi Wei Dou Shu expert writing a personal behavioral profile in English.\n\n'+
+'CRITICAL: Use the chart fingerprint above as your foundation. Identify what makes this chart DISTINCT — the格局 (chart patterns), the specific star combinations in the三方四正, the化忌 chain reactions from the飛化. Everything you write must trace to this specific chart.\n\n'+
+'TEST: Before finalizing each sentence ask yourself — could this apply to 50% of people? If yes, rewrite it from the chart data.\n\n'+
+'RULES:\n'+
+'- Zero Chinese characters in output\n'+
+'- No star names — translate everything into behavioral language\n'+
+'- The格局 pattern defines the fundamental life theme — use it as the opening frame\n'+
+'- 化忌 = a specific recurring friction; name what actually keeps happening in that life area\n'+
+'- 飛化 chains = cross-palace influences; name the actual dynamic they create\n'+
+'- Make the person feel seen, not analyzed\n\n'+
+'Birth: '+(name||'this person')+' | '+gender+' | '+year+'/'+month+'/'+day+' | '+hrTxt+'\n'+
+'Five Elements: '+chart.fiveElements+'\n'+
+'Full chart:\n'+palaceSummary+'\n\n'+
+'Palace names: 命宮=Life, 兄弟=Siblings, 夫妻=Spouse\/Partner, 子女=Children, 財帛=Wealth, 疾厄=Health, 遷移=Travel\/Change, 僕役=Friends\/Network, 官祿=Career, 田宅=Home, 福德=Inner Life, 父母=Parents\n\n'+
+'===META===\n'+
+'Lunar: '+chart.lunarDate+'\nLife Palace: '+lifePalace.branch+'\nBody Palace: '+(bodyPal?bodyPal.branch:'')+'\n5-Element: '+chart.fiveElements+'\n\n'+
+'===LIFE PORTRAIT===\n'+
+'[4-5 sentences. Open with what the格局 pattern means for this specific person — not the pattern name, but what it actually creates in a life. Then the specific dynamic of her Life Palace star combination. Close with something true about her that only this chart could reveal.]\n'+
+'Life is shaped by:\n• [derived from格局 or三方四正 — not generic]\n• [derived from生年化祿 or化權 placement]\n• [derived from生年化忌 or key飛化]\n• [derived from命主/身主 or五行]\n\n'+
+'===PALACES===\n'+
+'[12 paragraphs. Order: Life · Siblings · Spouse\/Partner · Children · Wealth · Health · Travel & Change · Friends & Network · Career · Home · Inner Life · Parents\n'+
+'Major palaces (Life, Spouse, Wealth, Career, Inner Life, Health): 2-3 sentences. Derive from actual stars + brightness + any化忌 or飛化 affecting this palace.\n'+
+'Minor palaces (Siblings, Children, Travel, Friends, Home, Parents): 1 sentence. Name the key dynamic only.\n'+
+'Format: **[Name]** — [behavioral language only, no star names, no Chinese]\n'+
+'If a化忌 or飛化 affects this palace, that IS the story of this palace — name the recurring pattern it creates.]\n\n'+
+'===HOW SHE OPERATES===\n'+
+'[3 bullets only. Each derived from a cross-palace dynamic — the格局, the飛化 chains, or the三方四正 interactions. Not personality traits. Behavioral patterns that only this chart configuration would produce.]\n'+
+'• \n• \n• \n\n'+
+'===CYCLES===\n'+
+'[Both sentences on ONE line per decade. Use大限四化 data. Sentence 1: which life area activates and what transformation energy is running. Sentence 2: what this specifically produces or demands for her given her chart.]\n'+
+'3-12 | Early Formation | \n'+
+'13-22 | Exploration | \n'+
+'23-32 | Acceleration | \n'+
+'33-42 | Structuring | \n'+
+'43-52 | Peak Output | \n'+
+'53-62 | Selection | \n'+
+'63-72 | Stabilization | \n'+
+'73-82 | Maintenance | \n\n'+
+'===SUMMARY===\n'+
+(name||'She')+' is someone who:\n'+
+'• [most essential truth — rooted in格局 or Life Palace]\n'+
+'• [second truth — from a key화化忌 or飛化 dynamic]\n'+
+'• [third truth — the gift and friction of this chart in one honest line]';
+
+    } else {
+      prompt = fingerprint+'\n\n'+zwdsRules+'\n\n'+
+'你是一位紫微斗數命理師，為真實客戶撰寫深度命盤分析。\n\n'+
+'關鍵指示：以上方命盤指紋為基礎。找出這張命盤最獨特的2-3個特徵。整份分析圍繞這些特徵展開。\n'+
+'測試：每寫一句，問自己——這句話能套用在50%的人身上嗎？能的話，從命盤重新推導。\n\n'+
+'出生：'+(name||'此人')+' | '+gender+' | '+year+'年'+month+'月'+day+'日 | '+hrTxt+'\n'+
+'農曆：'+chart.lunarDate+' | 干支：'+chart.chinesePillars+' | 五行：'+chart.fiveElements+'\n'+
+'命主：'+chart.lifeMaster+' | 身主：'+chart.bodyMaster+'\n'+
+'完整命盤：\n'+palaceSummary+'\n\n'+
+'===META===\n'+
+'農曆：'+chart.lunarDate+'\n干支：'+chart.chinesePillars+'\n命宮：'+lifePalace.branch+'\n身宮：'+(bodyPal?bodyPal.branch:'')+'\n五行局：'+chart.fiveElements+'\n命主：'+chart.lifeMaster+'\n身主：'+chart.bodyMaster+'\n\n'+
+'===LIFE PORTRAIT===\n'+
+'[4-5句。從格局說起——這個格局在她的人生中實際創造什麼。再說命宮主星組合的具體特質。最後說只有讀過這張命盤才能說出的那句話。直接，不客套。]\n'+
+'人生的基調：\n'+
+'• [從格局或三方四正推導——不是套語]\n'+
+'• [從生年化祿或化權落點推導]\n'+
+'• [從生年化忌或關鍵飛化推導]\n'+
+'• [從命主身主或五行推導]\n\n'+
+'===PALACES===\n'+
+'[12段。順序：命宮·兄弟·夫妻·子女·財帛·疾厄·遷移·僕役·官祿·田宅·福德·父母\n'+
+'主要宮位（命宮、夫妻、財帛、官祿、福德、疾厄）：2-3句。引用主星亮度、宮干四化、飛化影響。\n'+
+'次要宮位（兄弟、子女、遷移、僕役、田宅、父母）：1句。說最關鍵的星曜特質或飛化影響。\n'+
+'格式：**[宮位名]** — [若有化忌或飛化忌入此宮，那就是這個宮位的故事——說反覆出現的具體模式。若有強旺組合，說具體能力。不套用。]\n\n'+
+'===HOW SHE OPERATES===\n'+
+'[只寫3點。每點從跨宮動態推導——格局、飛化鏈、或三方四正的交互作用。不是性格特質。是只有這張命盤配置才會產生的行為模式。]\n'+
+'• \n• \n• \n\n'+
+'===CYCLES===\n'+
+'[每個大限兩句寫在同一行。使用大限四化資料。第一句：哪個宮位被啟動，四化能量是什麼。第二句：結合她的命盤，這個時期具體產生什麼或要求什麼。]\n'+
+'3-12 | 成形期 | \n'+
+'13-22 | 探索期 | \n'+
+'23-32 | 加速期 | \n'+
+'33-42 | 架構期 | \n'+
+'43-52 | 高峰期 | \n'+
+'53-62 | 篩選期 | \n'+
+'63-72 | 穩定期 | \n'+
+'73-82 | 沉澱期 | \n\n'+
+'===SUMMARY===\n'+
+(name||'她')+'的特質：\n'+
+'• [最核心的真相——從格局或命宮推導]\n'+
+'• [第二個真相——從關鍵化忌或飛化動態推導]\n'+
+'• [第三個真相——同時包含這張命盤獨有的天賦與摩擦]';
+    }
