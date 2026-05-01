@@ -485,45 +485,15 @@ async function generate(){
 '• [第三個真相——讓人讀了放下手機坐著想的那一行。]';
     }
 
-    // Streaming request
+    var res=await fetch('/proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:5000,messages:[{role:'user',content:prompt}]})});
+    var raw=await res.text();
+    if(!raw) throw new Error('Empty response from server');
+    var apiData=JSON.parse(raw);
+    if(apiData.error) throw new Error(apiData.error.message||'API error');
     clearInterval(ticker);
-    document.getElementById('load-txt').textContent = LANG==='zh' ? '正在生成...' : 'Generating...';
-
-    var streamRes = await fetch('/stream', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:5000,messages:[{role:'user',content:prompt}]})
-    });
-    if(!streamRes.ok) throw new Error('Server error: '+streamRes.status);
-
-    var reader = streamRes.body.getReader();
-    var decoder = new TextDecoder();
-    var fullText = '';
-    var buffer = '';
-
-    while(true) {
-      var result = await reader.read();
-      if(result.done) break;
-      buffer += decoder.decode(result.value, {stream:true});
-      var lines = buffer.split('\n');
-      buffer = lines.pop();
-      for(var i=0;i<lines.length;i++) {
-        var line = lines[i].trim();
-        if(!line || !line.startsWith('data:')) continue;
-        var data = line.slice(5).trim();
-        if(data==='[DONE]') continue;
-        try {
-          var parsed = JSON.parse(data);
-          if(parsed.type==='content_block_delta'&&parsed.delta&&parsed.delta.text) {
-            fullText += parsed.delta.text;
-          }
-          if(parsed.type==='message_stop') break;
-          if(parsed.error) throw new Error(parsed.error.message||'API error');
-        } catch(e) { if(e.message&&e.message.indexOf('API error')>-1) throw e; }
-      }
-    }
-    if(!fullText) throw new Error('No response received');
-    renderResults(fullText,name,year,month,day,hrTxt,gender,ganzhi,chart);
+    var text=apiData.content&&apiData.content[0]?apiData.content[0].text:'';
+    if(!text) throw new Error('No text in response');
+    renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart);
 
   } catch(e){
     clearInterval(ticker);
