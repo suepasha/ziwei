@@ -283,8 +283,6 @@ async function generate(){
   var hrTxt=hrSel.options[hrSel.selectedIndex].text;
   var gender=document.querySelector('input[name=gender]:checked').value;
   var iztroGender=gender==='Male'?'male':'female';
-  var pronoun=gender==='Male'?'he/his':'she/her';
-  var responseLang=LANG==='zh'?'Traditional Chinese (繁體中文)':'English';
   var ganzhi=gz(parseInt(year));
 
   document.getElementById('btn-gen').disabled=true;
@@ -305,188 +303,105 @@ async function generate(){
     if(chart.error) throw new Error('Chart error: '+chart.error);
     if(!chart.palaces||chart.palaces.length<12) throw new Error('Incomplete chart data');
 
-    // Step 2: Build palace summary for Claude
-    // Build enriched year mutagen summary
-    var ymStr = '';
-    if(chart.yearMutagen) {
-      var ym=chart.yearMutagen;
-      ymStr = [ym.lu,ym.quan,ym.ke,ym.ji].filter(Boolean).join('·');
-    }
-
+    // Step 2: Build palace summary
     var palaceSummary=chart.palaces.map(function(p){
-      var ms=p.majorStars.map(function(s){
-        return s.name+(s.mutagen?s.mutagen:'')+(s.brightness?'('+s.brightness+')':'');
-      }).join('·');
-      var mi=p.minorStars.map(function(s){
-        return s.name+(s.mutagen?s.mutagen:'')+(s.brightness?'('+s.brightness+')':'');
-      }).join('·');
-      var dm=p.decadeMutagen&&p.decadeMutagen.length?
-        ' 大限四化:[化祿:'+p.decadeMutagen[0]+'·化權:'+p.decadeMutagen[1]+'·化科:'+p.decadeMutagen[2]+'·化忌:'+p.decadeMutagen[3]+']':'';
-      return p.stem+p.branch+'【'+p.name+(p.isBodyPalace?' 身宮':'')+' 】大限:'+p.decadeRange+'('+p.decadeStem+')'+
-        (ms?' 主:'+ms:'')+(mi?' 輔:'+mi:'')+dm;
+      var ms=p.majorStars.map(function(s){return s.name+(s.mutagen||'')+'('+s.brightness+')';}).join('·');
+      var mi2=p.minorStars.slice(0,3).map(function(s){return s.name+(s.mutagen||'');}).join('·');
+      var dm=p.decadeMutagen&&p.decadeMutagen.length?' 大限[祿'+p.decadeMutagen[0]+'·忌'+p.decadeMutagen[3]+']':'';
+      return p.stem+p.branch+' '+p.name+(p.isBodyPalace?'/身宮':'')+' 大限'+p.decadeRange+(ms?' 主:'+ms:'')+(mi2?' 輔:'+mi2:'')+dm;
     }).join('\n');
 
-    var lifePalace=chart.palaces.find(function(p){return p.isLifePalace;})||{branch:'?'};
-    var bodyPalace=chart.palaces.find(function(p){return p.isBodyPalace;})||{branch:'?'};
-
-    // Step 3: Build chart fingerprint variables
+    // Step 3: Build fingerprint variables
     var SFMAP={'子':['辰','申','午'],'丑':['巳','酉','未'],'寅':['午','戌','申'],'卯':['未','亥','酉'],'辰':['申','子','戌'],'巳':['酉','丑','亥'],'午':['戌','寅','子'],'未':['亥','卯','丑'],'申':['子','辰','寅'],'酉':['丑','巳','卯'],'戌':['寅','午','辰'],'亥':['卯','未','巳']};
-    var lifePal = chart.palaces.find(function(p){return p.isLifePalace;})||{branch:'?',majorStars:[]};
-    var bodyPal = chart.palaces.find(function(p){return p.isBodyPalace;});
+    var lifePal=chart.palaces.find(function(p){return p.isLifePalace;})||{branch:'?',majorStars:[],stem:''};
+    var bodyPal=chart.palaces.find(function(p){return p.isBodyPalace;});
+    var lifePalace=lifePal;
 
-    var lifePalaceStars = lifePal.majorStars.map(function(s){return s.name+(s.mutagen||'')+'('+s.brightness+')';}).join('·');
-    var bodyPalaceStr = bodyPal ? bodyPal.name+'('+bodyPal.branch+') '+bodyPal.majorStars.map(function(s){return s.name+'('+s.brightness+')';}).join('·') : '';
-    var sfBranches = SFMAP[lifePal.branch]||[];
-    var sfPalaces = chart.palaces.filter(function(p){return sfBranches.indexOf(p.branch)>-1;}).map(function(p){
-      return p.name+'['+p.majorStars.map(function(s){return s.name+'('+s.brightness+')';}).join('·')+']';
-    }).join(' | ');
-    var patternsStr = chart.patterns&&chart.patterns.length ? chart.patterns.join('·') : '無特殊格局';
-    var flyJiStr = chart.flyingJi&&chart.flyingJi.length ? chart.flyingJi.join(' | ') : '';
-    var flyLuStr = chart.flyingLu&&chart.flyingLu.length ? chart.flyingLu.slice(0,4).join(' | ') : '';
+    var lifePalaceStars=lifePal.majorStars.map(function(s){return s.name+(s.mutagen||'')+'('+s.brightness+')';}).join('·');
+    var bodyPalaceStr=bodyPal?bodyPal.name+'('+bodyPal.branch+') '+bodyPal.majorStars.map(function(s){return s.name+'('+s.brightness+')';}).join('·'):'';
+    var sfBranches=SFMAP[lifePal.branch]||[];
+    var sfPalaces=chart.palaces.filter(function(p){return sfBranches.indexOf(p.branch)>-1;}).map(function(p){return p.name+'['+p.majorStars.map(function(s){return s.name+'('+s.brightness+')';}).join('·')+']';}).join(' | ');
+    var patternsStr=chart.patterns&&chart.patterns.length?chart.patterns.join('·'):'無特殊格局';
+    var flyJiStr=chart.flyingJi&&chart.flyingJi.length?chart.flyingJi.join(' | '):'';
+    var flyLuStr=chart.flyingLu&&chart.flyingLu.length?chart.flyingLu.slice(0,4).join(' | '):'';
+    var ym=chart.yearMutagen;
+    var ymStr=ym?[ym.lu,ym.quan,ym.ke,ym.ji].filter(Boolean).join('·'):'';
 
     // 小限 yearly data
-    var yearlyStr = '';
-    if(chart.yearlyData) {
+    var yearlyStr='';
+    if(chart.yearlyData){
       var palNameMap={'命宮':'Life','兄弟':'Siblings','夫妻':'Spouse/Partner','子女':'Children','財帛':'Wealth','疾厄':'Health','遷移':'Travel & Change','僕役':'Friends & Network','官祿':'Career','田宅':'Home','福德':'Inner Life','父母':'Parents'};
-      var currentYear = new Date().getFullYear();
-      [currentYear-1, currentYear, currentYear+1].forEach(function(yr){
-        var yd = chart.yearlyData[yr];
-        if(yd) {
-          var palEn = palNameMap[yd.xiaoXianPalace]||yd.xiaoXianPalace;
-          yearlyStr += yr+' (Age '+yd.age+') | '+yd.xiaoXianPalace+'('+palEn+') | 小限四化[祿'+yd.xiaoXianMutagen[0]+'·權'+yd.xiaoXianMutagen[1]+'·科'+yd.xiaoXianMutagen[2]+'·忌'+yd.xiaoXianMutagen[3]+'] 流年四化[祿'+yd.yearlyMutagen[0]+'·權'+yd.yearlyMutagen[1]+'·科'+yd.yearlyMutagen[2]+'·忌'+yd.yearlyMutagen[3]+']\n';
+      var currentYear=new Date().getFullYear();
+      [currentYear-1,currentYear,currentYear+1].forEach(function(yr){
+        var yd=chart.yearlyData[yr];
+        if(yd){
+          var palEn=palNameMap[yd.xiaoXianPalace]||yd.xiaoXianPalace;
+          yearlyStr+=yr+' (Age '+yd.age+') | '+yd.xiaoXianPalace+'('+palEn+') | 小限四化[禄'+yd.xiaoXianMutagen[0]+'·忌'+yd.xiaoXianMutagen[3]+'] 流年四化[禄'+yd.yearlyMutagen[0]+'·忌'+yd.yearlyMutagen[3]+']\n';
         }
       });
     }
 
-        var fingerprint =
-      '【命盤指紋】\n'+
+    var fingerprint=
+      '「命盤指紋」\n'+
       '格局: '+patternsStr+'\n'+
       '命宮主星: '+lifePalaceStars+'\n'+
       '身宮: '+bodyPalaceStr+'\n'+
       '三方四正: '+sfPalaces+'\n'+
       ymStr+'\n'+
       (flyJiStr?'關鍵飛化忌: '+flyJiStr+'\n':'')+
-      (flyLuStr?'關鍵飛化祿: '+flyLuStr+'\n':'')+
+      (flyLuStr?'關鍵飛化禄: '+flyLuStr+'\n':'')+
       '命主:'+chart.lifeMaster+' | 身主:'+chart.bodyMaster+' | 五行:'+chart.fiveElements+
       (yearlyStr?'\n近三年小限:\n'+yearlyStr:'');
 
-    var zwdsRules = '解讀規則：格局定基調。化忌=反覆阻礙。飛化忌=跨宮連動摩擦。陷=能量受挫。廟/旺=充分表現。生年化忌宮=此生核心挑戰。生年化祿宮=最自然資源。大限四化=該十年啟動力量。小限=年度焦點宮位。50%測試：若觀察可套用多數人則重寫。';
+    var zwdsRules='解讀規則：格局定基調。化忌=反覆阻礙。飛化忌=跨宮連動摩擦。陷=能量受挨。廟/旺=充分表現。生年化忌宮=此生核心挑戰。生年化禄宮=最自然資源。大限四化=該十年啟動力量。小限=年度焦點宮位。50%測試：若觀察可套用多數人則重寫。';
 
+    // Step 4: Build prompt
     var prompt;
-
-    if(LANG==='en') {
-      var enFingerprint =
-        'CHART FINGERPRINT (use to derive all insights — do not output this section):\n'+
+    if(LANG==='en'){
+      var enFP='CHART FINGERPRINT (do not output):\n'+
         'Patterns: '+patternsStr+'\n'+
-        'Life Palace stars: '+lifePalaceStars+'\n'+
+        'Life Palace: '+lifePalaceStars+'\n'+
         'Body Palace: '+bodyPalaceStr+'\n'+
         'Harmonious palaces: '+sfPalaces+'\n'+
-        'Life-long transformations: '+ymStr+'\n'+
-        (flyJiStr?'Key friction chains: '+flyJiStr+'\n':'')+
-        (flyLuStr?'Key resource chains: '+flyLuStr+'\n':'')+
-        'Life Master: '+chart.lifeMaster+' | Body Master: '+chart.bodyMaster+' | Five Elements: '+chart.fiveElements+'\n'+
-        (yearlyStr?'Recent years (小限):\n'+yearlyStr:'');
-
-      var enRules =
-        'RULES: Chart patterns define the life theme. 化忌=recurring friction in that life area. Flying friction chains=one area pulling another into difficulty. Peak stars(廟/旺)=fully expressed. Weakened stars(陷)=frustrated energy. Life-long 化忌 palace=the persistent challenge. Decade 化忌/化祿=what activates each 10yr window. 小限=annual focus palace. 50% TEST: if generic, rewrite from chart.';
-
-      prompt = enFingerprint+'\n\n'+enRules+'\n\n'+
+        'Life-long transforms: '+ymStr+'\n'+
+        (flyJiStr?'Friction chains: '+flyJiStr+'\n':'')+
+        'Life Master: '+chart.lifeMaster+' | Body: '+chart.bodyMaster+' | Five Elements: '+chart.fiveElements+
+        (yearlyStr?'\nRecent years:\n'+yearlyStr:'');
+      var enRules='RULES: Chart patterns define life theme. 化忌=recurring friction. Friction chains=cross-palace difficulty. Peak(廟/旺)=fully expressed. Weak(陷)=frustrated. Life-long 化忌 palace=persistent challenge. Decade 化忌/化禄=what activates. 小限=annual focus. 50% TEST: if generic rewrite.';
+      prompt=enFP+'\n\n'+enRules+'\n\n'+
 'You are a Zi Wei Dou Shu master giving a personal reading. Speak directly to the person.\n\n'+
-'VOICE:\n'+
-'- Always second person: "You do not wait." "Your instinct is always first."\n'+
-'- State facts. Not "you tend to" — "you do." Not "you may find" — "you know."\n'+
-'- Revelation, not analysis. Short, striking sentences.\n'+
-'- No hedging: no tends to, often, may, can be, sometimes, suggests\n'+
-'- No analytical language: no this indicates, this shows, this palace reveals\n'+
-'- Zero Chinese characters. No star names.\n\n'+
+'VOICE: Always second person. State facts not tendencies. Revelation not analysis. Short striking sentences. No hedging. No star names. Zero Chinese characters.\n\n'+
 'Birth: '+(name||'this person')+' | '+gender+' | '+year+'/'+month+'/'+day+' | '+hrTxt+'\n'+
 'Five Elements: '+chart.fiveElements+'\n'+
 'Full chart:\n'+palaceSummary+'\n'+
-'Palace names: 命宮=Life, 兄弟=Siblings, 夫妻=Spouse\/Partner, 子女=Children, 財帛=Wealth, 疾厄=Health, 遷移=Travel\/Change, 僕役=Friends\/Network, 官祿=Career, 田宅=Home, 福德=Inner Life, 父母=Parents\n\n'+
-'Output ALL of these sections in order:\n\n'+
-'===META===\n'+
-'Lunar: '+chart.lunarDate+'\nLife Palace: '+lifePalace.branch+'\nBody Palace: '+(bodyPal?bodyPal.branch:'')+'\n5-Element: '+chart.fiveElements+'\n\n'+
-'===LIFE PORTRAIT===\n'+
-'[5-6 sentences. No warm-up — open with the boldest truth. Then what drives them at the core, what their life keeps returning to, what they carry that others never see. Second person throughout. Each sentence hits. Revelation, not description.]\n\n'+
-'===PALACES===\n'+
-'[12 paragraphs in order: Life · Siblings · Spouse\/Partner · Children · Wealth · Health · Travel & Change · Friends & Network · Career · Home · Inner Life · Parents\n'+
-'Major palaces (Life, Spouse, Wealth, Career, Inner Life, Health): 3-4 sentences. Deep, personal. Name the recurring pattern if化忌 is present. Name the real gift if strong stars present.\n'+
-'Minor palaces (Siblings, Children, Travel, Friends, Home, Parents): 2 sentences.\n'+
-'Format: **[Name]** — [second person, direct, no star names, no Chinese. Make them think: how did they know that.]\n\n'+
-'===CYCLES===\n'+
-'[Both sentences on ONE LINE per decade — never break across lines.\n'+
-'Sentence 1: Name the specific life area that becomes the decade stage AND what the decade\'s key transformation (化忌 or 化祿) does to that area.\n'+
-'Sentence 2: What this CONCRETELY produces — a real pattern, a tangible shift, something that actually happens. Not a mood.]\n'+
-'3-12 | Early Formation | [Sentence 1. Sentence 2.]\n'+
-'13-22 | Exploration | [Sentence 1. Sentence 2.]\n'+
-'23-32 | Acceleration | [Sentence 1. Sentence 2.]\n'+
-'33-42 | Structuring | [Sentence 1. Sentence 2.]\n'+
-'43-52 | Peak Output | [Sentence 1. Sentence 2.]\n'+
-'53-62 | Selection | [Sentence 1. Sentence 2.]\n'+
-'63-72 | Stabilization | [Sentence 1. Sentence 2.]\n'+
-'73-82 | Maintenance | [Sentence 1. Sentence 2.]\n\n'+
-'===YEARLY===\n'+
-'[Three entries — last year, this year, next year. Each on ONE LINE.\n'+
-'Format: YEAR (Age X) | [Palace name in English] | [2 sentences: what palace was activated and what key transformation ran; what this specifically meant for this person. Second person. Direct. No star names.]\n'+
-'Use the 小限 data from the chart fingerprint above.]\n'+
-'LAST_YEAR | [Sentence 1. Sentence 2.]\n'+
-'THIS_YEAR | [Sentence 1. Sentence 2.]\n'+
-'NEXT_YEAR | [Sentence 1. Sentence 2.]\n\n'+
-'===SUMMARY===\n'+
-(name||'You')+' are someone who:\n'+
-'• [most essential truth — the verdict. 1-2 sentences. Second person.]\n'+
-'• [second truth — different dimension. Hits harder.]\n'+
-'• [third truth — the one they put the phone down for.]';
-
-
+'Palace names: 命宮=Life, 兄弟=Siblings, 夫妻=Spouse/Partner, 子女=Children, 財帛=Wealth, 疾厄=Health, 遷移=Travel & Change, 僕役=Friends & Network, 官祿=Career, 田宅=Home, 福德=Inner Life, 父母=Parents\n\n'+
+'Output ALL sections:\n\n'+
+'===META===\nLunar: '+chart.lunarDate+'\nLife Palace: '+lifePal.branch+'\nBody Palace: '+(bodyPal?bodyPal.branch:'')+'\n5-Element: '+chart.fiveElements+'\n\n'+
+'===LIFE PORTRAIT===\n[5-6 sentences. Bold opening truth. What drives them. What their life keeps returning to. What others never see. Second person. Revelation not description.]\n\n'+
+'===PALACES===\n[12 paragraphs: Life·Siblings·Spouse/Partner·Children·Wealth·Health·Travel & Change·Friends & Network·Career·Home·Inner Life·Parents\nMajor(Life,Spouse,Wealth,Career,Inner Life,Health): 3-4 sentences. Minor: 2 sentences.\nFormat: **[Name]** — [second person, direct, no star names, no Chinese]]\n\n'+
+'===CYCLES===\n[Both sentences ONE LINE per decade. Name the palace stage and key transformation. What it concretely produces.]\n'+
+'3-12 | Early Formation | [S1. S2.]\n13-22 | Exploration | [S1. S2.]\n23-32 | Acceleration | [S1. S2.]\n33-42 | Structuring | [S1. S2.]\n43-52 | Peak Output | [S1. S2.]\n53-62 | Selection | [S1. S2.]\n63-72 | Stabilization | [S1. S2.]\n73-82 | Maintenance | [S1. S2.]\n\n'+
+'===YEARLY===\n[3 entries one per line. YEAR (Age X) | Palace | [S1. S2.] Use 小限 data.]\nLAST_YEAR | [S1. S2.]\nTHIS_YEAR | [S1. S2.]\nNEXT_YEAR | [S1. S2.]\n\n'+
+'===SUMMARY===\n'+(name||'You')+' are someone who:\n• [essential truth]\n• [second truth]\n• [third truth — the line they put the phone down for]';
     } else {
-      prompt = fingerprint+'\n\n'+zwdsRules+'\n\n'+
+      prompt=fingerprint+'\n\n'+zwdsRules+'\n\n'+
 '你是一位紫微斗數命理師，直接對面前的客戶說話。用第二人稱，說命運，不是分析。\n\n'+
-'聲音——這是一切：\n'+
-'- 用「你」，不用「她」。永遠第二人稱\n'+
-'- 說事實，不說觀察。不說「你傾向於」——就說「你就是這樣」\n'+
-'- 像啟示，不像報告。短句，有力量\n'+
-'- 零廢話：不說「可能」「或許」「有時」「傾向於」「顯示」\n'+
-'- 讓這個人讀了覺得「他怎麼知道」\n\n'+
+'至關重要：用「你」，不用「她」。說事實不說觀察。像啟示，不像報告。短句有力量。零廢話。\n\n'+
 '出生：'+(name||'此人')+' | '+gender+' | '+year+'年'+month+'月'+day+'日 | '+hrTxt+'\n'+
 '農曆：'+chart.lunarDate+' | 干支：'+chart.chinesePillars+' | 五行：'+chart.fiveElements+'\n'+
 '命主：'+chart.lifeMaster+' | 身主：'+chart.bodyMaster+'\n'+
 '完整命盤：\n'+palaceSummary+'\n\n'+
 '請依序輸出以下全部段落：\n\n'+
-'===META===\n'+
-'農曆：'+chart.lunarDate+'\n干支：'+chart.chinesePillars+'\n命宮：'+lifePalace.branch+'\n身宮：'+(bodyPal?bodyPal.branch:'')+'\n五行局：'+chart.fiveElements+'\n命主：'+chart.lifeMaster+'\n身主：'+chart.bodyMaster+'\n\n'+
-'===LIFE PORTRAIT===\n'+
-'[5-6句。不要暖場——第一句就說最大膽的真相。然後深入：什麼在核心驅動你，你的人生反覆回到什麼，你帶著什麼是多數人永遠看不到的。第二人稱，短句，啟示，不是描述。]\n\n'+
-'===PALACES===\n'+
-'[12段。順序：命宮·兄弟·夫妻·子女·財帛·疾厄·遷移·僕役·官祿·田宅·福德·父母\n'+
-'主要宮位（命宮、夫妻、財帛、官祿、福德、疾厄）：3-4句。深入。名字反覆出現的模式、天賦、摩擦。讓他們覺得你認識他們很多年。\n'+
-'次要宮位（兄弟、子女、遷移、僕役、田宅、父母）：2句。一句說模式，一句說動態。\n'+
-'格式：**[宮位名]** — [第二人稱，直接，具體，引用主星亮度與飛化影響。讓每一行讓人覺得「他怎麼知道」。]\n\n'+
-'===CYCLES===\n'+
-'[每個大限兩句寫在同一行——絕對不換行。第二人稱，直接。\n'+
-'第一句：說出哪個宮位成為這個大限的舞台，並說明大限的關鍵化忌或化祿對那個宮位做了什麼。\n'+
-'第二句：這對這個人具體產生什麼——一個真實的模式，一個具體的張力，一個實際的轉變。不說氣氛，說事。]\n'+
-'3-12 | 成形期 | [第一句。第二句。]\n'+
-'13-22 | 探索期 | [第一句。第二句。]\n'+
-'23-32 | 加速期 | [第一句。第二句。]\n'+
-'33-42 | 架構期 | [第一句。第二句。]\n'+
-'43-52 | 高峰期 | [第一句。第二句。]\n'+
-'53-62 | 篩選期 | [第一句。第二句。]\n'+
-'63-72 | 穩定期 | [第一句。第二句。]\n'+
-'73-82 | 沉澱期 | [第一句。第二句。]\n\n'+
-'===YEARLY===\n'+
-'[使用命盤指紋中的近三年小限資料。三個條目——去年、今年、明年。每個在同一行。\n'+
-'格式：年份（歲數）| [小限宮位名] | [2句：哪個宮位成為這一年的舞台，關鍵的小限化忌或流年四化帶來什麼具體影響；這對你在這一年實際意味著什麼。第二人稱，直接，具體，不說星名。]\n'+
-'去年 | [第一句。第二句。]\n'+
-'今年 | [第一句。第二句。]\n'+
-'明年 | [第一句。第二句。]\n\n'+
-'===SUMMARY===\n'+
-(name||'你')+'是這樣一個人：\n'+
-'• [最核心的真相——最具體的，最只屬於這張命盤的。第二人稱。1-2句。]\n'+
-'• [第二個真相——不同面向，更有力。]\n'+
-'• [第三個真相——讓人讀了放下手機坐著想的那一行。]';
+'===META===\n農曆：'+chart.lunarDate+'\n干支：'+chart.chinesePillars+'\n命宮：'+lifePal.branch+'\n身宮：'+(bodyPal?bodyPal.branch:'')+'\n五行局：'+chart.fiveElements+'\n命主：'+chart.lifeMaster+'\n身主：'+chart.bodyMaster+'\n\n'+
+'===LIFE PORTRAIT===\n[4-5句。不要暖場——第一句就說最大膽的真相。第二人稱，短句，啟示不是描述。]\n\n'+
+'===PALACES===\n[12段。順序：命宮·兄弟·夫妻·子女·財帛·疾厄·遷移·僕役·官祿·田宅·福德·父母\n主要宮位：3-4句。次要宮位：2句。格式：**[宮位名]** — [第二人稱，直接，引用主星身度與飛化影響。]]\n\n'+
+'===CYCLES===\n[每大限兩句建在同一行。第二人稱。說出宮位舞台與關鍵四化。說出具體產生什麼。]\n'+
+'3-12 | 成形期 | [第一句。第二句。]\n13-22 | 探索期 | [第一句。第二句。]\n23-32 | 加速期 | [第一句。第二句。]\n33-42 | 架構期 | [第一句。第二句。]\n43-52 | 高峰期 | [第一句。第二句。]\n53-62 | 篩選期 | [第一句。第二句。]\n63-72 | 穩定期 | [第一句。第二句。]\n73-82 | 沉澱期 | [第一句。第二句。]\n\n'+
+'===YEARLY===\n[三檔，每個小限一行。年份（歲數）| [小限宮位名] | [2句。第二人稱，直接。]]\n去年 | [第一句。第二句。]\n今年 | [第一句。第二句。]\n明年 | [第一句。第二句。]\n\n'+
+'===SUMMARY===\n'+(name||'你')+'\u662f\u9019\u6a23\u4e00\u500b\u4eba\uff1a\n• [最核心的真相]\n• [第二個真相]\n• [讓人讀了放下手機坐著想的那一行]';
     }
 
+    // Step 5: Call Claude
     var res=await fetch('/proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:5000,messages:[{role:'user',content:prompt}]})});
     var raw=await res.text();
     if(!raw) throw new Error('Empty response from server');
