@@ -410,6 +410,10 @@ async function generate(){
     clearInterval(ticker);
     var text=apiData.content&&apiData.content[0]?apiData.content[0].text:'';
     if(!text) throw new Error('No text in response');
+    // Debug: check if sections exist
+    if(!text.includes('===LIFE PORTRAIT===') && !text.includes('===META===')) {
+      throw new Error('Claude returned no section markers. Raw response: ' + text.slice(0,300));
+    }
     renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart);
 
   } catch(e){
