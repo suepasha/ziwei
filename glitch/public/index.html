@@ -301,7 +301,8 @@ async function generate(){
     var chartRes=await fetch('/chart?year='+year+'&month='+month+'&day='+day+'&hour='+hourIndex+'&gender='+iztroGender+'&isNightZi='+isNightZi);
     var chart=await chartRes.json();
     if(chart.error) throw new Error('Chart error: '+chart.error);
-    if(!chart.palaces||chart.palaces.length<12) throw new Error('Incomplete chart data');
+    if(!chart.palaces||chart.palaces.length<12) throw new Error('Incomplete chart data: '+JSON.stringify(chart).slice(0,200));
+    document.getElementById('load-txt').textContent='Chart OK - building prompt...';
 
     // Step 2: Build palace summary
     var palaceSummary=chart.palaces.map(function(p){
@@ -404,12 +405,13 @@ async function generate(){
     // Step 5: Call Claude
     var res=await fetch('/proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:5000,messages:[{role:'user',content:prompt}]})});
     var raw=await res.text();
-    if(!raw) throw new Error('Empty response from server');
-    var apiData=JSON.parse(raw);
-    if(apiData.error) throw new Error(apiData.error.message||'API error');
+    if(!raw) throw new Error('Empty response from server (HTTP '+res.status+')');
+    var apiData;
+    try { apiData=JSON.parse(raw); } catch(e) { throw new Error('Bad JSON: '+raw.slice(0,200)); }
+    if(apiData.error) throw new Error('API: '+apiData.error.message+'|'+apiData.error.type);
     clearInterval(ticker);
     var text=apiData.content&&apiData.content[0]?apiData.content[0].text:'';
-    if(!text) throw new Error('No text in response');
+    if(!text) throw new Error('No text. Content: '+JSON.stringify(apiData.content).slice(0,200));
     // Debug: check if sections exist
     if(!text.includes('===LIFE PORTRAIT===') && !text.includes('===META===')) {
       throw new Error('Claude returned no section markers. Raw response: ' + text.slice(0,300));
