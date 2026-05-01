@@ -427,7 +427,7 @@ async function generate(){
   document.getElementById('btn-gen').disabled=false;
 }
 
-function sec(t,tag){var t2=t.replace(/\r\n/g,'\n').replace(/\r/g,'\n');var m=t2.match(new RegExp('==='+tag+'=== *\n([\s\S]*?)(?====|$)'));return m?m[1].trim():'';}
+function sec(t,tag){var t2=t.replace(/\r\n/g,'\n').replace(/\r/g,'\n');var re2=new RegExp('==='+tag+'=== *\n([\s\S]*?)(?====|$)');var m=re2.exec(t2);return m?m[1].trim():'';}
 function bullets(r){return r.split('\n').map(function(l){return l.replace(/^[•·\-]\s*/,'').trim();}).filter(Boolean);}
 
 function renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart){
