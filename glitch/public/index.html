@@ -353,6 +353,19 @@ async function generate(){
     var chartSignature = '命宮主星:'+lifePalaceStars+' | 身宮:'+bodyPalaceStars+' | 三方四正:'+sanfangStars+' | '+ymSig+' | 五行:'+chart.fiveElements+' | 命主:'+chart.lifeMaster+'·身主:'+chart.bodyMaster;
 
     // ZWDS interpretation rules for Claude
+    // ── Build chart fingerprint (used by Chinese prompt) ──
+    var fingerprint =
+      '【命盤指紋】\n'+
+      '格局: '+patternsStr+'\n'+
+      '命宮主星: '+lifePalaceStars+'\n'+
+      '身宮: '+bodyPalaceStr+'\n'+
+      '三方四正: '+sfPalaces+'\n'+
+      ymStr+'\n'+
+      (flyJiStr?'關鍵飛化忌: '+flyJiStr+'\n':'')+
+      (flyLuStr?'關鍵飛化祿: '+flyLuStr+'\n':'')+
+      '命主:'+chart.lifeMaster+' | 身主:'+chart.bodyMaster+' | 五行:'+chart.fiveElements+
+      (yearlyStr?'\n近三年小限:\n'+yearlyStr:'');
+
     var zwdsRules = 'KEY ZWDS RULES:\n'+
       '- 化忌 = recurring friction/blockage in that palace\'s life area; not disaster, but repeated difficulty\n'+
       '- 陷落星 = weakened star, energy present but frustrated; creates tension and the need to work harder\n'+
