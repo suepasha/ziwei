@@ -131,6 +131,28 @@ app.get('/chart', (req, res) => {
       };
     });
 
+    // ── 小限 data for last year, this year, next year ──
+    const currentYear = new Date().getFullYear();
+    const yearlyData = {};
+    [currentYear-1, currentYear, currentYear+1].forEach(yr => {
+      try {
+        const h = chart.horoscope(yr+'-06-01');
+        const age = h.age;
+        const yearly = h.yearly;
+        const xiaoXianPalace = age.palaceNames ? age.palaceNames[0] : '?';
+        yearlyData[yr] = {
+          age: age.nominalAge,
+          xiaoXianPalace: xiaoXianPalace,
+          xiaoXianStem: age.heavenlyStem,
+          xiaoXianBranch: age.earthlyBranch,
+          xiaoXianMutagen: age.mutagen || [],
+          yearlyMutagen: yearly.mutagen || [],
+          yearlyStem: yearly.heavenlyStem,
+          yearlyBranch: yearly.earthlyBranch
+        };
+      } catch(e) {}
+    });
+
     res.json({
       lunarDate: chart.lunarDate,
       chinesePillars: chart.chineseDate,
@@ -141,6 +163,7 @@ app.get('/chart', (req, res) => {
       patterns,
       flyingJi: flyingJi.slice(0, 8),  // most significant
       flyingLu: flyingLu.slice(0, 6),
+      yearlyData,
       palaces
     });
 
@@ -165,6 +188,28 @@ app.post('/proxy', (req, res) => {
   });
   proxyReq.on('error', err => res.status(500).json({ error: { message: err.message } }));
   proxyReq.write(body); proxyReq.end();
+});
+
+// Streaming proxy endpoint
+app.post('/stream', (req, res) => {
+  const apiKey = process.env.ANTHROPIC_API_KEY || req.headers['x-api-key'];
+  if (!apiKey) { res.status(400).end('no key'); return; }
+
+  const streamBody = JSON.stringify({ ...req.body, stream: true });
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+
+  const options = {
+    hostname: 'api.anthropic.com', path: '/v1/messages', method: 'POST',
+    headers: { 'Content-Type':'application/json', 'Content-Length':Buffer.byteLength(streamBody), 'x-api-key':apiKey, 'anthropic-version':'2023-06-01' }
+  };
+  const proxyReq = https.request(options, proxyRes => {
+    proxyRes.on('data', chunk => res.write(chunk));
+    proxyRes.on('end', () => res.end());
+  });
+  proxyReq.on('error', err => { res.write('data: {"error":"'+err.message+'"}\n\n'); res.end(); });
+  proxyReq.write(streamBody); proxyReq.end();
 });
 
 const PORT = process.env.PORT || 3000;
