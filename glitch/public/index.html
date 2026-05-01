@@ -329,32 +329,36 @@ async function generate(){
     var lifePalace=chart.palaces.find(function(p){return p.isLifePalace;})||{branch:'?'};
     var bodyPalace=chart.palaces.find(function(p){return p.isBodyPalace;})||{branch:'?'};
 
-    // Step 3: Call Claude with real chart data
+    // Step 3: Build chart fingerprint variables
+    var SFMAP={'子':['辰','申','午'],'丑':['巳','酉','未'],'寅':['午','戌','申'],'卯':['未','亥','酉'],'辰':['申','子','戌'],'巳':['酉','丑','亥'],'午':['戌','寅','子'],'未':['亥','卯','丑'],'申':['子','辰','寅'],'酉':['丑','巳','卯'],'戌':['寅','午','辰'],'亥':['卯','未','巳']};
+    var lifePal = chart.palaces.find(function(p){return p.isLifePalace;})||{branch:'?',majorStars:[]};
+    var bodyPal = chart.palaces.find(function(p){return p.isBodyPalace;});
 
-    // Build chart signature — the distinctive fingerprint of this chart
-    var lifePalaceStars = chart.palaces.filter(function(p){return p.isLifePalace;}).map(function(p){
-      return p.majorStars.map(function(s){return s.name+(s.mutagen||'')+'('+s.brightness+')';}).join('·');
-    }).join('');
-    var bodyPalaceStars = chart.palaces.filter(function(p){return p.isBodyPalace;}).map(function(p){
-      return p.name+' '+p.majorStars.map(function(s){return s.name+(s.mutagen||'')+'('+s.brightness+')';}).join('·');
-    }).join('');
-    var sanfangStars = chart.palaces.filter(function(p){
-      var SFMAP={'子':['辰','申','午'],'丑':['巳','酉','未'],'寅':['午','戌','申'],'卯':['未','亥','酉'],'辰':['申','子','戌'],'巳':['酉','丑','亥'],'午':['戌','寅','子'],'未':['亥','卯','丑'],'申':['子','辰','寅'],'酉':['丑','巳','卯'],'戌':['寅','午','辰'],'亥':['卯','未','巳']};
-      var lp=chart.palaces.find(function(x){return x.isLifePalace;});
-      return lp && (SFMAP[lp.branch]||[]).indexOf(p.branch)>-1;
-    }).map(function(p){
-      return p.name+'('+p.branch+'):'+p.majorStars.map(function(s){return s.name+(s.mutagen||'')+'('+s.brightness+')';}).join('·');
+    var lifePalaceStars = lifePal.majorStars.map(function(s){return s.name+(s.mutagen||'')+'('+s.brightness+')';}).join('·');
+    var bodyPalaceStr = bodyPal ? bodyPal.name+'('+bodyPal.branch+') '+bodyPal.majorStars.map(function(s){return s.name+'('+s.brightness+')';}).join('·') : '';
+    var sfBranches = SFMAP[lifePal.branch]||[];
+    var sfPalaces = chart.palaces.filter(function(p){return sfBranches.indexOf(p.branch)>-1;}).map(function(p){
+      return p.name+'['+p.majorStars.map(function(s){return s.name+'('+s.brightness+')';}).join('·')+']';
     }).join(' | ');
-    var jiHua = chart.palaces.map(function(p){
-      var fx=p.majorStars.filter(function(s){return s.mutagen;}).concat(p.minorStars.filter(function(s){return s.mutagen;}));
-      return fx.map(function(s){return s.name+s.mutagen+'在'+p.name;}).join('');
-    }).filter(Boolean).join('·');
-    var ymSig = chart.yearMutagen ? '生年化祿:'+chart.yearMutagen.lu+' | 生年化權:'+chart.yearMutagen.quan+' | 生年化科:'+chart.yearMutagen.ke+' | 生年化忌:'+chart.yearMutagen.ji : '';
-    var chartSignature = '命宮主星:'+lifePalaceStars+' | 身宮:'+bodyPalaceStars+' | 三方四正:'+sanfangStars+' | '+ymSig+' | 五行:'+chart.fiveElements+' | 命主:'+chart.lifeMaster+'·身主:'+chart.bodyMaster;
+    var patternsStr = chart.patterns&&chart.patterns.length ? chart.patterns.join('·') : '無特殊格局';
+    var flyJiStr = chart.flyingJi&&chart.flyingJi.length ? chart.flyingJi.join(' | ') : '';
+    var flyLuStr = chart.flyingLu&&chart.flyingLu.length ? chart.flyingLu.slice(0,4).join(' | ') : '';
 
-    // ZWDS interpretation rules for Claude
-    // ── Build chart fingerprint (used by Chinese prompt) ──
-    var fingerprint =
+    // 小限 yearly data
+    var yearlyStr = '';
+    if(chart.yearlyData) {
+      var palNameMap={'命宮':'Life','兄弟':'Siblings','夫妻':'Spouse/Partner','子女':'Children','財帛':'Wealth','疾厄':'Health','遷移':'Travel & Change','僕役':'Friends & Network','官祿':'Career','田宅':'Home','福德':'Inner Life','父母':'Parents'};
+      var currentYear = new Date().getFullYear();
+      [currentYear-1, currentYear, currentYear+1].forEach(function(yr){
+        var yd = chart.yearlyData[yr];
+        if(yd) {
+          var palEn = palNameMap[yd.xiaoXianPalace]||yd.xiaoXianPalace;
+          yearlyStr += yr+' (Age '+yd.age+') | '+yd.xiaoXianPalace+'('+palEn+') | 小限四化[祿'+yd.xiaoXianMutagen[0]+'·權'+yd.xiaoXianMutagen[1]+'·科'+yd.xiaoXianMutagen[2]+'·忌'+yd.xiaoXianMutagen[3]+'] 流年四化[祿'+yd.yearlyMutagen[0]+'·權'+yd.yearlyMutagen[1]+'·科'+yd.yearlyMutagen[2]+'·忌'+yd.yearlyMutagen[3]+']\n';
+        }
+      });
+    }
+
+        var fingerprint =
       '【命盤指紋】\n'+
       '格局: '+patternsStr+'\n'+
       '命宮主星: '+lifePalaceStars+'\n'+
@@ -366,17 +370,7 @@ async function generate(){
       '命主:'+chart.lifeMaster+' | 身主:'+chart.bodyMaster+' | 五行:'+chart.fiveElements+
       (yearlyStr?'\n近三年小限:\n'+yearlyStr:'');
 
-    var zwdsRules = 'KEY ZWDS RULES:\n'+
-      '- 化忌 = recurring friction/blockage in that palace\'s life area; not disaster, but repeated difficulty\n'+
-      '- 陷落星 = weakened star, energy present but frustrated; creates tension and the need to work harder\n'+
-      '- 廟/旺星 = peak power; that quality expresses fully and naturally\n'+
-      '- 命宮主星 defines core nature; 身宮主星 defines how that nature is expressed in the world\n'+
-      '- 三方四正 stars all influence the Life Palace — read them as a system, not individually\n'+
-      '- 生年化忌 = the life-long challenge theme; the palace it lands in is where friction concentrates\n'+
-      '- 生年化祿 = the life-long resource theme; the palace it lands in is where flow comes naturally\n'+
-      '- 大限四化 = the transformations active in each decade window; determines what shifts and activates\n'+
-      '- When 化忌 lands in a palace, the STARS in that palace become conflicted and blocked\n'+
-      '- When the same star appears in both 命宮 and 三方四正, its qualities are amplified significantly';
+    var zwdsRules = '解讀規則：格局定基調。化忌=反覆阻礙。飛化忌=跨宮連動摩擦。陷=能量受挫。廟/旺=充分表現。生年化忌宮=此生核心挑戰。生年化祿宮=最自然資源。大限四化=該十年啟動力量。小限=年度焦點宮位。50%測試：若觀察可套用多數人則重寫。';
 
     if(LANG==='en') {
       var enFingerprint =
@@ -392,17 +386,7 @@ async function generate(){
         (yearlyStr?'Recent years (小限):\n'+yearlyStr:'');
 
       var enRules =
-        'INTERPRETATION RULES:\n'+
-        '- Chart patterns define the fundamental life theme\n'+
-        '- 化忌 = a recurring friction — something that keeps happening no matter what\n'+
-        '- Flying friction chains = one area pulling another into difficulty\n'+
-        '- Weakened stars = real energy that struggles to express\n'+
-        '- Peak stars = the quality is fully alive and natural\n'+
-        '- Life-long 化忌 palace = the persistent challenge woven into this life\n'+
-        '- Life-long 化祿 palace = where things flow with least resistance\n'+
-        '- Decade 化忌/化祿 = what gets activated and tested in each 10-year window\n'+
-        '- 小限 = the annual focus palace — which life area becomes the year\'s stage\n'+
-        '- 50% TEST: if a line could describe half of all people, cut it';
+        'RULES: Chart patterns define the life theme. 化忌=recurring friction in that life area. Flying friction chains=one area pulling another into difficulty. Peak stars(廟/旺)=fully expressed. Weakened stars(陷)=frustrated energy. Life-long 化忌 palace=the persistent challenge. Decade 化忌/化祿=what activates each 10yr window. 小限=annual focus palace. 50% TEST: if generic, rewrite from chart.';
 
       prompt = enFingerprint+'\n\n'+enRules+'\n\n'+
 'You are a Zi Wei Dou Shu master giving a personal reading. Speak directly to the person.\n\n'+
@@ -501,15 +485,45 @@ async function generate(){
 '• [第三個真相——讓人讀了放下手機坐著想的那一行。]';
     }
 
-    var res=await fetch('/proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:6000,messages:[{role:'user',content:prompt}]})});
-    var raw=await res.text();
-    if(!raw) throw new Error('Empty response from server');
-    var apiData=JSON.parse(raw);
-    if(apiData.error) throw new Error(apiData.error.message||'API error');
+    // Streaming request
     clearInterval(ticker);
-    var text=apiData.content&&apiData.content[0]?apiData.content[0].text:'';
-    if(!text) throw new Error('No text in response');
-    renderResults(text,name,year,month,day,hrTxt,gender,ganzhi,chart);
+    document.getElementById('load-txt').textContent = LANG==='zh' ? '正在生成...' : 'Generating...';
+
+    var streamRes = await fetch('/stream', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:5000,messages:[{role:'user',content:prompt}]})
+    });
+    if(!streamRes.ok) throw new Error('Server error: '+streamRes.status);
+
+    var reader = streamRes.body.getReader();
+    var decoder = new TextDecoder();
+    var fullText = '';
+    var buffer = '';
+
+    while(true) {
+      var result = await reader.read();
+      if(result.done) break;
+      buffer += decoder.decode(result.value, {stream:true});
+      var lines = buffer.split('\n');
+      buffer = lines.pop();
+      for(var i=0;i<lines.length;i++) {
+        var line = lines[i].trim();
+        if(!line || !line.startsWith('data:')) continue;
+        var data = line.slice(5).trim();
+        if(data==='[DONE]') continue;
+        try {
+          var parsed = JSON.parse(data);
+          if(parsed.type==='content_block_delta'&&parsed.delta&&parsed.delta.text) {
+            fullText += parsed.delta.text;
+          }
+          if(parsed.type==='message_stop') break;
+          if(parsed.error) throw new Error(parsed.error.message||'API error');
+        } catch(e) { if(e.message&&e.message.indexOf('API error')>-1) throw e; }
+      }
+    }
+    if(!fullText) throw new Error('No response received');
+    renderResults(fullText,name,year,month,day,hrTxt,gender,ganzhi,chart);
 
   } catch(e){
     clearInterval(ticker);
