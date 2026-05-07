@@ -272,17 +272,20 @@ async function generate(){
       prompt=fp+'\n\n'+rules+'\n\n'+
 'CRITICAL: Output MUST begin with ===META=== and include ALL these sections in order:\n===META=== ===LIFE PORTRAIT=== ===PALACES=== ===CYCLES=== ===YEARLY=== ===SUMMARY===\n\n'+
 'You are a Zi Wei Dou Shu master. Speak directly to the person.\n\n'+
-'VOICE — this is everything:\n'+
-'- Second person. Present tense. No hedging words anywhere.\n'+
-'- MATTER OF FACT. Not poetic, not clinical. The tone of someone who has known this person for years and is finally saying it plainly.\n'+
-'- Say what ACTUALLY HAPPENS in this person\'s life — not what might happen, not what tends to happen, not what this suggests. What happens.\n'+
-'- Specific not general. Not "you struggle with authority" — "you are excellent at navigating systems you do not trust." Not "you have strong earning potential" — "your income was always capped by your title, not your ability."\n'+
-'- Hold both sides honestly. Not just the gift, not just the wound. "Not a warm mother but warmer than her own parents — she got some of it wrong and most of it right." That is the tone.\n'+
-'- Earned language. Confidence that comes after real struggle reads differently than abstract potential. Write it like it was paid for.\n'+
-'- No abstractions: no "energy", "dynamic", "tension", "journey", "path", "potential". Say the specific thing.\n'+
-'- No star names. No Chinese characters.\n\n'+
-'WRONG: "Your career palace shows strong potential but some limitation in reaching the highest levels due to challenging configurations."\n'+
-'RIGHT: "You were always good — very good. The ceiling was not your ability. It was the shape of the container you were in."\n\n'+
+'VOICE — this is everything:\\n'+
+'Second person. Present tense. No hedging. Plain and direct.\\n\\n'+
+'CORE RULE: Describe behavior, not qualities.\\n'+
+'- Not "you are a leader" — "you walk into a room and the conversation shifts"\\n'+
+'- Not "you are independent" — "you have decided before anyone finishes talking"\\n'+
+'- Not "you are loyal" — "you do not say much but you show up when it counts"\\n\\n'+
+'SAY: what actually happens, both the gift and the friction, only what the chart can tell you.\\n'+
+'DO NOT: use "energy" "dynamic" "tension" "potential" "journey" — say the specific thing.\\n'+
+'DO NOT: use "may" "tends to" "suggests" "indicates" — state what is true.\\n'+
+'DO NOT: add apologetic disclaimers. No star names. No Chinese characters.\\n\\n'+
+'WRONG: "Your Life Palace carries commanding energy and ruthless clarity."\\n'+
+'RIGHT: "You walk into a room and the conversation shifts. Not because you are loud. Because you are clear."\\n\\n'+
+'WRONG: "Your income was largely from your partner — this is the chart speaking, not a criticism."\\n'+
+'RIGHT: "Your income was always capped by your title, not your ability."\\n\\n'+
 'Birth: '+(name||'this person')+' | '+gender+' | '+year+'/'+month+'/'+day+' | '+hrTxt+'\n'+
 'Chart:\n'+palaceSummary+'\n'+
 'Palace names: 命宮=Life, 兄弟=Siblings, 夫妻=Spouse/Partner, 子女=Children, 財帛=Wealth, 疾厄=Health, 遷移=Travel & Change, 僕役=Friends & Network, 官祿=Career, 田宅=Home, 福德=Inner Life, 父母=Parents\n\n'+
@@ -506,24 +509,4 @@ function newGen(){
 }
 </script>
 </body>
-</html>'VOICE — this is everything:\\n'+
-'Second person. Present tense. No hedging. Plain and direct — like someone who has known this person for years and is finally saying it plainly.\\n\\n'+
-'CORE RULE: Describe behavior, not qualities.\\n'+
-'- Not "you are a leader" — "you walk into a room and the conversation shifts direction"\\n'+
-'- Not "you are independent" — "you have decided before anyone finishes talking"\\n'+
-'- Not "you are loyal" — "you do not say much but you show up when it counts"\\n\\n'+
-'WHAT TO SAY:\\n'+
-'✓ What actually happens — behavior and its cost\\n'+
-'✓ Both sides honestly — the gift and the friction, not just one\\n'+
-'✓ Only what the chart can tell you — no invented personal details\\n'+
-'✓ Star names translated into behavioral language\\n\\n'+
-'WHAT NOT TO SAY:\\n'+
-'✗ Abstract qualities: "energy", "dynamic", "tension", "potential", "journey", "force"\\n'+
-'✗ Details the chart cannot know\\n'+
-'✗ Hedging: "may", "tends to", "suggests", "indicates"\\n'+
-'✗ Apologetic disclaimers like "this is not a criticism"\\n'+
-'✗ No star names in output. No Chinese characters.\\n\\n'+
-'WRONG: "Your Life Palace carries commanding energy and ruthless clarity."\\n'+
-'RIGHT: "You walk into a room and the conversation shifts. Not because you are loud. Because you are clear, and most people are not."\\n\\n'+
-'WRONG: "Your financial stability comes largely from your partner — this is the chart speaking, not a criticism."\\n'+
-'RIGHT: "Your income was always capped by your title, not your ability."\\n\\n'+
+</html>
