@@ -367,7 +367,7 @@ async function generate(){
     clearInterval(ticker);
     var text=apiData.content&&apiData.content[0]?apiData.content[0].text:'';
     if(!text)throw new Error('No text returned');
-    renderResults(text,name,year,month,day,hrTxt,gender,chart);
+    renderResults(text,name,year,month,day,hrTxt,gender,chart,readMode);
 
   }catch(e){
     clearInterval(ticker);
@@ -393,7 +393,7 @@ function sec(t,tag){
 }
 function bullets(r){return r.split('\n').map(function(l){return l.replace(/^[•·\-]\s*/,'').trim();}).filter(Boolean);}
 
-function renderResults(text,name,year,month,day,hrTxt,gender,chart){
+function renderResults(text,name,year,month,day,hrTxt,gender,chart,readMode){
   _lastChart=chart;
   _lastName=year+'年'+month+'月'+day+'日'+hrTxt+' 陰'+(gender==='Female'?'女':'男');
 
@@ -464,13 +464,19 @@ function renderResults(text,name,year,month,day,hrTxt,gender,chart){
   var summaryItems=bullets(summaryRaw).filter(function(b){
     return b.toLowerCase().indexOf('is someone who')<0&&b.indexOf('的特質')<0&&b.toLowerCase().indexOf('are someone who')<0&&b.indexOf('是這樣')<0;
   });
+  if(readMode!=='question'){
   h+='<div class="scard-full">';
   h+='<div class="sh">'+(LANG==='zh'?'總結 — '+(name||'你')+'是這樣一個人':(name?name+' is someone who':'You are someone who'))+'</div>';
   h+='<ul class="blist">';
   summaryItems.forEach(function(b){h+='<li>'+b+'</li>';});
   h+='</ul></div>';
+  } // end if readMode!=='question'
   // ── QUESTION ANSWER ──
   var qRaw=sec(text,'QUESTION');
+  if(!qRaw&&readMode==='question'){
+    // Claude may have answered without the marker - show full text
+    qRaw=text.replace(/===META===[\s\S]*?(?=\n\n|$)/,'').trim();
+  }
   if(qRaw){
     h+='<div class="scard-full" style="margin-top:10px;border-left:3px solid var(--gold)">';
     h+='<div class="sh">'+(LANG==='zh'?'你的問題':'Your Question')+'</div>';
