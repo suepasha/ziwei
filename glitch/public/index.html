@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title id="page-title">Zi Wei Dou Shu · Purple Star Astrology</title>
+<title id="page-title">Zi Wei Dou Shu</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#f5f2eb;--ink2:#fdfcf8;--ink3:#ede8dc;--gold:#5a4e38;--gold2:#a09070;--cream:#1e1a10;--cream2:#4a4030;--cream3:#7a6e58;--border:#ddd5c0;--border2:#a09070;--sbg:#f0faf4;--sbr:#b8dfc8;--stx:#2d7a4f;--wbg:#fef9ec;--wbr:#e8d49a;--wtx:#8a6a10}
+:root{--ink:#f5f2eb;--ink2:#fdfcf8;--ink3:#ede8dc;--gold:#5a4e38;--gold2:#a09070;--cream:#1e1a10;--cream2:#4a4030;--cream3:#7a6e58;--border:#ddd5c0;--border2:#a09070}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Jost',sans-serif;background:var(--ink);color:var(--cream);min-height:100vh;line-height:1.7}
 body::before{content:'';display:block;height:3px;background:linear-gradient(90deg,transparent,var(--gold2),#c0a880,var(--gold2),transparent)}
@@ -21,10 +21,11 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
 .form-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:500;color:var(--gold);margin-bottom:1.5rem;padding-bottom:.875rem;border-bottom:1px solid var(--border)}
 .field{margin-bottom:1rem}.field:last-child{margin-bottom:0}
 .field label{display:block;font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--cream3);margin-bottom:6px}
-.field input[type=text],.field select{width:100%;padding:10px 14px;background:var(--ink3);border:1px solid var(--border);border-radius:6px;color:var(--cream);font-family:'Jost',sans-serif;font-size:14px;outline:none;transition:.2s;appearance:none;-webkit-appearance:none}
-.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238a7860' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-color:var(--ink3);padding-right:32px}
-.field input:focus,.field select:focus{border-color:var(--gold2)}
-.field input::placeholder{color:var(--cream3)}
+.field input[type=text],.field select,.field textarea{width:100%;padding:10px 14px;background:var(--ink3);border:1px solid var(--border);border-radius:6px;color:var(--cream);font-family:'Jost',sans-serif;font-size:13px;outline:none;transition:.2s}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238a7860' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;appearance:none;-webkit-appearance:none}
+.field textarea{resize:vertical;line-height:1.6}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold2)}
+.field input::placeholder,.field textarea::placeholder{color:var(--cream3)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .radios{display:flex;gap:20px;padding:2px 0}
 .radios label{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--cream);cursor:pointer}
@@ -39,12 +40,12 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
 .err-box{display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:1rem 1.25rem;margin-bottom:1.25rem;font-size:13px;color:#b91c1c;line-height:1.7}
 .err-box.on{display:block}
 .results{display:none}.results.on{display:block}
-.prof-hdr{margin-bottom:0.75rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border)}
+.prof-hdr{margin-bottom:.75rem;padding-bottom:.75rem;border-bottom:1px solid var(--border)}
 .pname{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:500;color:var(--gold);margin-bottom:4px}
 .psub{font-size:13px;color:var(--cream3)}
 .stitle{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:500;color:var(--gold);margin-bottom:1rem;margin-top:1rem}
 .pal-paras{display:flex;flex-direction:column;gap:10px;margin-bottom:1.5rem}
-.pal-para{background:var(--ink2);border:1px solid var(--border);border-radius:8px;padding:.875rem 1rem;font-size:13px;color:var(--cream2);line-height:1.75;border-left:3px solid var(--border2)}
+.pal-para{background:var(--ink2);border:1px solid var(--border);border-radius:8px;padding:.875rem 1rem;font-size:13px;color:var(--cream2);line-height:1.8;border-left:3px solid var(--border2)}
 .pal-name{font-weight:600;color:var(--gold);margin-right:4px}
 .scard-full{background:var(--ink2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.125rem;margin-bottom:10px}
 .sh{font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
@@ -52,20 +53,19 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
 .blist li{font-size:13px;color:var(--cream2);line-height:1.65;padding-left:14px;position:relative}
 .blist li::before{content:"—";position:absolute;left:0;color:var(--gold2);font-size:11px;line-height:1.7}
 .cycles{display:flex;flex-direction:column;gap:7px}
-.cyc{padding:10px 14px;background:var(--ink3);border-radius:6px;border-left:2px solid var(--border2);transition:.2s}
-.cyc:hover{border-left-color:var(--gold)}
+.cyc{padding:10px 14px;background:var(--ink3);border-radius:6px;border-left:2px solid var(--border2)}
 .cy-lbl{font-size:12px;font-weight:500;color:var(--cream);margin-bottom:3px}
-.cy-txt{font-size:13px;color:var(--cream3);line-height:1.6}
+.cy-txt{font-size:13px;color:var(--cream3);line-height:1.7}
 .btn-new{width:100%;padding:12px;background:none;border:1px solid var(--border2);border-radius:8px;color:var(--cream2);font-family:'Jost',sans-serif;font-size:14px;cursor:pointer;margin-top:1.5rem;transition:.2s}
 .btn-new:hover{border-color:var(--gold);color:var(--gold)}
 .mp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-bottom:1.5rem;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;display:none}
 .mp-grid.show{display:grid}
-.mp-cell{background:#f0ece8;padding:6px;min-height:160px;font-size:11px;position:relative;display:flex;flex-direction:column;gap:2px}
+.mp-cell{background:#f0ece8;padding:6px;min-height:160px;font-size:11px;display:flex;flex-direction:column;gap:2px}
 .mp-cell.life{background:#c8a898}.mp-cell.body{background:#dce4ee}.mp-cell.sanfang{background:#dde8dc}
-.mp-cell.center{background:#faf8f5;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:4px}
+.mp-cell.center{background:#faf8f5;display:flex;flex-direction:column;justify-content:flex-start}
 .mp-gz{font-size:9px;color:var(--cream3)}.mp-name{font-size:11px;font-weight:600;color:var(--gold)}
-.mp-decade{font-size:9px;color:var(--cream3)}
-.mp-ages{font-size:9px;color:#5a7a9a;line-height:1.4;margin-top:1px}.mp-stars{display:flex;flex-wrap:wrap;gap:2px;font-size:11px}
+.mp-decade{font-size:9px;color:var(--cream3)}.mp-ages{font-size:9px;color:#5a7a9a;line-height:1.4;margin-top:1px}
+.mp-stars{display:flex;flex-wrap:wrap;gap:2px;font-size:11px;margin-top:2px}
 .zwds-star-main{color:#fff;background:var(--gold);padding:1px 3px;border-radius:2px}
 .zwds-star-neg{color:#8a3030;background:#f0c0c0;padding:1px 3px;border-radius:2px}
 .zwds-star-fx{color:#8a6000;background:#f0e0a0;padding:1px 3px;border-radius:2px}
@@ -81,7 +81,7 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
 <body>
 <header class="site-header">
   <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:2px">
-    <svg width="28" height="28" viewBox="0 0 64 64" style="display:inline-block;vertical-align:middle;flex-shrink:0">
+    <svg width="28" height="28" viewBox="0 0 64 64" style="flex-shrink:0">
       <circle cx="32" cy="32" r="29" fill="#5a4e38" opacity="0.1"/>
       <circle cx="32" cy="32" r="29" fill="none" stroke="#5a4e38" stroke-width="2"/>
       <circle cx="32" cy="32" r="20" fill="none" stroke="#a09070" stroke-width="0.8" stroke-dasharray="3,2"/>
@@ -112,10 +112,6 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
       </div>
     </div>
     <div class="field">
-      <label id="t-ctx">About you <span id="t-ctx-note" style="font-weight:300;text-transform:none;letter-spacing:0;font-size:11px;color:var(--cream3)">(optional — the more specific, the more personal your reading)</span></label>
-      <textarea id="f-ctx" rows="3" placeholder="e.g. I work in tech, married 20 years, two kids, just changed careers…" style="width:100%;padding:10px 14px;background:var(--ink3);border:1px solid var(--border);border-radius:6px;color:var(--cream);font-family:'Jost',sans-serif;font-size:13px;outline:none;resize:vertical;line-height:1.6"></textarea>
-    </div>
-    <div class="field">
       <div class="grid2">
         <div><label id="t-yr">Year</label><select id="f-yr"></select></div>
         <div><label id="t-hr">Birth Hour</label>
@@ -131,12 +127,13 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
       </div>
     </div>
     <div class="field" id="zi-toggle" style="display:none">
-      <label id="t-zi">Born after midnight? (00:00–00:59)</label>
+      <label id="t-zi">Born after midnight?</label>
       <div class="radios">
         <label><input type="radio" name="nightzi" value="false" checked> <span id="t-zi-no">No (23:00–23:59)</span></label>
         <label><input type="radio" name="nightzi" value="true"> <span id="t-zi-yes">Yes (00:00–00:59)</span></label>
       </div>
     </div>
+
   </div>
   <button class="btn-generate" id="btn-gen" onclick="generate()">Generate</button>
   <div class="loading" id="loading"><div class="spinner"></div><p id="load-txt">Calculating chart…</p></div>
@@ -150,8 +147,8 @@ var MO={
   zh:['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月']
 };
 var TX={
-  en:{birth:'Birth Information',name:'Name (optional)',ph:'Enter name…',gender:'Gender',male:'Male',female:'Female',yr:'Year',mo:'Month',dy:'Day',hr:'Birth Hour',btn:'Generate',zi:'Born after midnight? (00:00–00:59)',zino:'No (23:00–23:59)',ziyes:'Yes (00:00–00:59)',ctx:'About you',ctxph:'e.g. I work in tech, married 20 years, two kids, just changed careers…',ctxlbl:'optional — the more specific, the more personal your reading'},
-  zh:{birth:'出生資料',name:'姓名（選填）',ph:'輸入姓名…',gender:'性別',male:'男',female:'女',yr:'年',mo:'月',dy:'日',hr:'出生時辰',btn:'送出',zi:'午夜後出生？(00:00–00:59)',zino:'否 (23:00–23:59)',ziyes:'是 (00:00–00:59)',ctx:'關於你',ctxph:'例如：我在科技業工作，結婚20年，兩個孩子，剛換了跑道…',ctxlbl:'選填——越具體，解讀越貼近你'}
+  en:{birth:'Birth Information',name:'Name (optional)',ph:'Enter name…',gender:'Gender',male:'Male',female:'Female',yr:'Year',mo:'Month',dy:'Day',hr:'Birth Hour',btn:'Generate',zi:'Born after midnight?',zino:'No (23:00–23:59)',ziyes:'Yes (00:00–00:59)'},
+  zh:{birth:'出生資料',name:'姓名（選填）',ph:'輸入姓名…',gender:'性別',male:'男',female:'女',yr:'年',mo:'月',dy:'日',hr:'出生時辰',btn:'送出',zi:'午夜後出生？',zino:'否 (23:00–23:59)',ziyes:'是 (00:00–00:59)'}
 };
 
 function setLang(l){
@@ -159,10 +156,11 @@ function setLang(l){
   localStorage.setItem('zwds_lang',l);
   document.getElementById('btn-en').classList.toggle('on',l==='en');
   document.getElementById('btn-zh').classList.toggle('on',l==='zh');
-  document.getElementById('page-title').textContent=l==='zh'?'紫微斗數':'Zi Wei Dou Shu · Purple Star Astrology';
+  document.getElementById('page-title').textContent=l==='zh'?'紫微斗數':'Zi Wei Dou Shu';
   document.getElementById('main-title').textContent=l==='zh'?'紫微斗數':'Zi Wei Dou Shu';
-  document.getElementById('main-sub').textContent=l==='zh'?'':'Purple Star Astrology';
-  document.getElementById('main-sub').style.display=l==='zh'?'none':'block';
+  var sub=document.getElementById('main-sub');
+  sub.textContent=l==='zh'?'':'Purple Star Astrology';
+  sub.style.display=l==='zh'?'none':'block';
   var t=TX[l];
   document.getElementById('t-birth').textContent=t.birth;
   document.getElementById('t-name').textContent=t.name;
@@ -178,9 +176,6 @@ function setLang(l){
   document.getElementById('t-zi').textContent=t.zi;
   document.getElementById('t-zi-no').textContent=t.zino;
   document.getElementById('t-zi-yes').textContent=t.ziyes;
-  document.getElementById('t-ctx').textContent=t.ctx;
-  document.getElementById('t-ctx-note').textContent=t.ctxlbl;
-  document.getElementById('f-ctx').placeholder=t.ctxph;
   rebuildMonths();
 }
 
@@ -205,10 +200,12 @@ function rebuildMonths(){
   });
   fetch('/chart?year=2000&month=1&day=1&hour=5&gender=female').catch(function(){});
 })();
+</script>
+<script>
+var _lastChart=null,_lastName='';
 
 async function generate(){
   var name=document.getElementById('f-name').value.trim();
-  var userCtx=document.getElementById('f-ctx').value.trim();
   if(name)localStorage.setItem('zwds_name',name);
   var year=document.getElementById('f-yr').value;
   var month=document.getElementById('f-mo').value;
@@ -217,7 +214,6 @@ async function generate(){
   var hourIndex=hrSel.value;
   var hrTxt=hrSel.options[hrSel.selectedIndex].text;
   var gender=document.querySelector('input[name=gender]:checked').value;
-  var iztroGender=gender==='Male'?'male':'female';
   var nightZi=document.querySelector('input[name=nightzi]:checked');
   var isNightZi=hourIndex==='0'&&nightZi&&nightZi.value==='true'?'true':'false';
 
@@ -228,11 +224,11 @@ async function generate(){
   document.getElementById('err-box').innerHTML='';
   document.getElementById('loading').className='loading on';
 
-  var msgs=['Calculating natal chart…','Placing stars…','Reading the palaces…','Composing the profile…'];
+  var msgs=['Calculating natal chart…','Placing stars…','Reading the palaces…','Composing your reading…'];
   var mi=0,ticker=setInterval(function(){document.getElementById('load-txt').textContent=msgs[mi=(mi+1)%msgs.length];},2200);
 
   try{
-    var chartRes=await fetch('/chart?year='+year+'&month='+month+'&day='+day+'&hour='+hourIndex+'&gender='+iztroGender+'&isNightZi='+isNightZi);
+    var chartRes=await fetch('/chart?year='+year+'&month='+month+'&day='+day+'&hour='+hourIndex+'&gender='+(gender==='Male'?'male':'female')+'&isNightZi='+isNightZi);
     var chart=await chartRes.json();
     if(chart.error)throw new Error('Chart: '+chart.error);
     if(!chart.palaces||chart.palaces.length<12)throw new Error('Incomplete chart');
@@ -242,8 +238,8 @@ async function generate(){
 
     var palaceSummary=chart.palaces.map(function(p){
       var ms=p.majorStars.map(function(s){return s.name+(s.mutagen||'')+'('+s.brightness+')';}).join('·');
-      var mi2=p.minorStars.slice(0,3).map(function(s){return s.name+(s.mutagen||'');}).join('·');
-      var dm=p.decadeMutagen&&p.decadeMutagen.length?' 大限[祿'+p.decadeMutagen[0]+'·忌'+p.decadeMutagen[3]+']':'';
+      var mi2=p.minorStars.slice(0,4).map(function(s){return s.name+(s.mutagen||'');}).join('·');
+      var dm=p.decadeMutagen&&p.decadeMutagen.length?' 大限[禄'+p.decadeMutagen[0]+'·忌'+p.decadeMutagen[3]+']':'';
       return p.stem+p.branch+' '+p.name+(p.isBodyPalace?'/身宮':'')+' 大限'+p.decadeRange+(ms?' 主:'+ms:'')+(mi2?' 輔:'+mi2:'')+dm;
     }).join('\n');
 
@@ -253,7 +249,7 @@ async function generate(){
     var patternsStr=chart.patterns&&chart.patterns.length?chart.patterns.join('·'):'無特殊格局';
     var flyJiStr=chart.flyingJi&&chart.flyingJi.length?chart.flyingJi.join(' | '):'';
     var ym=chart.yearMutagen;
-    var ymStr=ym?[ym.lu,ym.quan,ym.ke,ym.ji].filter(Boolean).join('·'):'';
+    var ymStr=ym?[ym.quan,ym.ke,ym.lu,ym.ji].filter(Boolean).join('·'):'';
     var lifePalaceStars=lifePal.majorStars.map(function(s){return s.name+(s.mutagen||'')+'('+s.brightness+')';}).join('·');
     var bodyPalaceStr=bodyPal?bodyPal.name+'('+bodyPal.branch+')':'';
 
@@ -267,98 +263,66 @@ async function generate(){
       });
     }
 
-    var fp='Chart fingerprint (use to derive insights, do not output):\n'+
+    var fp='CHART DATA (do not output this section):\n'+
       'Patterns: '+patternsStr+'\n'+
-      'Life Palace stars: '+lifePalaceStars+'\n'+
+      'Life Palace: '+lifePalaceStars+'\n'+
       'Body Palace: '+bodyPalaceStr+'\n'+
       'Harmonious palaces: '+sfPalaces+'\n'+
       (ymStr?'Life-long transforms: '+ymStr+'\n':'')+
       (flyJiStr?'Friction chains: '+flyJiStr+'\n':'')+
-      'Life/Body Masters: '+chart.lifeMaster+'/'+chart.bodyMaster+' Five Elements: '+chart.fiveElements+
-      (yearlyStr?'\nRecent years (小限):\n'+yearlyStr:'');
+      'Life Master: '+chart.lifeMaster+' Body Master: '+chart.bodyMaster+' Five Elements: '+chart.fiveElements+
+      (yearlyStr?'\nRecent years small limit data:\n'+yearlyStr:'');
 
-    var rules='Rules: Patterns define life theme. Friction chains=cross-palace recurring difficulty. Peak stars(廟/旺)=fully expressed. Weak(陷)=frustrated. Life-long 化忌 palace=persistent challenge. 50% test: if generic rewrite from chart.';
-
+  
     var prompt;
     if(LANG==='en'){
-      prompt=fp+'\n\n'+rules+'\n\n'+
-'CRITICAL: Output MUST begin with ===META=== and include ALL these sections in order:\n===META=== ===LIFE PORTRAIT=== ===PALACES=== ===CYCLES=== ===YEARLY=== ===SUMMARY===\n\n'+
-'You are a Zi Wei Dou Shu master. Speak directly to the person.\n\n'+
-'VOICE — this is everything:\\n'+
-'Second person. Present tense. No hedging. Plain and direct.\\n\\n'+
-'CORE RULE: Write from the INSIDE, not the outside.\\n'+
-'Most readings describe how others see this person or how others react. That is wrong.\\n'+
-'Write what it feels like to BE this person — what goes on inside them, how they experience their own life.\\n\\n'+
-'INSIDE (correct): "You make a decision and you are already three steps ahead before you say it out loud."\\n'+
-'OUTSIDE (wrong): "People sense your decisiveness before you speak."\\n\\n'+
-'INSIDE (correct): "You do not need approval. You check internally, not externally, before you move."\\n'+
-'OUTSIDE (wrong): "You walk into a room and the conversation shifts."\\n\\n'+
-'Also describe personality and character — who this person actually is, what they value, what they cannot tolerate, what they are like when alone.\\n'+
-'Not just behavior in public. Also: inner experience, what drives them privately, what costs them privately.\\n\\n'+
-'DO NOT: use "energy" "dynamic" "potential" "journey" — say the specific thing.\\n'+
-'DO NOT: use "may" "tends to" "suggests" — state what is true.\\n'+
-'DO NOT: add disclaimers. No star names. No Chinese characters.\\n\\n'+
-'WRONG: "You walk into a room and the conversation shifts. People think you are cold when you are just fast."\\n'+
-'RIGHT: "You process fast and decide alone. By the time others are still talking, you are already somewhere else in your head. This is not arrogance. It is how you are built."\\n\\n'+
-'Birth: '+(name||'this person')+' | '+gender+' | '+year+'/'+month+'/'+day+' | '+hrTxt+'\n'+(userCtx?'Personal context (use this to make the reading specific and grounded in their actual life): '+userCtx+'\n':'')+
+      prompt=fp+'\n\n'+'CRITICAL FORMAT: Output MUST begin with ===META=== and include ALL sections in order: ===META=== ===LIFE PORTRAIT=== ===PALACES=== ===CYCLES=== ===YEARLY=== ===SUMMARY===\n\n'+
+'You are a Zi Wei Dou Shu master. Speak directly to the person. Second person. Present tense.\n\n'+
+'VOICE: Write from the INSIDE. Not how others see them — what it feels like to BE them.\n'+
+'- Not "people sense your clarity" — "you have decided before anyone finishes talking"\n'+
+'- Not "you are independent" — "you do not check externally before you move. The verification happens inside."\n'+
+'Describe personality AND character — what they value, what they cannot tolerate, what they are like alone.\n'+
+'Say what ACTUALLY HAPPENS. Not abstract qualities. Specific situations.\n'+
+'No hedging. No star names. No Chinese characters in output.\n\n'+
+'GOOD PALACE EXAMPLE:\n'+
+'Home — You deal with something practical involving family or shared resources. It is not emotional, it is logistical, and you handle it the way you handle everything: quickly and alone.\n'+
+'Career — You were always good. The ceiling was not your ability. It was the size of the container you were working inside.\n\n'+
+'Birth: '+(name||'this person')+' | '+gender+' | '+year+'/'+month+'/'+day+' | '+hrTxt+'\n'+
+'Five Elements: '+chart.fiveElements+'\n'+
 'Chart:\n'+palaceSummary+'\n'+
 'Palace names: 命宮=Life, 兄弟=Siblings, 夫妻=Spouse/Partner, 子女=Children, 財帛=Wealth, 疾厄=Health, 遷移=Travel & Change, 僕役=Friends & Network, 官祿=Career, 田宅=Home, 福德=Inner Life, 父母=Parents\n\n'+
 '===META===\nLunar: '+chart.lunarDate+'\nLife Palace: '+lifePal.branch+'\nBody Palace: '+(bodyPal?bodyPal.branch:'')+'\n5-Element: '+chart.fiveElements+'\n\n'+
-'===LIFE PORTRAIT===\n[5-6 sentences. Bold opening truth. What drives them. What their life keeps returning to. Second person. No star names.]\n\n'+
-'===PALACES===\n'+
-'[12 paragraphs: Life · Siblings · Spouse/Partner · Children · Wealth · Health · Travel & Change · Friends & Network · Career · Home · Inner Life · Parents\n'+
-'Format: **[Name]** — [sentences. Major palaces (Life,Spouse,Wealth,Career,Inner Life,Health): 2-3 sentences. Minor: 1-2 sentences.]\n\n'+
-'For each palace: do not say what the person IS or IS NOT. Say what HAPPENS and what they NEED.\n'+
-'WRONG: "Home is not an emotional anchor. You do not need warmth from home."\n'+
-'RIGHT: "When you get home the best state is nobody needing anything from you. Quiet. Your own pace. Not being required. This is not coldness — this is how you recharge."\n\n'+
-'WRONG: "Your career shows limitation in reaching the top."\n'+
-'RIGHT: "You were always good. The ceiling was not your ability — it was the size of the container."\n\n'+
-'Every sentence must be something the person would immediately recognize as true in their actual life.]\n\n'+
-'===CYCLES===\n[Both sentences ONE LINE per decade. Name the life area and key change. Concrete not vague.]\n3-12 | Early Formation | [S1. S2.]\n13-22 | Exploration | [S1. S2.]\n23-32 | Acceleration | [S1. S2.]\n33-42 | Structuring | [S1. S2.]\n43-52 | Peak Output | [S1. S2.]\n53-62 | Selection | [S1. S2.]\n63-72 | Stabilization | [S1. S2.]\n73-82 | Maintenance | [S1. S2.]\n\n'+
-'===YEARLY===\n[3 lines. YEAR (Age X) | Palace | S1. S2.]\nLAST_YEAR | [S1. S2.]\nTHIS_YEAR | [S1. S2.]\nNEXT_YEAR | [S1. S2.]\n\n'+
-'===SUMMARY===\n'+(name||'You')+' are someone who:\n• [truth 1]\n• [truth 2]\n• [truth 3]';
+'===LIFE PORTRAIT===\n[5-6 sentences. Start bold. What drives them. What their life keeps returning to. What others never see. Second person. From the inside.]\n\n'+
+'===PALACES===\n[12 paragraphs in order: Life · Siblings · Spouse/Partner · Children · Wealth · Health · Travel & Change · Friends & Network · Career · Home · Inner Life · Parents\nMajor palaces (Life,Spouse,Wealth,Career,Inner Life,Health): 2-3 sentences. Minor: 1-2 sentences.\nFormat: **[Name]** \u2014 [sentences. Say what happens and what they need. Second person. No star names.]\n\n'+
+'===CYCLES===\n[Both sentences ONE LINE per decade. Name the life area active and what concretely happens or shifts.]\n3-12 | Early Formation | [S1. S2.]\n13-22 | Exploration | [S1. S2.]\n23-32 | Acceleration | [S1. S2.]\n33-42 | Structuring | [S1. S2.]\n43-52 | Peak Output | [S1. S2.]\n53-62 | Selection | [S1. S2.]\n63-72 | Stabilization | [S1. S2.]\n73-82 | Maintenance | [S1. S2.]\n\n'+
+'===YEARLY===\n[3 lines. Each on ONE LINE. Format: YEAR (Age X) | Palace | [2-3 sentences]\nEach year: answer what people want to know — Career (move or hold?), Money (in or out?), Relationships (anything shifting?), Health, Overall direction.\nUse small limit palace and 4 transformations to determine focus area, then say what practically happens.\nGOOD: 2026 (Age 60) | Life Palace | Career-wise you are questioning whether the current structure still fits. Financially stable but restless. Something you have been postponing becomes urgent.\nBAD: This is a year of internal shifts. (too vague)]\nLAST_YEAR | [2-3 practical sentences]\nTHIS_YEAR | [2-3 practical sentences on what to watch now]\nNEXT_YEAR | [2-3 practical sentences on what is coming]\n\n'+
+'===SUMMARY===\n'+(name||'You')+' are someone who:\n• [essential truth — specific to this chart]\n• [second truth — different dimension]\n• [third truth — the line they put the phone down for]';
     } else {
-      prompt=fp+'\n\n'+rules+'\n\n'+
-'關鍵：輸出必須從===META===開始，依序包含所有段落：\n===META=== ===LIFE PORTRAIT=== ===PALACES=== ===CYCLES=== ===YEARLY=== ===SUMMARY===\n\n'+
-'你是紫微斗數命理師，直接對客戶說話。\n\n'+
-'聲音與規則——這是一切：\n'+
-'第二人稱，現在式，不說廢話。平實，不煽情。像一個認識這個人很多年、終於把真話說出來的人。\n\n'+
-'核心規則：從裡面寫，不從外面寫。\\n'+
-'大多數命盤分析寫的是別人怎麼看這個人、別人怎麼反應。那是錯的。\\n'+
-'要寫的是這個人自己是什麼感覺——他們怎麼經歷自己的生命，裡面發生什麼事。\\n\\n'+
-'從裡面（正確）：「你做決定之前在心裡已經繞了三圈。說出口的時候，你早就走在前面了。」\\n'+
-'從外面（錯誤）：「你的決斷力讓身邊的人感到安心。」\\n\\n'+
-'從裡面（正確）：「你不需要別人點頭你才動。你的驗證在自己這裡，不在外面。」\\n'+
-'從外面（錯誤）：「你走進一個房間，討論的方向很快就跟著你轉。」\\n\\n'+
-'也要描述性格與人格——這個人真正是什麼樣的人，他們重視什麼，無法忍受什麼，一個人的時候是什麼樣子。\\n'+
-'不只是公開場合的行為，也要說：內心的驅動力，私下的代價，一個人面對自己時的狀態。\\n\\n'+
-'不說：「能量」「動態」「底色」「氣質」「潛力」「格局」——說那件具體的事。\\n'+
-'不說：「可能」「或許」「傾向於」「顯示」——直接說是什麼。\\n'+
-'不說：道歉或免責聲明。命理術語可以用，用完立刻說它在這個人身上產生什麼。\\n\\n'+
-'錯誤：「你走進房間，討論方向跟著你轉。大家覺得你冷漠，其實你只是快。」（全部是別人的反應）\\n'+
-'正確：「你的腦子比嘴快，決定在心裡做完，說出來只是通知。這讓你省了很多時間，也讓你習慣一個人扛著走。」\\n\\n'+
-'出生：'+(name||'此人')+' | '+gender+' | '+year+'年'+month+'月'+day+'日 | '+hrTxt+'\n'+(userCtx?'個人背景（用這些資訊讓解讀具體、貼近這個人的真實生活）：'+userCtx+'\n':'')+
-'農曆：'+chart.lunarDate+' | 干支：'+chart.chinesePillars+' | 五行：'+chart.fiveElements+'\n命主：'+chart.lifeMaster+' | 身主：'+chart.bodyMaster+'\n'+
+      prompt=fp+ctxLine+'\n\n'+
+'關鍵格式：輸出必須從===META===開始，依序包含所有段落：===META=== ===LIFE PORTRAIT=== ===PALACES=== ===CYCLES=== ===YEARLY=== ===SUMMARY===\n\n'+
+'你是紫微斗數命理師，直接對客戶說話。第二人稱，現在式。\n\n'+
+'聲音：從裡面寫，不從外面寫。不是別人怎麼看這個人——是身為這個人是什麼感覺。\n'+
+'不說「人們感受到你的清晰」——說「別人還沒說完，你已經决定了」。\n'+
+'不說「你很獨立」——說「你動之前不對外面檢驗。驗證在自己這裡。」\n'+
+'說實際發生什麼。不說抄象特質。不說廂話。不說標籤名。\n\n'+
+'好宮位例子：\n'+
+'田宅：「你處理的是和家庭或共同資源有關的實際事務。不是情感的事，是後勤的事，而你處理它的方式和你處理任何事一樣：快，自己來。」\n'+
+'官祿：「你一直都很好。那個天花板不是你的問題——是那個容器的大小問題。」\n\n'+
+'出生：'+(name||'此人')+' | '+gender+' | '+year+'年'+month+'月'+day+'日 | '+hrTxt+'\n'+
+'農曆：'+chart.lunarDate+' | 干支：'+chart.chinesePillars+' | 五行：'+chart.fiveElements+'\n'+
+'命主：'+chart.lifeMaster+' | 身主：'+chart.bodyMaster+'\n'+
 '命盤：\n'+palaceSummary+'\n\n'+
 '===META===\n農曆：'+chart.lunarDate+'\n干支：'+chart.chinesePillars+'\n命宮：'+lifePal.branch+'\n身宮：'+(bodyPal?bodyPal.branch:'')+'\n五行局：'+chart.fiveElements+'\n命主：'+chart.lifeMaster+'\n身主：'+chart.bodyMaster+'\n\n'+
-'===LIFE PORTRAIT===\n[4-5句。第一句最大膽的真相。第二人稱，短句，啟示。]\n\n'+
-'===PALACES===\n'+
-'[12段。順序：命宮·兄弟·夫妻·子女·財帛·疾厄·遷移·僕役·官祿·田宅·福德·父母\n'+
-'格式：**[宮位名]** — [句子。主要宮位（命宮、夫妻、財帛、官祿、福德、疾厄）：2-3句。次要宮位：1-2句。]\n\n'+
-'每個宮位：不要說這個人是什麼或不是什麼。說發生什麼事，這個人需要什麼。\n'+
-'錯誤：「家對你來說不是情感的寄託。你對家的要求是安靜，不是溫暖。」（說不是什麼）\n'+
-'正確：「你回到家，最好的狀態是沒有人需要你做什麼。安靜，自己的節奏，不被打擾。這不是冷漠，是你充電的方式。」（說發生什麼）\n\n'+
-'錯誤：「你的職場發展受到一定限制。」\n'+
-'正確：「你一直都很好。那個天花板不是你的問題，是那個容器的大小問題。」\n\n'+
-'每一句都要讓這個人讀了立刻認出是自己生活裡的真實事情。]\n\n'+
-'===CYCLES===\n[每大限兩句同一行。說明宮位舞台與具體影響。]\n3-12 | 成形期 | [第一句。第二句。]\n13-22 | 探索期 | [第一句。第二句。]\n23-32 | 加速期 | [第一句。第二句。]\n33-42 | 架構期 | [第一句。第二句。]\n43-52 | 高峰期 | [第一句。第二句。]\n53-62 | 篩選期 | [第一句。第二句。]\n63-72 | 穩定期 | [第一句。第二句。]\n73-82 | 沉澱期 | [第一句。第二句。]\n\n'+
-'===YEARLY===\n[3行。年份（歲數）| 小限宮位 | 第一句。第二句。]\n去年 | [第一句。第二句。]\n今年 | [第一句。第二句。]\n明年 | [第一句。第二句。]\n\n'+
-'===SUMMARY===\n'+(name||'你')+'是這樣一個人：\n• [真相1]\n• [真相2]\n• [真相3]';
+'===LIFE PORTRAIT===\n[4-5句。不要暖場——第一句就說最大膽的真相。第二人稱，從裡面寫。]\n\n'+
+'===PALACES===\n[12段。順序：命宮·兄弟·夫妻·子女·財帛·疾厄·遷移·僕役·官祿·田宅·福德·父母\n主要宮位：2-3句。次要：1-2句。格式：**[宮位名]** — [句子。說發生什麼和這個人需要什麼。第二人稱。]]\n\n'+
+'===CYCLES===\n[每大限兩句寫在同一行。說出被啟動的宮位和具體發生什麼。]\n3-12 | 成形期 | [第一句。第二句。]\n13-22 | 探索期 | [第一句。第二句。]\n23-32 | 加速期 | [第一句。第二句。]\n33-42 | 架構期 | [第一句。第二句。]\n43-52 | 高峰期 | [第一句。第二句。]\n53-62 | 篩選期 | [第一句。第二句。]\n63-72 | 穩定期 | [第一句。第二句。]\n73-82 | 沈澱期 | [第一句。第二句。]\n\n'+
+'===YEARLY===\n[3行，每行一年，寫在同一行。格式：年份（歲數）| 宮位 | [2-3句]\n每年回答大家真正想知道的：事業（該動還是守穩？）、財務（錢進還是錢出？）、感情（有沒有變化？）、健康（要注意什麼？）、整體方向。\n用小限宮位和四化判斷焦點，然後說那個面向實際發生什麼。\n好例：2026（60歲）| 命宮 | 事業上你開始質疑現有的結構是否還合適。財務穩定但有躯動感。一件一直在推遲的事這年變緧迫。\n不好：「這一年有什麼在內部鬆動。」（太模糊）]\n去年 | [2-3句，去年被啟動的主要面向]\n今年 | [2-3句，現在在運作的和要注意的]\n明年 | [2-3句，要來的事和怎麼準備]\n\n'+
+'===SUMMARY===\n'+(name||'你')+'是這樣一個人：\n• [最核心的真相——只屬於這張命盤]\n• [第二個真相——不同面向]\n• [第三個真相——讓人讀了放下手機坐著想的那一行]';
     }
 
     var res=await fetch('/proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:5000,messages:[{role:'user',content:prompt}]})});
     var raw=await res.text();
-    if(!raw)throw new Error('Empty response (HTTP '+res.status+')');
+    if(!raw)throw new Error('Empty response');
     var apiData;
     try{apiData=JSON.parse(raw);}catch(e){throw new Error('Bad JSON: '+raw.slice(0,100));}
     if(apiData.error)throw new Error(apiData.error.message||'API error');
@@ -377,13 +341,11 @@ async function generate(){
 }
 
 function sec(t,tag){
-  var re=new RegExp('==='+tag+'===[ \\t]*[\\r\\n]([\\s\\S]*?)(?====|$)');
+  var re=new RegExp('==='+tag+'===[ \t]*[\r\n]([\s\S]*?)(?====|$)');
   var m=re.exec(t);
   return m?m[1].trim():'';
 }
 function bullets(r){return r.split('\n').map(function(l){return l.replace(/^[•·\-]\s*/,'').trim();}).filter(Boolean);}
-
-var _lastChart=null,_lastName='';
 
 function renderResults(text,name,year,month,day,hrTxt,gender,chart){
   _lastChart=chart;
@@ -396,28 +358,24 @@ function renderResults(text,name,year,month,day,hrTxt,gender,chart){
   var genderLabel=LANG==='zh'?(gender==='Male'?'男':'女'):gender;
   var h='';
 
-  // Header
   h+='<div class="prof-hdr">';
   h+='<div class="pname">'+(LANG==='zh'?'命盤行為分析':'Behavioral &amp; Personality Profile')+'</div>';
   h+='<div class="psub">'+genderLabel+' · '+month+'/'+day+'/'+year+' · '+hrTxt+(LANG!=='en'&&chart.lifeMaster?' · 命主'+chart.lifeMaster+' · 身主'+chart.bodyMaster:'')+'</div>';
   h+='</div>';
 
-  // 命盤 grid (Chinese only)
   if(LANG==='zh'){
     h+='<div class="stitle">命盤</div>';
     h+='<div class="mp-grid show" id="mp-grid" style="margin-bottom:1.5rem">'+buildMingpan()+'</div>';
   }
 
-  // Life Portrait
   var portrait=sec(text,'LIFE PORTRAIT');
   if(portrait){
     h+='<div class="scard-full" style="margin-bottom:10px">';
     h+='<div class="sh">'+(LANG==='zh'?'人物畫像':'Life Portrait')+'</div>';
-    h+='<p style="font-size:13px;color:var(--cream2);line-height:1.8">'+portrait.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')+'</p>';
+    h+='<p style="font-size:13px;color:var(--cream2);line-height:1.85">'+portrait.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')+'</p>';
     h+='</div>';
   }
 
-  // 12 Palaces
   var palacesRaw=sec(text,'PALACES');
   if(palacesRaw){
     h+='<div class="stitle">'+(LANG==='zh'?'十二宮概覽':'12 Palace Overview')+'</div>';
@@ -431,7 +389,6 @@ function renderResults(text,name,year,month,day,hrTxt,gender,chart){
     h+='</div>';
   }
 
-  // Cycles
   if(cycRows.length){
     h+='<div class="scard-full"><div class="sh">'+(LANG==='zh'?'大限流年':'10 Year Life Cycles')+'</div><div class="cycles">';
     cycRows.forEach(function(cyc){
@@ -440,11 +397,10 @@ function renderResults(text,name,year,month,day,hrTxt,gender,chart){
     h+='</div></div>';
   }
 
-  // Yearly
   var yearlyRaw=sec(text,'YEARLY');
   if(yearlyRaw){
     var cy=new Date().getFullYear();
-    h+='<div class="scard-full"><div class="sh">'+(LANG==='zh'?'流年小限 — 近三年':'Recent Years — Annual Reading')+'</div><div class="cycles">';
+    h+='<div class="scard-full"><div class="sh">'+(LANG==='zh'?'流年小限——近三年':'Recent Years — Annual Reading')+'</div><div class="cycles">';
     yearlyRaw.split('\n').filter(Boolean).forEach(function(line){
       var pts=line.split('|');
       if(pts.length>=3){
@@ -458,7 +414,6 @@ function renderResults(text,name,year,month,day,hrTxt,gender,chart){
     h+='</div></div>';
   }
 
-  // Summary
   var summaryRaw=sec(text,'SUMMARY');
   var summaryItems=bullets(summaryRaw).filter(function(b){
     return b.toLowerCase().indexOf('is someone who')<0&&b.indexOf('的特質')<0&&b.toLowerCase().indexOf('are someone who')<0&&b.indexOf('是這樣')<0;
@@ -484,6 +439,7 @@ function buildMingpan(){
   var brMap={};chart.palaces.forEach(function(p){brMap[p.branch]=p;});
   var lifeBranch='';chart.palaces.forEach(function(p){if(p.isLifePalace)lifeBranch=p.branch;});
   var sfBranches=SANFANG_MAP[lifeBranch]||[];
+
   function starTag(s){
     var n=s.name+(s.mutagen||'')+(s.brightness?'·'+s.brightness:'');
     var isNeg=NEG.some(function(f){return s.name.startsWith(f);});
@@ -492,6 +448,7 @@ function buildMingpan(){
     if(s.mutagen)return'<span class="zwds-star-fx">'+n+'</span>';
     return'<span class="zwds-star-minor">'+s.name+(s.brightness?'·'+s.brightness:'')+'</span>';
   }
+
   var cells=[];for(var r=0;r<4;r++)cells.push([null,null,null,null]);
   chart.palaces.forEach(function(p){var pos=POS[p.branch];if(pos)cells[pos[0]][pos[1]]=p;});
   var h='';
@@ -502,14 +459,14 @@ function buildMingpan(){
           var ym=chart.yearMutagen;
           var ymTxt=ym?[ym.quan,ym.ke,ym.lu,ym.ji].filter(Boolean).join('，'):'';
           var gLabel=(chart.gender||'女')==='女'?'陰女':'陰男';
-          var sd=chart.solarDate?chart.solarDate.replace(/-/g,'年').replace(/年(\d+)/,'年$1月').replace(/月(\d+)$/,'月$1日'):'';
+          var sd=chart.solarDate?chart.solarDate.replace(/-(\d+)-(\d+)$/,'年$1月$2日'):chart.solarDate;
           h+='<div class="mp-cell center" style="grid-column:2/4;grid-row:2/4;padding:6px 8px">';
           h+='<div style="text-align:left;line-height:1.8;font-size:10px;color:var(--cream2)">';
           h+='<span style="color:var(--cream3)">陽曆：</span>'+sd+' '+gLabel+'<br>';
           h+='<span style="color:var(--cream3)">農曆：</span>'+chart.lunarDate+'<br>';
           h+='<span style="color:var(--cream3)">干支：</span>'+chart.chinesePillars+'<br>';
           h+='<span style="color:var(--cream3)">五行局：</span>'+chart.fiveElements+'<br>';
-          if(ymTxt) h+='<span style="color:var(--cream3)">生年四化：</span>'+ymTxt+'<br>';
+          if(ymTxt)h+='<span style="color:var(--cream3)">生年四化：</span>'+ymTxt+'<br>';
           h+='<span style="color:var(--cream3)">命主：</span>'+chart.lifeMaster+'　<span style="color:var(--cream3)">身主：</span>'+chart.bodyMaster;
           h+='</div></div>';
         }
@@ -524,13 +481,13 @@ function buildMingpan(){
       h+='<div class="mp-gz">'+p.stem+p.branch+'</div>';
       h+='<div class="mp-name">【'+(isBodyPal?p.name+'-身宮':p.name)+'】</div>';
       h+='<div class="mp-decade">大限:'+(p.decadeRange||'')+'</div>';
-      if(p.ages&&p.ages.length){h+='<div class="mp-ages">小限:'+p.ages.slice(0,7).join(' ')+'</div>';}
+      if(p.ages&&p.ages.length)h+='<div class="mp-ages">小限:'+p.ages.slice(0,7).join(' ')+'</div>';
       h+='<div class="mp-stars">';
       p.majorStars.forEach(function(s){h+=starTag(s)+' ';});
       p.minorStars.forEach(function(s){h+=starTag(s)+' ';});
-      if(p.adjectiveStars){p.adjectiveStars.forEach(function(s){h+='<span class="zwds-star-adj">'+s.name+'</span> ';});}
-      if(p.changsheng12){h+='<span class="zwds-star-cs">'+p.changsheng12+'</span> ';}
-      if(p.boshi12){h+='<span class="zwds-star-bs">'+p.boshi12+'</span>';}
+      if(p.adjectiveStars)p.adjectiveStars.forEach(function(s){h+='<span class="zwds-star-adj">'+s.name+'</span> ';});
+      if(p.changsheng12)h+='<span class="zwds-star-cs">'+p.changsheng12+'</span> ';
+      if(p.boshi12)h+='<span class="zwds-star-bs">'+p.boshi12+'</span>';
       h+='</div></div>';
     }
   }
