@@ -329,6 +329,9 @@ async function generate(){
     clearInterval(ticker);
     var text=apiData.content&&apiData.content[0]?apiData.content[0].text:'';
     if(!text)throw new Error('No text returned');
+    // DEBUG - show first 400 chars of Claude response
+    document.getElementById('err-box').innerHTML='<b>Claude raw (first 400 chars):</b><br><pre style="white-space:pre-wrap;font-size:10px">'+text.slice(0,400).replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</pre>';
+    document.getElementById('err-box').className='err-box on';
     renderResults(text,name,year,month,day,hrTxt,gender,chart);
 
   }catch(e){
