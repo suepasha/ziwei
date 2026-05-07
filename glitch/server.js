@@ -127,7 +127,11 @@ app.get('/chart', (req, res) => {
         palaceStemFx: pStemFx, // [化祿,化權,化科,化忌] for this palace's stem
         decadeMutagen: decadeMutagen,
         majorStars: p.majorStars.map(s => ({ name:s.name, brightness:s.brightness||'', mutagen:s.mutagen||'' })),
-        minorStars: p.minorStars.map(s => ({ name:s.name, brightness:s.brightness||'', mutagen:s.mutagen||'' }))
+        minorStars: p.minorStars.map(s => ({ name:s.name, brightness:s.brightness||'', mutagen:s.mutagen||'' })),
+        adjectiveStars: (p.adjectiveStars||[]).map(s => ({ name:s.name, mutagen:s.mutagen||'' })),
+        changsheng12: p.changsheng12||'',
+        boshi12: p.boshi12||'',
+        ages: p.ages||[]
       };
     });
 
