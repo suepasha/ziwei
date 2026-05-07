@@ -145,7 +145,7 @@ app.get('/chart', (req, res) => {
         const yearly = h.yearly;
         const xiaoXianPalace = age.palaceNames ? age.palaceNames[0] : '?';
         yearlyData[yr] = {
-          age: age.nominalAge,
+          age: age.nominalAge - 1,
           xiaoXianPalace: xiaoXianPalace,
           xiaoXianStem: age.heavenlyStem,
           xiaoXianBranch: age.earthlyBranch,
