@@ -482,7 +482,17 @@ function renderResults(text,name,year,month,day,hrTxt,gender,chart,readMode){
   if(qRaw){
     h+='<div class="scard-full" style="margin-top:10px;border-left:3px solid var(--gold)">';
     h+='<div class="sh">'+(LANG==='zh'?'你的問題':'Your Question')+'</div>';
-    h+='<p style="font-size:13px;color:var(--cream2);line-height:1.85">'+qRaw+'</p>';
+    // Split question line from answer
+    var qLines=qRaw.split('\n');
+    var qQuestion='',qAnswer='';
+    if(qLines.length>1&&(qLines[0].indexOf('問：')>-1||qLines[0].toLowerCase().indexOf('asked:')>-1||qLines[0].toLowerCase().indexOf('the person asked:')>-1)){
+      qQuestion=qLines[0];
+      qAnswer=qLines.slice(1).join('\n').trim();
+    } else {
+      qAnswer=qRaw;
+    }
+    if(qQuestion)h+='<p style="font-size:12px;color:var(--cream3);line-height:1.6;margin-bottom:8px;font-style:italic">'+qQuestion+'</p>';
+    h+='<p style="font-size:13px;color:var(--cream2);line-height:1.85">'+qAnswer+'</p>';
     h+='</div>';
   }
   h+='<button class="btn-new" onclick="newGen()">'+(LANG==='zh'?'為另一人生成':'Generate for another person')+'</button>';
