@@ -157,13 +157,26 @@ app.get('/chart', (req, res) => {
       } catch(e) {}
     });
 
+    // Build yearMutagen as text strings
+    const ymText = { lu:'', quan:'', ke:'', ji:'' };
+    chart.palaces.forEach(p => {
+      [...p.majorStars, ...p.minorStars].forEach(s => {
+        if (s.mutagen === '祿') ymText.lu = s.name+'化祿';
+        if (s.mutagen === '權') ymText.quan = s.name+'化權';
+        if (s.mutagen === '科') ymText.ke = s.name+'化科';
+        if (s.mutagen === '忌') ymText.ji = s.name+'化忌';
+      });
+    });
+
     res.json({
+      solarDate: chart.solarDate,
       lunarDate: chart.lunarDate,
       chinesePillars: chart.chineseDate,
       fiveElements: chart.fiveElementsClass,
+      gender: chart.gender,
       lifeMaster: chart.soul,
       bodyMaster: chart.body,
-      yearMutagen,
+      yearMutagen: ymText,
       patterns,
       flyingJi: flyingJi.slice(0, 8),  // most significant
       flyingLu: flyingLu.slice(0, 6),
