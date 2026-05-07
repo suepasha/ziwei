@@ -229,8 +229,6 @@ var _lastChart=null,_lastName='';
 async function generate(){
   var name=document.getElementById('f-name').value.trim();
   if(name)localStorage.setItem('zwds_name',name);
-  var readMode=document.querySelector('input[name=readmode]:checked').value;
-  var userQ=(readMode==='question'||readMode==='both')&&document.getElementById('f-q')?document.getElementById('f-q').value.trim():'';
   var year=document.getElementById('f-yr').value;
   var month=document.getElementById('f-mo').value;
   var day=document.getElementById('f-dy').value;
@@ -240,6 +238,8 @@ async function generate(){
   var gender=document.querySelector('input[name=gender]:checked').value;
   var nightZi=document.querySelector('input[name=nightzi]:checked');
   var isNightZi=hourIndex==='0'&&nightZi&&nightZi.value==='true'?'true':'false';
+  var readMode=document.querySelector('input[name=readmode]:checked').value;
+  var userQ=(readMode==='question'||readMode==='both')&&document.getElementById('f-q')?document.getElementById('f-q').value.trim():'';
 
   document.getElementById('btn-gen').disabled=true;
   document.getElementById('results').className='results';
@@ -248,7 +248,7 @@ async function generate(){
   document.getElementById('err-box').innerHTML='';
   document.getElementById('loading').className='loading on';
 
-  var msgs=['Calculating natal chart…','Placing stars…','Reading the palaces…','Composing your reading…'];
+  var msgs=['Calculating natal chart\u2026','Placing stars\u2026','Reading the palaces\u2026','Composing your reading\u2026'];
   var mi=0,ticker=setInterval(function(){document.getElementById('load-txt').textContent=msgs[mi=(mi+1)%msgs.length];},2200);
 
   try{
@@ -261,116 +261,101 @@ async function generate(){
     var bodyPal=chart.palaces.find(function(p){return p.isBodyPalace;});
 
     var palaceSummary=chart.palaces.map(function(p){
-      var ms=p.majorStars.map(function(s){return s.name+(s.mutagen||'')+'('+s.brightness+')';}).join('·');
-      var mi2=p.minorStars.slice(0,4).map(function(s){return s.name+(s.mutagen||'');}).join('·');
-      var dm=p.decadeMutagen&&p.decadeMutagen.length?' 大限[禄'+p.decadeMutagen[0]+'·忌'+p.decadeMutagen[3]+']':'';
-      return p.stem+p.branch+' '+p.name+(p.isBodyPalace?'/身宮':'')+' 大限'+p.decadeRange+(ms?' 主:'+ms:'')+(mi2?' 輔:'+mi2:'')+dm;
+      var ms=p.majorStars.map(function(s){return s.name+(s.mutagen||'')+'('+s.brightness+')';}).join('\u00b7');
+      var mi2=p.minorStars.slice(0,4).map(function(s){return s.name+(s.mutagen||'');}).join('\u00b7');
+      var dm=p.decadeMutagen&&p.decadeMutagen.length?' \u5927\u9650[\u7984'+p.decadeMutagen[0]+'\u00b7\u5fcc'+p.decadeMutagen[3]+']':'';
+      return p.stem+p.branch+' '+p.name+(p.isBodyPalace?'/\u8eab\u5bae':'')+' \u5927\u9650'+p.decadeRange+(ms?' \u4e3b:'+ms:'')+(mi2?' \u8f14:'+mi2:'')+dm;
     }).join('\n');
 
-    var SFMAP={'子':['辰','申','午'],'丑':['巳','酉','未'],'寅':['午','戌','申'],'卯':['未','亥','酉'],'辰':['申','子','戌'],'巳':['酉','丑','亥'],'午':['戌','寅','子'],'未':['亥','卯','丑'],'申':['子','辰','寅'],'酉':['丑','巳','卯'],'戌':['寅','午','辰'],'亥':['卯','未','巳']};
+    var SFMAP={'\u5b50':['\u8fb0','\u7533','\u5348'],'\u4e11':['\u5df3','\u9149','\u672a'],'\u5bc5':['\u5348','\u620c','\u7533'],'\u536f':['\u672a','\u4ea5','\u9149'],'\u8fb0':['\u7533','\u5b50','\u620c'],'\u5df3':['\u9149','\u4e11','\u4ea5'],'\u5348':['\u620c','\u5bc5','\u5b50'],'\u672a':['\u4ea5','\u536f','\u4e11'],'\u7533':['\u5b50','\u8fb0','\u5bc5'],'\u9149':['\u4e11','\u5df3','\u536f'],'\u620c':['\u5bc5','\u5348','\u8fb0'],'\u4ea5':['\u536f','\u672a','\u5df3']};
     var sfBranches=SFMAP[lifePal.branch]||[];
-    var sfPalaces=chart.palaces.filter(function(p){return sfBranches.indexOf(p.branch)>-1;}).map(function(p){return p.name+'['+p.majorStars.map(function(s){return s.name+'('+s.brightness+')';}).join('·')+']';}).join(' | ');
-    var patternsStr=chart.patterns&&chart.patterns.length?chart.patterns.join('·'):'無特殊格局';
+    var sfPalaces=chart.palaces.filter(function(p){return sfBranches.indexOf(p.branch)>-1;}).map(function(p){return p.name+'['+p.majorStars.map(function(s){return s.name+'('+s.brightness+')';}).join('\u00b7')+']';}).join(' | ');
+    var patternsStr=chart.patterns&&chart.patterns.length?chart.patterns.join('\u00b7'):'\u7121\u7279\u6b8a\u683c\u5c40';
     var flyJiStr=chart.flyingJi&&chart.flyingJi.length?chart.flyingJi.join(' | '):'';
     var ym=chart.yearMutagen;
-    var ymStr=ym?[ym.quan,ym.ke,ym.lu,ym.ji].filter(Boolean).join('·'):'';
-    var lifePalaceStars=lifePal.majorStars.map(function(s){return s.name+(s.mutagen||'')+'('+s.brightness+')';}).join('·');
+    var ymStr=ym?[ym.quan,ym.ke,ym.lu,ym.ji].filter(Boolean).join('\u00b7'):'';
+    var lifePalaceStars=lifePal.majorStars.map(function(s){return s.name+(s.mutagen||'')+'('+s.brightness+')';}).join('\u00b7');
     var bodyPalaceStr=bodyPal?bodyPal.name+'('+bodyPal.branch+')':'';
 
     var yearlyStr='';
     if(chart.yearlyData){
-      var palNameMap={'命宮':'Life','兄弟':'Siblings','夫妻':'Spouse/Partner','子女':'Children','財帛':'Wealth','疾厄':'Health','遷移':'Travel & Change','僕役':'Friends & Network','官祿':'Career','田宅':'Home','福德':'Inner Life','父母':'Parents'};
-      var cy=new Date().getFullYear();
-      [cy-1,cy,cy+1].forEach(function(yr){
+      var palNameMap={'\u547d\u5bae':'Life','\u5144\u5f1f':'Siblings','\u592b\u59bb':'Spouse/Partner','\u5b50\u5973':'Children','\u8ca1\u5e1b':'Wealth','\u75be\u5384':'Health','\u9077\u79fb':'Travel & Change','\u50d5\u5f79':'Friends & Network','\u5b98\u797f':'Career','\u7530\u5b85':'Home','\u798f\u5fb7':'Inner Life','\u7236\u6bcd':'Parents'};
+      var cy2=new Date().getFullYear();
+      [cy2-1,cy2,cy2+1].forEach(function(yr){
         var yd=chart.yearlyData[yr];
-        if(yd){var pe=palNameMap[yd.xiaoXianPalace]||yd.xiaoXianPalace;yearlyStr+=yr+' (Age '+yd.age+') | '+yd.xiaoXianPalace+'('+pe+') | 小限忌:'+yd.xiaoXianMutagen[3]+' 流年忌:'+yd.yearlyMutagen[3]+'\n';}
+        if(yd){var pe=palNameMap[yd.xiaoXianPalace]||yd.xiaoXianPalace;yearlyStr+=yr+' (Age '+yd.age+') | '+yd.xiaoXianPalace+'('+pe+') | \u5c0f\u9650\u5fcc:'+yd.xiaoXianMutagen[3]+' \u6d41\u5e74\u5fcc:'+yd.yearlyMutagen[3]+'\n';}
       });
     }
 
-    var fp='CHART DATA (do not output this section):\n'+
-      'Current year: '+cy+' (use this year for all yearly references)\n'+
-      'Age system: Western age (e.g. born 1967, age in 2026 = 59). Use the age values provided in the yearly data — do not calculate yourself.\n'+
+    var cy=new Date().getFullYear();
+    var fp='CHART DATA:\nCurrent year: '+cy+' | Western age system\n'+
       'Patterns: '+patternsStr+'\n'+
       'Life Palace: '+lifePalaceStars+'\n'+
       'Body Palace: '+bodyPalaceStr+'\n'+
       'Harmonious palaces: '+sfPalaces+'\n'+
-      (ymStr?'Life-long transforms: '+ymStr+'\n':'')+
+      (ymStr?'Life transforms: '+ymStr+'\n':'')+
       (flyJiStr?'Friction chains: '+flyJiStr+'\n':'')+
-      'Life Master: '+chart.lifeMaster+' Body Master: '+chart.bodyMaster+' Five Elements: '+chart.fiveElements+
-      (yearlyStr?'\nRecent years small limit data:\n'+yearlyStr:'');
+      'Life Master: '+chart.lifeMaster+' Body: '+chart.bodyMaster+' Five Elements: '+chart.fiveElements+
+      (yearlyStr?'\nYearly data:\n'+yearlyStr:'');
 
-  
     var prompt;
-    var cy=new Date().getFullYear();
     if(readMode==='question'){
-      // Question-only mode: short focused prompt
       if(LANG==='en'){
         prompt=fp+'\n\n'+
-'You are a Zi Wei Dou Shu master. Answer ONLY the question below. Do not give a full reading.\n'+
-'Output ONLY two sections in this exact order:\n\n'+
+'You are a Zi Wei Dou Shu master. Answer ONLY the question. No full reading.\n'+
+'Output ONLY:\n\n'+
 '===META===\nLunar: '+chart.lunarDate+'\nLife Palace: '+lifePal.branch+'\n5-Element: '+chart.fiveElements+'\n\n'+
 '===QUESTION===\n'+
-'The person asked: '+userQ+'\n'+
-'[Use the chart data to answer directly. Name the specific palace and transformation most relevant. Say what actually happens for THIS person this year (current year: '+cy+'). Give one concrete action or thing to watch. Include timing if relevant. 3-5 sentences. No hedging.]';
+'Asked: '+userQ+'\n'+
+'[Answer directly. Name the relevant palace and transformation. Concrete. 3-5 sentences.]';
       } else {
         prompt=fp+'\n\n'+
-'你是紫微斗數命理師。只回答以下問題，不要給完整解讀。\n'+
-'只輸出以下兩個段落，順序如下：\n\n'+
-'===META===\n農曆：'+chart.lunarDate+'\n命宮：'+lifePal.branch+'\n五行局：'+chart.fiveElements+'\n\n'+
+'\u4f60\u662f\u7d2b\u5fae\u6597\u6578\u547d\u7406\u5e2b\u3002\u53ea\u56de\u7b54\u4e0b\u9762\u554f\u984c\u3002\n'+
+'\u53ea\u8f38\u51fa\uff1a\n\n'+
+'===META===\n\u8fb2\u66c6\uff1a'+chart.lunarDate+'\n\u547d\u5bae\uff1a'+lifePal.branch+'\n\u4e94\u884c\u5c40\uff1a'+chart.fiveElements+'\n\n'+
 '===QUESTION===\n'+
-'這個人問：'+userQ+'\n'+
-'[用命盤資料直接回答。指出最相關的宮位和四化。說明今年（'+cy+'年）這個人具體發生什麼。給出一件具體可以做的事或要留意的事。如果時間點相關請說明。3-5句。不說廢話。]';
+'\u554f\uff1a'+userQ+'\n'+
+'[\u76f4\u63a5\u56de\u7b54\u3002\u8aaa\u660e\u6700\u76f8\u95dc\u7684\u5bae\u4f4d\u548c\u56db\u5316\u3002\u5177\u9ad4\u884c\u52d5\u30023-5\u53e5\u3002]';
       }
     } else if(LANG==='en'){
-
-      prompt=fp+'\n\n'+(readMode==='question'?'CRITICAL FORMAT: Output ONLY ===META=== then ===QUESTION=== — do NOT output LIFE PORTRAIT, PALACES, CYCLES, YEARLY, or SUMMARY.\n\n':'CRITICAL FORMAT: Output MUST begin with ===META=== and include ALL sections in order: ===META=== ===LIFE PORTRAIT=== ===PALACES=== ===CYCLES=== ===YEARLY=== ===SUMMARY===\n\n')+
+      prompt=fp+'\n\n'+
+'CRITICAL FORMAT: Start with ===META=== then ALL sections: ===META=== ===LIFE PORTRAIT=== ===PALACES=== ===CYCLES=== ===YEARLY=== ===SUMMARY===\n\n'+
 'You are a Zi Wei Dou Shu master. Speak directly to the person. Second person. Present tense.\n\n'+
-'VOICE: Write from the INSIDE. Not how others see them — what it feels like to BE them.\n'+
-'- Not "people sense your clarity" — "you have decided before anyone finishes talking"\n'+
-'- Not "you are independent" — "you do not check externally before you move. The verification happens inside."\n'+
-'Describe personality AND character — what they value, what they cannot tolerate, what they are like alone.\n'+
-'Say what ACTUALLY HAPPENS. Not abstract qualities. Specific situations.\n'+
-'No hedging. No star names. No Chinese characters in output.\n\n'+
-'GOOD PALACE EXAMPLE:\n'+
-'Home — You deal with something practical involving family or shared resources. It is not emotional, it is logistical, and you handle it the way you handle everything: quickly and alone.\n'+
-'Career (廉貞七殺命) — You were always reliable. The ceiling was structural, not personal — the configuration never built you for the top of a hierarchy, it built you for executing at the highest level within one.\n'+
-'Career (紫微破軍命) — You do not climb. You build. The organizations you touched either became something bigger or broke under the pressure of your vision. That is not failure. That is the shape of this chart.\n'+
-'Career (廉貞貪狼陷命) — The talent is real but it does not announce itself. You have to find the right environment before it shows up — and until then you work twice as hard for half the recognition.\n'+
-'RULE: The career reading must be derived from THIS person\'s actual 官祿配置 — not a generic ceiling metaphor that could apply to anyone.\n\n'+
+'VOICE: Write from the INSIDE. What it feels like to BE this person.\n'+
+'- Not "people sense your clarity" - "you have decided before anyone finishes talking"\n'+
+'- Not "you are independent" - "you do not check externally before you move"\n'+
+'Say what ACTUALLY HAPPENS. No hedging. No star names. No Chinese characters.\n\n'+
+'CAREER NOTE - derive from actual 官祿:\n'+
+'\u5ec9\u8c1e\u4e03\u6bba: executes at highest level within structure, not built for top of hierarchy\n'+
+'\u7d2b\u5fae\u7834\u8ecd: does not climb, builds - organizations grow or break under this energy\n'+
+'\u5ec9\u8c1e\u8ca2\u72fc\u9677: real talent needing right environment\n\n'+
+'HOME: "You deal with something practical involving family or shared resources. It is not emotional, it is logistical, and you handle it the way you handle everything: quickly and alone."\n\n'+
 'Birth: '+(name||'this person')+' | '+gender+' | '+year+'/'+month+'/'+day+' | '+hrTxt+'\n'+
 'Five Elements: '+chart.fiveElements+'\n'+
 'Chart:\n'+palaceSummary+'\n'+
-'Palace names: 命宮=Life, 兄弟=Siblings, 夫妻=Spouse/Partner, 子女=Children, 財帛=Wealth, 疾厄=Health, 遷移=Travel & Change, 僕役=Friends & Network, 官祿=Career, 田宅=Home, 福德=Inner Life, 父母=Parents\n\n'+
+'Palace names: \u547d\u5bae=Life,\u5144\u5f1f=Siblings,\u592b\u59bb=Spouse/Partner,\u5b50\u5973=Children,\u8ca1\u5e1b=Wealth,\u75be\u5384=Health,\u9077\u79fb=Travel & Change,\u50d5\u5f79=Friends & Network,\u5b98\u797f=Career,\u7530\u5b85=Home,\u798f\u5fb7=Inner Life,\u7236\u6bcd=Parents\n\n'+
 '===META===\nLunar: '+chart.lunarDate+'\nLife Palace: '+lifePal.branch+'\nBody Palace: '+(bodyPal?bodyPal.branch:'')+'\n5-Element: '+chart.fiveElements+'\n\n'+
-'===LIFE PORTRAIT===\n[5-6 sentences. Start bold. What drives them. What their life keeps returning to. What others never see. Second person. From the inside.]\n\n'+
-'===PALACES===\n[12 paragraphs in order: Life · Siblings · Spouse/Partner · Children · Wealth · Health · Travel & Change · Friends & Network · Career · Home · Inner Life · Parents\nMajor palaces (Life,Spouse,Wealth,Career,Inner Life,Health): 2-3 sentences. Minor: 1-2 sentences.\nFormat: **[Name]** \u2014 [sentences. Say what happens and what they need. Second person. No star names.]\n\n'+
-'===CYCLES===\n[Both sentences ONE LINE per decade. Name the life area active and what concretely happens or shifts.]\n3-12 | Early Formation | [S1. S2.]\n13-22 | Exploration | [S1. S2.]\n23-32 | Acceleration | [S1. S2.]\n33-42 | Structuring | [S1. S2.]\n43-52 | Peak Output | [S1. S2.]\n53-62 | Selection | [S1. S2.]\n63-72 | Stabilization | [S1. S2.]\n73-82 | Maintenance | [S1. S2.]\n\n'+
-'===YEARLY===\n[3 lines. Each on ONE LINE. Format: YEAR (Age X) | Palace | [2-3 sentences]\nEach year: answer what people want to know — Career (move or hold?), Money (in or out?), Relationships (anything shifting?), Health, Overall direction.\nUse small limit palace and 4 transformations to determine focus area, then say what practically happens.\nGOOD: 2026 (Age 60) | Life Palace | Career-wise you are questioning whether the current structure still fits. Financially stable but restless. Something you have been postponing becomes urgent.\nBAD: This is a year of internal shifts. (too vague)]\nLAST_YEAR | [2-3 practical sentences]\nTHIS_YEAR | [2-3 practical sentences on what to watch now]\nNEXT_YEAR | [2-3 practical sentences on what is coming]\n\n'+
-'===SUMMARY===\n'+(name||'You')+' are someone who:\n• [essential truth — specific to this chart]\n• [second truth — different dimension]\n• [third truth — the line they put the phone down for]'+(userQ?'\n\n===QUESTION===\nThe person asked: '+userQ+'\n[Answer this specific question using the chart data.\n- Name the specific palace and transformation most relevant to this question.\n- Say what is actually happening this year for THIS person — not generic advice.\n- Give one concrete action or thing to watch for. Not \'if opportunity comes take it\' — the specific move this chart points to.\n- Include timing if relevant (this year vs next).\n- 3-5 sentences. No hedging. No platitudes.]':'');
+'===LIFE PORTRAIT===\n[5-6 sentences. Bold opening truth. Write from inside. What drives them. What others never see.]\n\n'+
+'===PALACES===\n[12 paragraphs: Life\u00b7Siblings\u00b7Spouse/Partner\u00b7Children\u00b7Wealth\u00b7Health\u00b7Travel & Change\u00b7Friends & Network\u00b7Career\u00b7Home\u00b7Inner Life\u00b7Parents\nFormat: **[Name]** \u2014 [say what happens and what they need. No star names.]\nMajor palaces: 2-3 sentences. Minor: 1-2 sentences.]\n\n'+
+'===CYCLES===\n[ONE LINE per decade: range | phase | S1. S2.]\n3-12 | Early Formation | [S1. S2.]\n13-22 | Exploration | [S1. S2.]\n23-32 | Acceleration | [S1. S2.]\n33-42 | Structuring | [S1. S2.]\n43-52 | Peak Output | [S1. S2.]\n53-62 | Selection | [S1. S2.]\n63-72 | Stabilization | [S1. S2.]\n73-82 | Maintenance | [S1. S2.]\n\n'+
+'===YEARLY===\n[3 lines. Format: YEAR (Age X) | Palace | sentences answering: career (move or hold?), money (in or out?), relationships, overall. Use yearly data provided.]\nLAST_YEAR | [2-3 sentences]\nTHIS_YEAR | [2-3 sentences]\nNEXT_YEAR | [2-3 sentences]\n\n'+
+'===SUMMARY===\n'+(name||'You')+' are someone who:\n\u2022 [essential truth]\n\u2022 [second truth]\n\u2022 [third truth]'+(userQ?'\n\n===QUESTION===\nAsked: '+userQ+'\n[Answer directly. Relevant palace and transformation. Concrete action. 3-5 sentences.]':'');
     } else {
-
       prompt=fp+'\n\n'+
-+(readMode==='question'?'關鍵格式：只輸出===META===然後===QUESTION===——不要輸出LIFE PORTRAIT、PALACES、CYCLES、YEARLY或SUMMARY。\n\n':'關鍵格式：輸出必須從===META===開始，依序包含所有段落：===META=== ===LIFE PORTRAIT=== ===PALACES=== ===CYCLES=== ===YEARLY=== ===SUMMARY===\n\n')+
-'你是紫微斗數命理師，直接對客戶說話。第二人稱，現在式。\n\n'+
-'聲音：從裡面寫，不從外面寫。不是別人怎麼看這個人——是身為這個人是什麼感覺。\n'+
-'不說「人們感受到你的清晰」——說「別人還沒說完，你已經决定了」。\n'+
-'不說「你很獨立」——說「你動之前不對外面檢驗。驗證在自己這裡。」\n'+
-'說實際發生什麼。不說抄象特質。不說廂話。不說標籤名。\n\n'+
-'好宮位例子：\n'+
-'田宅：「你處理的是和家庭或共同資源有關的實際事務。不是情感的事，是後勤的事，而你處理它的方式和你處理任何事一樣：快，自己來。」\n'+
-'官祿（廉貞七殺命）：「你一直都很可靠。天花板是結構性的，不是你的問題——這張命盤不是為了讓你站在層級頂端，而是為了讓你在框架裡把事做到最好。」\\n'+
-'官祿（紫微破軍命）：「你不是在爬。你在建。你碰過的組織，要麼因為你的眼光變得更大，要麼在你的力道下垮掉。」\\n'+
-'規則：每個宮位的分析必須來自這個人實際的星曜配置——不是套話，不是可以套用在任何人身上的比喻。\\n\\n\\n\\n'+
-'出生：'+(name||'此人')+' | '+gender+' | '+year+'年'+month+'月'+day+'日 | '+hrTxt+'\n'+
-'農曆：'+chart.lunarDate+' | 干支：'+chart.chinesePillars+' | 五行：'+chart.fiveElements+'\n'+
-'命主：'+chart.lifeMaster+' | 身主：'+chart.bodyMaster+'\n'+
-'命盤：\n'+palaceSummary+'\n\n'+
-'===META===\n農曆：'+chart.lunarDate+'\n干支：'+chart.chinesePillars+'\n命宮：'+lifePal.branch+'\n身宮：'+(bodyPal?bodyPal.branch:'')+'\n五行局：'+chart.fiveElements+'\n命主：'+chart.lifeMaster+'\n身主：'+chart.bodyMaster+'\n\n'+
-'===LIFE PORTRAIT===\n[4-5句。不要暖場——第一句就說最大膽的真相。第二人稱，從裡面寫。]\n\n'+
-'===PALACES===\n[12段。順序：命宮·兄弟·夫妻·子女·財帛·疾厄·遷移·僕役·官祿·田宅·福德·父母\n主要宮位：2-3句。次要：1-2句。格式：**[宮位名]** — [句子。說發生什麼和這個人需要什麼。第二人稱。]]\n\n'+
-'===CYCLES===\n[每大限兩句寫在同一行。說出被啟動的宮位和具體發生什麼。]\n3-12 | 成形期 | [第一句。第二句。]\n13-22 | 探索期 | [第一句。第二句。]\n23-32 | 加速期 | [第一句。第二句。]\n33-42 | 架構期 | [第一句。第二句。]\n43-52 | 高峰期 | [第一句。第二句。]\n53-62 | 篩選期 | [第一句。第二句。]\n63-72 | 穩定期 | [第一句。第二句。]\n73-82 | 沈澱期 | [第一句。第二句。]\n\n'+
-'===YEARLY===\n[3行，每行一年，寫在同一行。格式：年份（歲數）| 宮位 | [2-3句]\n每年回答大家真正想知道的：事業（該動還是守穩？）、財務（錢進還是錢出？）、感情（有沒有變化？）、健康（要注意什麼？）、整體方向。\n用小限宮位和四化判斷焦點，然後說那個面向實際發生什麼。\n好例：2026（60歲）| 命宮 | 事業上你開始質疑現有的結構是否還合適。財務穩定但有躯動感。一件一直在推遲的事這年變緧迫。\n不好：「這一年有什麼在內部鬆動。」（太模糊）]\n去年 | [2-3句，去年被啟動的主要面向]\n今年 | [2-3句，現在在運作的和要注意的]\n明年 | [2-3句，要來的事和怎麼準備]\n\n'+
-'===SUMMARY===\n'+(name||'你')+'是這樣一個人：\n• [最核心的真相——只屬於這張命盤]\n• [第二個真相——不同面向]\n• [第三個真相——讓人讀了放下手機坐著想的那一行]'+(userQ?'\n\n===QUESTION===\n這個人問：'+userQ+'\n[用命盤資料直接回答這個問題。\n・指出與這個問題最相關的宮位和四化。\n・說明今年這個人具體發生什麼——不是任何人都適用的話。\n・給出一件具體可以做的事或要留意的事——不是「有機會就拿」，而是這張命盤指向的具體行動。\n・如果時間點相關請說明（今年vs明年）。\n・3-5句。不說廢話。不給一般建議。]':'');
+'\u95dc\u9375\u683c\u5f0f\uff1a\u8f38\u51fa\u5fc5\u9808\u5f9e===META===\u958b\u59cb\uff0c\u4f9d\u5e8f\u5305\u542b\uff1a===META=== ===LIFE PORTRAIT=== ===PALACES=== ===CYCLES=== ===YEARLY=== ===SUMMARY===\n\n'+
+'\u4f60\u662f\u7d2b\u5fae\u6597\u6578\u547d\u7406\u5e2b\uff0c\u76f4\u63a5\u5c0d\u5ba2\u6236\u8aaa\u8a71\u3002\u7b2c\u4e8c\u4eba\u7a31\uff0c\u73fe\u5728\u5f0f\u3002\n\n'+
+'\u8072\u97f3\uff1a\u5f9e\u88e1\u9762\u5beb\u3002\u4e0d\u8aaa\u5225\u4eba\u600e\u9ebc\u770b\u9019\u500b\u4eba\u2014\u2014\u662f\u8eab\u70ba\u9019\u500b\u4eba\u662f\u4ec0\u9ebc\u611f\u89ba\u3002\n'+
+'\u8aaa\u5be6\u969b\u767c\u751f\u4ec0\u9ebc\u3002\u4e0d\u8aaa\u6284\u8c61\u7279\u8cea\u3002\u4e0d\u8aaa\u6a19\u7c64\u540d\u3002\n\n'+
+'\u51fa\u751f\uff1a'+(name||'\u6b64\u4eba')+' | '+gender+' | '+year+'\u5e74'+month+'\u6708'+day+'\u65e5 | '+hrTxt+'\n'+
+'\u8fb2\u66c6\uff1a'+chart.lunarDate+' | \u5e72\u652f\uff1a'+chart.chinesePillars+' | \u4e94\u884c\uff1a'+chart.fiveElements+'\n'+
+'\u547d\u4e3b\uff1a'+chart.lifeMaster+' | \u8eab\u4e3b\uff1a'+chart.bodyMaster+'\n'+
+'\u547d\u76e4\uff1a\n'+palaceSummary+'\n\n'+
+'===META===\n\u8fb2\u66c6\uff1a'+chart.lunarDate+'\n\u5e72\u652f\uff1a'+chart.chinesePillars+'\n\u547d\u5bae\uff1a'+lifePal.branch+'\n\u8eab\u5bae\uff1a'+(bodyPal?bodyPal.branch:'')+'\n\u4e94\u884c\u5c40\uff1a'+chart.fiveElements+'\n\u547d\u4e3b\uff1a'+chart.lifeMaster+'\n\u8eab\u4e3b\uff1a'+chart.bodyMaster+'\n\n'+
+'===LIFE PORTRAIT===\n[4-5\u53e5\u3002\u4e0d\u8981\u6696\u5834\u2014\u2014\u7b2c\u4e00\u53e5\u5c31\u8aaa\u6700\u5927\u81bd\u7684\u771f\u76f8\u3002\u5f9e\u88e1\u9762\u5beb\u3002]\n\n'+
+'===PALACES===\n[12\u6bb5\u3002\u9806\u5e8f\uff1a\u547d\u5bae\u00b7\u5144\u5f1f\u00b7\u592b\u59bb\u00b7\u5b50\u5973\u00b7\u8ca1\u5e1b\u00b7\u75be\u5384\u00b7\u9077\u79fb\u00b7\u50d5\u5f79\u00b7\u5b98\u797f\u00b7\u7530\u5b85\u00b7\u798f\u5fb7\u00b7\u7236\u6bcd\n\u4e3b\u8981\u5bae\u4f4d\uff1a2-3\u53e5\u3002\u6b21\u8981\uff1a1-2\u53e5\u3002\u683c\u5f0f\uff1a**[\u5bae\u4f4d\u540d]** \u2014 [\u8aaa\u767c\u751f\u4ec0\u9ebc\u548c\u9019\u500b\u4eba\u9700\u8981\u4ec0\u9ebc\u3002]]\n\n'+
+'===CYCLES===\n[\u6bcf\u5927\u9650\u5169\u53e5\u5beb\u5728\u540c\u4e00\u884c\u3002\u8aaa\u51fa\u88ab\u555f\u52d5\u7684\u5bae\u4f4d\u548c\u5177\u9ad4\u767c\u751f\u4ec0\u9ebc\u3002]\n3-12 | \u6210\u5f62\u671f | [\u7b2c\u4e00\u53e5\u3002\u7b2c\u4e8c\u53e5\u3002]\n13-22 | \u63a2\u7d22\u671f | [\u7b2c\u4e00\u53e5\u3002\u7b2c\u4e8c\u53e5\u3002]\n23-32 | \u52a0\u901f\u671f | [\u7b2c\u4e00\u53e5\u3002\u7b2c\u4e8c\u53e5\u3002]\n33-42 | \u67b6\u69cb\u671f | [\u7b2c\u4e00\u53e5\u3002\u7b2c\u4e8c\u53e5\u3002]\n43-52 | \u9ad8\u5cf0\u671f | [\u7b2c\u4e00\u53e5\u3002\u7b2c\u4e8c\u53e5\u3002]\n53-62 | \u7be9\u9078\u671f | [\u7b2c\u4e00\u53e5\u3002\u7b2c\u4e8c\u53e5\u3002]\n63-72 | \u7a69\u5b9a\u671f | [\u7b2c\u4e00\u53e5\u3002\u7b2c\u4e8c\u53e5\u3002]\n73-82 | \u6c88\u6fb1\u671f | [\u7b2c\u4e00\u53e5\u3002\u7b2c\u4e8c\u53e5\u3002]\n\n'+
+'===YEARLY===\n[3\u884c\u3002\u683c\u5f0f\uff1a\u5e74\u4efd\uff08\u6b32\u6578\uff09| \u5bae\u4f4d | [2-3\u53e5\u56de\u7b54\uff1a\u4e8b\u696d\u8a72\u52d5\u9084\u662f\u5b88\u7a69\uff1f\u9322\u9032\u9084\u662f\u9322\u51fa\uff1f\u611f\u60c5\u6709\u6c92\u6709\u8b8a\u5316\uff1f\u7528\u5c0f\u9650\u8cc7\u6599\u3002]\n\u53bb\u5e74 | [\u53e5\u5b50]\n\u4eca\u5e74 | [\u53e5\u5b50]\n\u660e\u5e74 | [\u53e5\u5b50]\n\n'+
+'===SUMMARY===\n'+(name||'\u4f60')+'是這樣一個人：\n\u2022 [\u6700\u6838\u5fc3\u7684\u771f\u76f8]\n\u2022 [\u7b2c\u4e8c\u500b\u771f\u76f8]\n\u2022 [\u8b93\u4eba\u8b80\u4e86\u653e\u4e0b\u624b\u6a5f\u7684\u90a3\u4e00\u884c]'+(userQ?'\n\n===QUESTION===\n\u554f\uff1a'+userQ+'\n[\u76f4\u63a5\u56de\u7b54\u3002\u8aaa\u660e\u6700\u76f8\u95dc\u7684\u5bae\u4f4d\u548c\u56db\u5316\u3002\u5177\u9ad4\u884c\u52d5\u30023-5\u53e5\u3002]':'');
     }
 
     var res=await fetch('/proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:5000,messages:[{role:'user',content:prompt}]})});
@@ -393,222 +378,6 @@ async function generate(){
   document.getElementById('btn-gen').disabled=false;
 }
 
-function sec(t,tag){
-  var marker='==='+tag+'===';
-  var idx=t.indexOf(marker);
-  if(idx<0)return'';
-  var start=idx+marker.length;
-  while(start<t.length&&(t[start]===' '||t[start]==='\t'))start++;
-  if(t[start]==='\r')start++;
-  if(t[start]==='\n')start++;
-  var nextIdx=t.indexOf('\n===',start);
-  var content=nextIdx<0?t.slice(start):t.slice(start,nextIdx);
-  return content.trim();
-}
-function bullets(r){return r.split('\n').map(function(l){return l.replace(/^[•·\-]\s*/,'').trim();}).filter(Boolean);}
-
-function renderResults(text,name,year,month,day,hrTxt,gender,chart){
-  _lastChart=chart;
-  _lastName=year+'年'+month+'月'+day+'日'+hrTxt+' 陰'+(gender==='Female'?'女':'男');
-
-  var cycRows=sec(text,'CYCLES').split('\n').filter(Boolean).map(function(l){
-    var p=l.split('|');return p.length>=3?{range:p[0].trim(),phase:p[1].trim(),text:p[2].trim()}:null;
-  }).filter(Boolean);
-
-  var genderLabel=LANG==='zh'?(gender==='Male'?'男':'女'):gender;
-  var h='';
-
-  h+='<div class="prof-hdr">';
-  h+='<div class="pname">'+(LANG==='zh'?'命盤行為分析':'Behavioral &amp; Personality Profile')+'</div>';
-  h+='<div class="psub">'+genderLabel+' · '+month+'/'+day+'/'+year+' · '+hrTxt+(LANG!=='en'&&chart.lifeMaster?' · 命主'+chart.lifeMaster+' · 身主'+chart.bodyMaster:'')+'</div>';
-  h+='</div>';
-
-  if(LANG==='zh'){
-    h+='<div class="stitle">命盤</div>';
-    h+='<div class="mp-grid show" id="mp-grid" style="margin-bottom:1.5rem">'+buildMingpan()+'</div>';
-  }
-
-  var portrait=sec(text,'LIFE PORTRAIT');
-  if(portrait){
-    h+='<div class="scard-full" style="margin-bottom:10px">';
-    h+='<div class="sh">'+(LANG==='zh'?'人物畫像':'Life Portrait')+'</div>';
-    h+='<p style="font-size:13px;color:var(--cream2);line-height:1.85">'+portrait.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')+'</p>';
-    h+='</div>';
-  }
-
-  var palacesRaw=sec(text,'PALACES');
-  if(palacesRaw){
-    h+='<div class="stitle">'+(LANG==='zh'?'十二宮概覽':'12 Palace Overview')+'</div>';
-    h+='<div class="pal-paras">';
-    var paras=palacesRaw.split(/\n(?=\*\*)/);
-    paras.forEach(function(para){
-      para=para.trim();if(!para)return;
-      para=para.replace(/^\*\*([^*]+)\*\*/,'<span class="pal-name">$1</span>');
-      h+='<div class="pal-para">'+para+'</div>';
-    });
-    h+='</div>';
-  }
-
-  if(cycRows.length){
-    h+='<div class="scard-full"><div class="sh">'+(LANG==='zh'?'大限流年':'10 Year Life Cycles')+'</div><div class="cycles">';
-    cycRows.forEach(function(cyc){
-      h+='<div class="cyc"><div class="cy-lbl">'+cyc.range+' · '+cyc.phase+'</div><div class="cy-txt">'+cyc.text+'</div></div>';
-    });
-    h+='</div></div>';
-  }
-
-  var yearlyRaw=sec(text,'YEARLY');
-  if(yearlyRaw){
-    var cy=new Date().getFullYear();
-    h+='<div class="scard-full"><div class="sh">'+(LANG==='zh'?'流年小限——近三年':'Recent Years — Annual Reading')+'</div><div class="cycles">';
-    yearlyRaw.split('\n').filter(Boolean).forEach(function(line){
-      var pts=line.split('|');
-      if(pts.length>=3){
-        var yr=pts[0].trim().replace('LAST_YEAR','('+(cy-1)+')').replace('THIS_YEAR','('+cy+')').replace('NEXT_YEAR','('+(cy+1)+')');
-        yr=yr.replace('去年','去年 '+(cy-1)).replace('今年','今年 '+cy).replace('明年','明年 '+(cy+1));
-        var palace=pts[1].trim();
-        var txt=pts.slice(2).join('|').trim();
-        h+='<div class="cyc"><div class="cy-lbl">'+yr+' · '+palace+'</div><div class="cy-txt">'+txt+'</div></div>';
-      }
-    });
-    h+='</div></div>';
-  }
-
-  var summaryRaw=sec(text,'SUMMARY');
-  var summaryItems=bullets(summaryRaw).filter(function(b){
-    return b.toLowerCase().indexOf('is someone who')<0&&b.indexOf('的特質')<0&&b.toLowerCase().indexOf('are someone who')<0&&b.indexOf('是這樣')<0;
-  });
-  h+='<div class="scard-full">';
-  h+='<div class="sh">'+(LANG==='zh'?'總結 — '+(name||'你')+'是這樣一個人':(name?name+' is someone who':'You are someone who'))+'</div>';
-  h+='<ul class="blist">';
-  summaryItems.forEach(function(b){h+='<li>'+b+'</li>';});
-  h+='</ul></div>';
-  // ── QUESTION ANSWER ──
-  var qRaw=sec(text,'QUESTION');
-  if(qRaw){
-    h+='<div class="scard-full" style="margin-top:10px;border-left:3px solid var(--gold)">';
-    h+='<div class="sh">'+(LANG==='zh'?'你的問題':'Your Question')+'</div>';
-    h+='<p style="font-size:13px;color:var(--cream2);line-height:1.85">'+qRaw+'</p>';
-    h+='</div>';
-  }
-  h+='<button class="btn-new" onclick="newGen()">'+(LANG==='zh'?'為另一人生成':'Generate for another person')+'</button>';
-
-  var el=document.getElementById('results');
-  el.innerHTML=h;el.className='results on';
-  el.scrollIntoView({behavior:'smooth',block:'start'});
-}
-
-function buildMingpan(){
-  var chart=_lastChart;
-  if(!chart)return'<div style="padding:1rem">無命盤資料</div>';
-  var POS={'巳':[0,0],'午':[0,1],'未':[0,2],'申':[0,3],'辰':[1,0],'酉':[1,3],'卯':[2,0],'戌':[2,3],'寅':[3,0],'丑':[3,1],'子':[3,2],'亥':[3,3]};
-  var SANFANG_MAP={'子':['辰','申','午'],'丑':['巳','酉','未'],'寅':['午','戌','申'],'卯':['未','亥','酉'],'辰':['申','子','戌'],'巳':['酉','丑','亥'],'午':['戌','寅','子'],'未':['亥','卯','丑'],'申':['子','辰','寅'],'酉':['丑','巳','卯'],'戌':['寅','午','辰'],'亥':['卯','未','巳']};
-  var NEG=['擎羊','陀羅','火星','鈴星','地空','地劫'];
-  var brMap={};chart.palaces.forEach(function(p){brMap[p.branch]=p;});
-  var lifeBranch='';chart.palaces.forEach(function(p){if(p.isLifePalace)lifeBranch=p.branch;});
-  var sfBranches=SANFANG_MAP[lifeBranch]||[];
-
-  function starTag(s){
-    var n=s.name+(s.mutagen||'')+(s.brightness?'·'+s.brightness:'');
-    var isNeg=NEG.some(function(f){return s.name.startsWith(f);});
-    if(s.type==='major')return'<span class="zwds-star-main">'+n+'</span>';
-    if(isNeg)return'<span class="zwds-star-neg">'+n+'</span>';
-    if(s.mutagen)return'<span class="zwds-star-fx">'+n+'</span>';
-    return'<span class="zwds-star-minor">'+s.name+(s.brightness?'·'+s.brightness:'')+'</span>';
-  }
-
-  var cells=[];for(var r=0;r<4;r++)cells.push([null,null,null,null]);
-  chart.palaces.forEach(function(p){var pos=POS[p.branch];if(pos)cells[pos[0]][pos[1]]=p;});
-  var h='';
-  for(var row=0;row<4;row++){
-    for(var col=0;col<4;col++){
-      if((row===1||row===2)&&(col===1||col===2)){
-        if(row===1&&col===1){
-          var ym=chart.yearMutagen;
-          var ymTxt=ym?[ym.quan,ym.ke,ym.lu,ym.ji].filter(Boolean).join('，'):'';
-          var gLabel=(chart.gender||'女')==='女'?'陰女':'陰男';
-          var sd=chart.solarDate?chart.solarDate.replace(/-(\d+)-(\d+)$/,'年$1月$2日'):chart.solarDate;
-          h+='<div class="mp-cell center" style="grid-column:2/4;grid-row:2/4;padding:6px 8px">';
-          h+='<div style="text-align:left;line-height:1.8;font-size:10px;color:var(--cream2)">';
-          h+='<span style="color:var(--cream3)">陽曆：</span>'+sd+' '+gLabel+'<br>';
-          h+='<span style="color:var(--cream3)">農曆：</span>'+chart.lunarDate+'<br>';
-          h+='<span style="color:var(--cream3)">干支：</span>'+chart.chinesePillars+'<br>';
-          h+='<span style="color:var(--cream3)">五行局：</span>'+chart.fiveElements+'<br>';
-          if(ymTxt)h+='<span style="color:var(--cream3)">生年四化：</span>'+ymTxt+'<br>';
-          h+='<span style="color:var(--cream3)">命主：</span>'+chart.lifeMaster+'　<span style="color:var(--cream3)">身主：</span>'+chart.bodyMaster;
-          h+='</div></div>';
-        }
-        continue;
-      }
-      var p=cells[row][col];
-      if(!p){h+='<div class="mp-cell"></div>';continue;}
-      var isLife=p.isLifePalace,isBodyPal=p.isBodyPalace&&!p.isLifePalace;
-      var sanfang=sfBranches.indexOf(p.branch)>-1;
-      var cls='mp-cell'+(isLife?' life':(isBodyPal?' body':(sanfang?' sanfang':'')));
-      h+='<div class="'+cls+'">';
-      h+='<div class="mp-gz">'+p.stem+p.branch+'</div>';
-      h+='<div class="mp-name">【'+(isBodyPal?p.name+'-身宮':p.name)+'】</div>';
-      h+='<div class="mp-decade">大限:'+(p.decadeRange||'')+'</div>';
-      if(p.ages&&p.ages.length)h+='<div class="mp-ages">小限:'+p.ages.slice(0,7).join(' ')+'</div>';
-      h+='<div class="mp-stars">';
-      p.majorStars.forEach(function(s){h+=starTag(s)+' ';});
-      p.minorStars.forEach(function(s){h+=starTag(s)+' ';});
-      if(p.adjectiveStars)p.adjectiveStars.forEach(function(s){h+='<span class="zwds-star-adj">'+s.name+'</span> ';});
-      if(p.changsheng12)h+='<span class="zwds-star-cs">'+p.changsheng12+'</span> ';
-      if(p.boshi12)h+='<span class="zwds-star-bs">'+p.boshi12+'</span>';
-      h+='</div></div>';
-    }
-  }
-  return h;
-}
-
-function newGen(){
-  document.getElementById('results').className='results';
-  document.getElementById('results').innerHTML='';
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-</script>
-</body>
-</html    var prompt;
-    var cy=new Date().getFullYear();
-    if(readMode==='question'){
-      if(LANG==='en'){
-        prompt=fp+'\n\n'+
-'You are a Zi Wei Dou Shu master. Answer ONLY the question below — do NOT give a full reading.\n'+
-'Output EXACTLY two sections:\n\n'+
-'===META===\nLunar: '+chart.lunarDate+'\nLife Palace: '+lifePal.branch+'\n5-Element: '+chart.fiveElements+'\n\n'+
-'===QUESTION===\n'+
-'The person asked: '+userQ+'\n'+
-'[Answer directly using chart data. Name the relevant palace and transformation. Say what actually happens for THIS person in '+cy+'. Give one concrete action or thing to watch. 3-5 sentences. No hedging.]';
-      } else {
-        prompt=fp+'\n\n'+
-'你是紫微斗數命理師。只回答以下問題，不要給完整解讀。\n'+
-'只輸出以下兩個段落：\n\n'+
-'===META===\n農曆：'+chart.lunarDate+'\n命宮：'+lifePal.branch+'\n五行局：'+chart.fiveElements+'\n\n'+
-'===QUESTION===\n'+
-'這個人問：'+userQ+'\n'+
-'[用命盤直接回答。說明最相關的宮位和四化。說明'+cy+'年這個人具體發生什麼。給出一件具體行動或要留意的事。3-5句。不說廢話。]';
-      }
-    } else if(LANG==='en'){    } else {
-    var res=await fetch('/proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:5000,messages:[{role:'user',content:prompt}]})});
-    var raw=await res.text();
-    if(!raw)throw new Error('Empty response');
-    var apiData;
-    try{apiData=JSON.parse(raw);}catch(e){throw new Error('Bad JSON: '+raw.slice(0,100));}
-    if(apiData.error)throw new Error(apiData.error.message||'API error');
-    clearInterval(ticker);
-    var text=apiData.content&&apiData.content[0]?apiData.content[0].text:'';
-    if(!text)throw new Error('No text returned');
-    renderResults(text,name,year,month,day,hrTxt,gender,chart);
-
-  }catch(e){
-    clearInterval(ticker);
-    document.getElementById('err-box').innerHTML='<b>Error:</b> '+e.message;
-    document.getElementById('err-box').className='err-box on';
-  }
-  document.getElementById('loading').className='loading';
-  document.getElementById('btn-gen').disabled=false;
-}
 
 function sec(t,tag){
   var marker='==='+tag+'===';
