@@ -288,6 +288,8 @@ async function generate(){
     }
 
     var fp='CHART DATA (do not output this section):\n'+
+      'Current year: '+cy+' (use this year for all yearly references)\n'+
+      'Age system: Western age (e.g. born 1967, age in 2026 = 59). Use the age values provided in the yearly data — do not calculate yourself.\n'+
       'Patterns: '+patternsStr+'\n'+
       'Life Palace: '+lifePalaceStars+'\n'+
       'Body Palace: '+bodyPalaceStr+'\n'+
@@ -299,7 +301,28 @@ async function generate(){
 
   
     var prompt;
-    if(LANG==='en'){
+    var cy=new Date().getFullYear();
+    if(readMode==='question'){
+      // Question-only mode: short focused prompt
+      if(LANG==='en'){
+        prompt=fp+'\n\n'+
+'You are a Zi Wei Dou Shu master. Answer ONLY the question below. Do not give a full reading.\n'+
+'Output ONLY two sections in this exact order:\n\n'+
+'===META===\nLunar: '+chart.lunarDate+'\nLife Palace: '+lifePal.branch+'\n5-Element: '+chart.fiveElements+'\n\n'+
+'===QUESTION===\n'+
+'The person asked: '+userQ+'\n'+
+'[Use the chart data to answer directly. Name the specific palace and transformation most relevant. Say what actually happens for THIS person this year (current year: '+cy+'). Give one concrete action or thing to watch. Include timing if relevant. 3-5 sentences. No hedging.]';
+      } else {
+        prompt=fp+'\n\n'+
+'你是紫微斗數命理師。只回答以下問題，不要給完整解讀。\n'+
+'只輸出以下兩個段落，順序如下：\n\n'+
+'===META===\n農曆：'+chart.lunarDate+'\n命宮：'+lifePal.branch+'\n五行局：'+chart.fiveElements+'\n\n'+
+'===QUESTION===\n'+
+'這個人問：'+userQ+'\n'+
+'[用命盤資料直接回答。指出最相關的宮位和四化。說明今年（'+cy+'年）這個人具體發生什麼。給出一件具體可以做的事或要留意的事。如果時間點相關請說明。3-5句。不說廢話。]';
+      }
+    } else if(LANG==='en'){
+
       prompt=fp+'\n\n'+(readMode==='question'?'CRITICAL FORMAT: Output ONLY ===META=== then ===QUESTION=== — do NOT output LIFE PORTRAIT, PALACES, CYCLES, YEARLY, or SUMMARY.\n\n':'CRITICAL FORMAT: Output MUST begin with ===META=== and include ALL sections in order: ===META=== ===LIFE PORTRAIT=== ===PALACES=== ===CYCLES=== ===YEARLY=== ===SUMMARY===\n\n')+
 'You are a Zi Wei Dou Shu master. Speak directly to the person. Second person. Present tense.\n\n'+
 'VOICE: Write from the INSIDE. Not how others see them — what it feels like to BE them.\n'+
@@ -325,6 +348,7 @@ async function generate(){
 '===YEARLY===\n[3 lines. Each on ONE LINE. Format: YEAR (Age X) | Palace | [2-3 sentences]\nEach year: answer what people want to know — Career (move or hold?), Money (in or out?), Relationships (anything shifting?), Health, Overall direction.\nUse small limit palace and 4 transformations to determine focus area, then say what practically happens.\nGOOD: 2026 (Age 60) | Life Palace | Career-wise you are questioning whether the current structure still fits. Financially stable but restless. Something you have been postponing becomes urgent.\nBAD: This is a year of internal shifts. (too vague)]\nLAST_YEAR | [2-3 practical sentences]\nTHIS_YEAR | [2-3 practical sentences on what to watch now]\nNEXT_YEAR | [2-3 practical sentences on what is coming]\n\n'+
 '===SUMMARY===\n'+(name||'You')+' are someone who:\n• [essential truth — specific to this chart]\n• [second truth — different dimension]\n• [third truth — the line they put the phone down for]'+(userQ?'\n\n===QUESTION===\nThe person asked: '+userQ+'\n[Answer this specific question using the chart data.\n- Name the specific palace and transformation most relevant to this question.\n- Say what is actually happening this year for THIS person — not generic advice.\n- Give one concrete action or thing to watch for. Not \'if opportunity comes take it\' — the specific move this chart points to.\n- Include timing if relevant (this year vs next).\n- 3-5 sentences. No hedging. No platitudes.]':'');
     } else {
+
       prompt=fp+'\n\n'+
 +(readMode==='question'?'關鍵格式：只輸出===META===然後===QUESTION===——不要輸出LIFE PORTRAIT、PALACES、CYCLES、YEARLY或SUMMARY。\n\n':'關鍵格式：輸出必須從===META===開始，依序包含所有段落：===META=== ===LIFE PORTRAIT=== ===PALACES=== ===CYCLES=== ===YEARLY=== ===SUMMARY===\n\n')+
 '你是紫微斗數命理師，直接對客戶說話。第二人稱，現在式。\n\n'+
@@ -349,6 +373,223 @@ async function generate(){
 '===SUMMARY===\n'+(name||'你')+'是這樣一個人：\n• [最核心的真相——只屬於這張命盤]\n• [第二個真相——不同面向]\n• [第三個真相——讓人讀了放下手機坐著想的那一行]'+(userQ?'\n\n===QUESTION===\n這個人問：'+userQ+'\n[用命盤資料直接回答這個問題。\n・指出與這個問題最相關的宮位和四化。\n・說明今年這個人具體發生什麼——不是任何人都適用的話。\n・給出一件具體可以做的事或要留意的事——不是「有機會就拿」，而是這張命盤指向的具體行動。\n・如果時間點相關請說明（今年vs明年）。\n・3-5句。不說廢話。不給一般建議。]':'');
     }
 
+    var res=await fetch('/proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:5000,messages:[{role:'user',content:prompt}]})});
+    var raw=await res.text();
+    if(!raw)throw new Error('Empty response');
+    var apiData;
+    try{apiData=JSON.parse(raw);}catch(e){throw new Error('Bad JSON: '+raw.slice(0,100));}
+    if(apiData.error)throw new Error(apiData.error.message||'API error');
+    clearInterval(ticker);
+    var text=apiData.content&&apiData.content[0]?apiData.content[0].text:'';
+    if(!text)throw new Error('No text returned');
+    renderResults(text,name,year,month,day,hrTxt,gender,chart);
+
+  }catch(e){
+    clearInterval(ticker);
+    document.getElementById('err-box').innerHTML='<b>Error:</b> '+e.message;
+    document.getElementById('err-box').className='err-box on';
+  }
+  document.getElementById('loading').className='loading';
+  document.getElementById('btn-gen').disabled=false;
+}
+
+function sec(t,tag){
+  var marker='==='+tag+'===';
+  var idx=t.indexOf(marker);
+  if(idx<0)return'';
+  var start=idx+marker.length;
+  while(start<t.length&&(t[start]===' '||t[start]==='\t'))start++;
+  if(t[start]==='\r')start++;
+  if(t[start]==='\n')start++;
+  var nextIdx=t.indexOf('\n===',start);
+  var content=nextIdx<0?t.slice(start):t.slice(start,nextIdx);
+  return content.trim();
+}
+function bullets(r){return r.split('\n').map(function(l){return l.replace(/^[•·\-]\s*/,'').trim();}).filter(Boolean);}
+
+function renderResults(text,name,year,month,day,hrTxt,gender,chart){
+  _lastChart=chart;
+  _lastName=year+'年'+month+'月'+day+'日'+hrTxt+' 陰'+(gender==='Female'?'女':'男');
+
+  var cycRows=sec(text,'CYCLES').split('\n').filter(Boolean).map(function(l){
+    var p=l.split('|');return p.length>=3?{range:p[0].trim(),phase:p[1].trim(),text:p[2].trim()}:null;
+  }).filter(Boolean);
+
+  var genderLabel=LANG==='zh'?(gender==='Male'?'男':'女'):gender;
+  var h='';
+
+  h+='<div class="prof-hdr">';
+  h+='<div class="pname">'+(LANG==='zh'?'命盤行為分析':'Behavioral &amp; Personality Profile')+'</div>';
+  h+='<div class="psub">'+genderLabel+' · '+month+'/'+day+'/'+year+' · '+hrTxt+(LANG!=='en'&&chart.lifeMaster?' · 命主'+chart.lifeMaster+' · 身主'+chart.bodyMaster:'')+'</div>';
+  h+='</div>';
+
+  if(LANG==='zh'){
+    h+='<div class="stitle">命盤</div>';
+    h+='<div class="mp-grid show" id="mp-grid" style="margin-bottom:1.5rem">'+buildMingpan()+'</div>';
+  }
+
+  var portrait=sec(text,'LIFE PORTRAIT');
+  if(portrait){
+    h+='<div class="scard-full" style="margin-bottom:10px">';
+    h+='<div class="sh">'+(LANG==='zh'?'人物畫像':'Life Portrait')+'</div>';
+    h+='<p style="font-size:13px;color:var(--cream2);line-height:1.85">'+portrait.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')+'</p>';
+    h+='</div>';
+  }
+
+  var palacesRaw=sec(text,'PALACES');
+  if(palacesRaw){
+    h+='<div class="stitle">'+(LANG==='zh'?'十二宮概覽':'12 Palace Overview')+'</div>';
+    h+='<div class="pal-paras">';
+    var paras=palacesRaw.split(/\n(?=\*\*)/);
+    paras.forEach(function(para){
+      para=para.trim();if(!para)return;
+      para=para.replace(/^\*\*([^*]+)\*\*/,'<span class="pal-name">$1</span>');
+      h+='<div class="pal-para">'+para+'</div>';
+    });
+    h+='</div>';
+  }
+
+  if(cycRows.length){
+    h+='<div class="scard-full"><div class="sh">'+(LANG==='zh'?'大限流年':'10 Year Life Cycles')+'</div><div class="cycles">';
+    cycRows.forEach(function(cyc){
+      h+='<div class="cyc"><div class="cy-lbl">'+cyc.range+' · '+cyc.phase+'</div><div class="cy-txt">'+cyc.text+'</div></div>';
+    });
+    h+='</div></div>';
+  }
+
+  var yearlyRaw=sec(text,'YEARLY');
+  if(yearlyRaw){
+    var cy=new Date().getFullYear();
+    h+='<div class="scard-full"><div class="sh">'+(LANG==='zh'?'流年小限——近三年':'Recent Years — Annual Reading')+'</div><div class="cycles">';
+    yearlyRaw.split('\n').filter(Boolean).forEach(function(line){
+      var pts=line.split('|');
+      if(pts.length>=3){
+        var yr=pts[0].trim().replace('LAST_YEAR','('+(cy-1)+')').replace('THIS_YEAR','('+cy+')').replace('NEXT_YEAR','('+(cy+1)+')');
+        yr=yr.replace('去年','去年 '+(cy-1)).replace('今年','今年 '+cy).replace('明年','明年 '+(cy+1));
+        var palace=pts[1].trim();
+        var txt=pts.slice(2).join('|').trim();
+        h+='<div class="cyc"><div class="cy-lbl">'+yr+' · '+palace+'</div><div class="cy-txt">'+txt+'</div></div>';
+      }
+    });
+    h+='</div></div>';
+  }
+
+  var summaryRaw=sec(text,'SUMMARY');
+  var summaryItems=bullets(summaryRaw).filter(function(b){
+    return b.toLowerCase().indexOf('is someone who')<0&&b.indexOf('的特質')<0&&b.toLowerCase().indexOf('are someone who')<0&&b.indexOf('是這樣')<0;
+  });
+  h+='<div class="scard-full">';
+  h+='<div class="sh">'+(LANG==='zh'?'總結 — '+(name||'你')+'是這樣一個人':(name?name+' is someone who':'You are someone who'))+'</div>';
+  h+='<ul class="blist">';
+  summaryItems.forEach(function(b){h+='<li>'+b+'</li>';});
+  h+='</ul></div>';
+  // ── QUESTION ANSWER ──
+  var qRaw=sec(text,'QUESTION');
+  if(qRaw){
+    h+='<div class="scard-full" style="margin-top:10px;border-left:3px solid var(--gold)">';
+    h+='<div class="sh">'+(LANG==='zh'?'你的問題':'Your Question')+'</div>';
+    h+='<p style="font-size:13px;color:var(--cream2);line-height:1.85">'+qRaw+'</p>';
+    h+='</div>';
+  }
+  h+='<button class="btn-new" onclick="newGen()">'+(LANG==='zh'?'為另一人生成':'Generate for another person')+'</button>';
+
+  var el=document.getElementById('results');
+  el.innerHTML=h;el.className='results on';
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function buildMingpan(){
+  var chart=_lastChart;
+  if(!chart)return'<div style="padding:1rem">無命盤資料</div>';
+  var POS={'巳':[0,0],'午':[0,1],'未':[0,2],'申':[0,3],'辰':[1,0],'酉':[1,3],'卯':[2,0],'戌':[2,3],'寅':[3,0],'丑':[3,1],'子':[3,2],'亥':[3,3]};
+  var SANFANG_MAP={'子':['辰','申','午'],'丑':['巳','酉','未'],'寅':['午','戌','申'],'卯':['未','亥','酉'],'辰':['申','子','戌'],'巳':['酉','丑','亥'],'午':['戌','寅','子'],'未':['亥','卯','丑'],'申':['子','辰','寅'],'酉':['丑','巳','卯'],'戌':['寅','午','辰'],'亥':['卯','未','巳']};
+  var NEG=['擎羊','陀羅','火星','鈴星','地空','地劫'];
+  var brMap={};chart.palaces.forEach(function(p){brMap[p.branch]=p;});
+  var lifeBranch='';chart.palaces.forEach(function(p){if(p.isLifePalace)lifeBranch=p.branch;});
+  var sfBranches=SANFANG_MAP[lifeBranch]||[];
+
+  function starTag(s){
+    var n=s.name+(s.mutagen||'')+(s.brightness?'·'+s.brightness:'');
+    var isNeg=NEG.some(function(f){return s.name.startsWith(f);});
+    if(s.type==='major')return'<span class="zwds-star-main">'+n+'</span>';
+    if(isNeg)return'<span class="zwds-star-neg">'+n+'</span>';
+    if(s.mutagen)return'<span class="zwds-star-fx">'+n+'</span>';
+    return'<span class="zwds-star-minor">'+s.name+(s.brightness?'·'+s.brightness:'')+'</span>';
+  }
+
+  var cells=[];for(var r=0;r<4;r++)cells.push([null,null,null,null]);
+  chart.palaces.forEach(function(p){var pos=POS[p.branch];if(pos)cells[pos[0]][pos[1]]=p;});
+  var h='';
+  for(var row=0;row<4;row++){
+    for(var col=0;col<4;col++){
+      if((row===1||row===2)&&(col===1||col===2)){
+        if(row===1&&col===1){
+          var ym=chart.yearMutagen;
+          var ymTxt=ym?[ym.quan,ym.ke,ym.lu,ym.ji].filter(Boolean).join('，'):'';
+          var gLabel=(chart.gender||'女')==='女'?'陰女':'陰男';
+          var sd=chart.solarDate?chart.solarDate.replace(/-(\d+)-(\d+)$/,'年$1月$2日'):chart.solarDate;
+          h+='<div class="mp-cell center" style="grid-column:2/4;grid-row:2/4;padding:6px 8px">';
+          h+='<div style="text-align:left;line-height:1.8;font-size:10px;color:var(--cream2)">';
+          h+='<span style="color:var(--cream3)">陽曆：</span>'+sd+' '+gLabel+'<br>';
+          h+='<span style="color:var(--cream3)">農曆：</span>'+chart.lunarDate+'<br>';
+          h+='<span style="color:var(--cream3)">干支：</span>'+chart.chinesePillars+'<br>';
+          h+='<span style="color:var(--cream3)">五行局：</span>'+chart.fiveElements+'<br>';
+          if(ymTxt)h+='<span style="color:var(--cream3)">生年四化：</span>'+ymTxt+'<br>';
+          h+='<span style="color:var(--cream3)">命主：</span>'+chart.lifeMaster+'　<span style="color:var(--cream3)">身主：</span>'+chart.bodyMaster;
+          h+='</div></div>';
+        }
+        continue;
+      }
+      var p=cells[row][col];
+      if(!p){h+='<div class="mp-cell"></div>';continue;}
+      var isLife=p.isLifePalace,isBodyPal=p.isBodyPalace&&!p.isLifePalace;
+      var sanfang=sfBranches.indexOf(p.branch)>-1;
+      var cls='mp-cell'+(isLife?' life':(isBodyPal?' body':(sanfang?' sanfang':'')));
+      h+='<div class="'+cls+'">';
+      h+='<div class="mp-gz">'+p.stem+p.branch+'</div>';
+      h+='<div class="mp-name">【'+(isBodyPal?p.name+'-身宮':p.name)+'】</div>';
+      h+='<div class="mp-decade">大限:'+(p.decadeRange||'')+'</div>';
+      if(p.ages&&p.ages.length)h+='<div class="mp-ages">小限:'+p.ages.slice(0,7).join(' ')+'</div>';
+      h+='<div class="mp-stars">';
+      p.majorStars.forEach(function(s){h+=starTag(s)+' ';});
+      p.minorStars.forEach(function(s){h+=starTag(s)+' ';});
+      if(p.adjectiveStars)p.adjectiveStars.forEach(function(s){h+='<span class="zwds-star-adj">'+s.name+'</span> ';});
+      if(p.changsheng12)h+='<span class="zwds-star-cs">'+p.changsheng12+'</span> ';
+      if(p.boshi12)h+='<span class="zwds-star-bs">'+p.boshi12+'</span>';
+      h+='</div></div>';
+    }
+  }
+  return h;
+}
+
+function newGen(){
+  document.getElementById('results').className='results';
+  document.getElementById('results').innerHTML='';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html    var prompt;
+    var cy=new Date().getFullYear();
+    if(readMode==='question'){
+      if(LANG==='en'){
+        prompt=fp+'\n\n'+
+'You are a Zi Wei Dou Shu master. Answer ONLY the question below — do NOT give a full reading.\n'+
+'Output EXACTLY two sections:\n\n'+
+'===META===\nLunar: '+chart.lunarDate+'\nLife Palace: '+lifePal.branch+'\n5-Element: '+chart.fiveElements+'\n\n'+
+'===QUESTION===\n'+
+'The person asked: '+userQ+'\n'+
+'[Answer directly using chart data. Name the relevant palace and transformation. Say what actually happens for THIS person in '+cy+'. Give one concrete action or thing to watch. 3-5 sentences. No hedging.]';
+      } else {
+        prompt=fp+'\n\n'+
+'你是紫微斗數命理師。只回答以下問題，不要給完整解讀。\n'+
+'只輸出以下兩個段落：\n\n'+
+'===META===\n農曆：'+chart.lunarDate+'\n命宮：'+lifePal.branch+'\n五行局：'+chart.fiveElements+'\n\n'+
+'===QUESTION===\n'+
+'這個人問：'+userQ+'\n'+
+'[用命盤直接回答。說明最相關的宮位和四化。說明'+cy+'年這個人具體發生什麼。給出一件具體行動或要留意的事。3-5句。不說廢話。]';
+      }
+    } else if(LANG==='en'){    } else {
     var res=await fetch('/proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:5000,messages:[{role:'user',content:prompt}]})});
     var raw=await res.text();
     if(!raw)throw new Error('Empty response');
