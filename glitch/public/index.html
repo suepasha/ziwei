@@ -112,6 +112,10 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
       </div>
     </div>
     <div class="field">
+      <label id="t-ctx">About you <span id="t-ctx-note" style="font-weight:300;text-transform:none;letter-spacing:0;font-size:11px;color:var(--cream3)">(optional — the more specific, the more personal your reading)</span></label>
+      <textarea id="f-ctx" rows="3" placeholder="e.g. I work in tech, married 20 years, two kids, just changed careers…" style="width:100%;padding:10px 14px;background:var(--ink3);border:1px solid var(--border);border-radius:6px;color:var(--cream);font-family:'Jost',sans-serif;font-size:13px;outline:none;resize:vertical;line-height:1.6"></textarea>
+    </div>
+    <div class="field">
       <div class="grid2">
         <div><label id="t-yr">Year</label><select id="f-yr"></select></div>
         <div><label id="t-hr">Birth Hour</label>
@@ -146,8 +150,8 @@ var MO={
   zh:['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月']
 };
 var TX={
-  en:{birth:'Birth Information',name:'Name (optional)',ph:'Enter name…',gender:'Gender',male:'Male',female:'Female',yr:'Year',mo:'Month',dy:'Day',hr:'Birth Hour',btn:'Generate',zi:'Born after midnight? (00:00–00:59)',zino:'No (23:00–23:59)',ziyes:'Yes (00:00–00:59)'},
-  zh:{birth:'出生資料',name:'姓名（選填）',ph:'輸入姓名…',gender:'性別',male:'男',female:'女',yr:'年',mo:'月',dy:'日',hr:'出生時辰',btn:'送出',zi:'午夜後出生？(00:00–00:59)',zino:'否 (23:00–23:59)',ziyes:'是 (00:00–00:59)'}
+  en:{birth:'Birth Information',name:'Name (optional)',ph:'Enter name…',gender:'Gender',male:'Male',female:'Female',yr:'Year',mo:'Month',dy:'Day',hr:'Birth Hour',btn:'Generate',zi:'Born after midnight? (00:00–00:59)',zino:'No (23:00–23:59)',ziyes:'Yes (00:00–00:59)',ctx:'About you',ctxph:'e.g. I work in tech, married 20 years, two kids, just changed careers…',ctxlbl:'optional — the more specific, the more personal your reading'},
+  zh:{birth:'出生資料',name:'姓名（選填）',ph:'輸入姓名…',gender:'性別',male:'男',female:'女',yr:'年',mo:'月',dy:'日',hr:'出生時辰',btn:'送出',zi:'午夜後出生？(00:00–00:59)',zino:'否 (23:00–23:59)',ziyes:'是 (00:00–00:59)',ctx:'關於你',ctxph:'例如：我在科技業工作，結婚20年，兩個孩子，剛換了跑道…',ctxlbl:'選填——越具體，解讀越貼近你'}
 };
 
 function setLang(l){
@@ -174,6 +178,9 @@ function setLang(l){
   document.getElementById('t-zi').textContent=t.zi;
   document.getElementById('t-zi-no').textContent=t.zino;
   document.getElementById('t-zi-yes').textContent=t.ziyes;
+  document.getElementById('t-ctx').textContent=t.ctx;
+  document.getElementById('t-ctx-note').textContent=t.ctxlbl;
+  document.getElementById('f-ctx').placeholder=t.ctxph;
   rebuildMonths();
 }
 
@@ -201,6 +208,7 @@ function rebuildMonths(){
 
 async function generate(){
   var name=document.getElementById('f-name').value.trim();
+  var userCtx=document.getElementById('f-ctx').value.trim();
   if(name)localStorage.setItem('zwds_name',name);
   var year=document.getElementById('f-yr').value;
   var month=document.getElementById('f-mo').value;
@@ -292,12 +300,20 @@ async function generate(){
 'DO NOT: add disclaimers. No star names. No Chinese characters.\\n\\n'+
 'WRONG: "You walk into a room and the conversation shifts. People think you are cold when you are just fast."\\n'+
 'RIGHT: "You process fast and decide alone. By the time others are still talking, you are already somewhere else in your head. This is not arrogance. It is how you are built."\\n\\n'+
-'Birth: '+(name||'this person')+' | '+gender+' | '+year+'/'+month+'/'+day+' | '+hrTxt+'\n'+
+'Birth: '+(name||'this person')+' | '+gender+' | '+year+'/'+month+'/'+day+' | '+hrTxt+'\n'+(userCtx?'Personal context (use this to make the reading specific and grounded in their actual life): '+userCtx+'\n':'')+
 'Chart:\n'+palaceSummary+'\n'+
 'Palace names: 命宮=Life, 兄弟=Siblings, 夫妻=Spouse/Partner, 子女=Children, 財帛=Wealth, 疾厄=Health, 遷移=Travel & Change, 僕役=Friends & Network, 官祿=Career, 田宅=Home, 福德=Inner Life, 父母=Parents\n\n'+
 '===META===\nLunar: '+chart.lunarDate+'\nLife Palace: '+lifePal.branch+'\nBody Palace: '+(bodyPal?bodyPal.branch:'')+'\n5-Element: '+chart.fiveElements+'\n\n'+
 '===LIFE PORTRAIT===\n[5-6 sentences. Bold opening truth. What drives them. What their life keeps returning to. Second person. No star names.]\n\n'+
-'===PALACES===\n[12 paragraphs: Life · Siblings · Spouse/Partner · Children · Wealth · Health · Travel & Change · Friends & Network · Career · Home · Inner Life · Parents\nFormat: **[Name]** — [2-3 sentences for major palaces (Life,Spouse,Wealth,Career,Inner Life,Health), 1-2 for minor. Second person. Direct. No star names.]\n\n'+
+'===PALACES===\n'+
+'[12 paragraphs: Life · Siblings · Spouse/Partner · Children · Wealth · Health · Travel & Change · Friends & Network · Career · Home · Inner Life · Parents\n'+
+'Format: **[Name]** — [sentences. Major palaces (Life,Spouse,Wealth,Career,Inner Life,Health): 2-3 sentences. Minor: 1-2 sentences.]\n\n'+
+'For each palace: do not say what the person IS or IS NOT. Say what HAPPENS and what they NEED.\n'+
+'WRONG: "Home is not an emotional anchor. You do not need warmth from home."\n'+
+'RIGHT: "When you get home the best state is nobody needing anything from you. Quiet. Your own pace. Not being required. This is not coldness — this is how you recharge."\n\n'+
+'WRONG: "Your career shows limitation in reaching the top."\n'+
+'RIGHT: "You were always good. The ceiling was not your ability — it was the size of the container."\n\n'+
+'Every sentence must be something the person would immediately recognize as true in their actual life.]\n\n'+
 '===CYCLES===\n[Both sentences ONE LINE per decade. Name the life area and key change. Concrete not vague.]\n3-12 | Early Formation | [S1. S2.]\n13-22 | Exploration | [S1. S2.]\n23-32 | Acceleration | [S1. S2.]\n33-42 | Structuring | [S1. S2.]\n43-52 | Peak Output | [S1. S2.]\n53-62 | Selection | [S1. S2.]\n63-72 | Stabilization | [S1. S2.]\n73-82 | Maintenance | [S1. S2.]\n\n'+
 '===YEARLY===\n[3 lines. YEAR (Age X) | Palace | S1. S2.]\nLAST_YEAR | [S1. S2.]\nTHIS_YEAR | [S1. S2.]\nNEXT_YEAR | [S1. S2.]\n\n'+
 '===SUMMARY===\n'+(name||'You')+' are someone who:\n• [truth 1]\n• [truth 2]\n• [truth 3]';
@@ -321,12 +337,20 @@ async function generate(){
 '不說：道歉或免責聲明。命理術語可以用，用完立刻說它在這個人身上產生什麼。\\n\\n'+
 '錯誤：「你走進房間，討論方向跟著你轉。大家覺得你冷漠，其實你只是快。」（全部是別人的反應）\\n'+
 '正確：「你的腦子比嘴快，決定在心裡做完，說出來只是通知。這讓你省了很多時間，也讓你習慣一個人扛著走。」\\n\\n'+
-'出生：'+(name||'此人')+' | '+gender+' | '+year+'年'+month+'月'+day+'日 | '+hrTxt+'\n'+
+'出生：'+(name||'此人')+' | '+gender+' | '+year+'年'+month+'月'+day+'日 | '+hrTxt+'\n'+(userCtx?'個人背景（用這些資訊讓解讀具體、貼近這個人的真實生活）：'+userCtx+'\n':'')+
 '農曆：'+chart.lunarDate+' | 干支：'+chart.chinesePillars+' | 五行：'+chart.fiveElements+'\n命主：'+chart.lifeMaster+' | 身主：'+chart.bodyMaster+'\n'+
 '命盤：\n'+palaceSummary+'\n\n'+
 '===META===\n農曆：'+chart.lunarDate+'\n干支：'+chart.chinesePillars+'\n命宮：'+lifePal.branch+'\n身宮：'+(bodyPal?bodyPal.branch:'')+'\n五行局：'+chart.fiveElements+'\n命主：'+chart.lifeMaster+'\n身主：'+chart.bodyMaster+'\n\n'+
 '===LIFE PORTRAIT===\n[4-5句。第一句最大膽的真相。第二人稱，短句，啟示。]\n\n'+
-'===PALACES===\n[12段。順序：命宮·兄弟·夫妻·子女·財帛·疾厄·遷移·僕役·官祿·田宅·福德·父母\n格式：**[宮位名]** — [主要宮位2-3句，次要宮位1-2句。第二人稱，直接，引用主星。]\n\n'+
+'===PALACES===\n'+
+'[12段。順序：命宮·兄弟·夫妻·子女·財帛·疾厄·遷移·僕役·官祿·田宅·福德·父母\n'+
+'格式：**[宮位名]** — [句子。主要宮位（命宮、夫妻、財帛、官祿、福德、疾厄）：2-3句。次要宮位：1-2句。]\n\n'+
+'每個宮位：不要說這個人是什麼或不是什麼。說發生什麼事，這個人需要什麼。\n'+
+'錯誤：「家對你來說不是情感的寄託。你對家的要求是安靜，不是溫暖。」（說不是什麼）\n'+
+'正確：「你回到家，最好的狀態是沒有人需要你做什麼。安靜，自己的節奏，不被打擾。這不是冷漠，是你充電的方式。」（說發生什麼）\n\n'+
+'錯誤：「你的職場發展受到一定限制。」\n'+
+'正確：「你一直都很好。那個天花板不是你的問題，是那個容器的大小問題。」\n\n'+
+'每一句都要讓這個人讀了立刻認出是自己生活裡的真實事情。]\n\n'+
 '===CYCLES===\n[每大限兩句同一行。說明宮位舞台與具體影響。]\n3-12 | 成形期 | [第一句。第二句。]\n13-22 | 探索期 | [第一句。第二句。]\n23-32 | 加速期 | [第一句。第二句。]\n33-42 | 架構期 | [第一句。第二句。]\n43-52 | 高峰期 | [第一句。第二句。]\n53-62 | 篩選期 | [第一句。第二句。]\n63-72 | 穩定期 | [第一句。第二句。]\n73-82 | 沉澱期 | [第一句。第二句。]\n\n'+
 '===YEARLY===\n[3行。年份（歲數）| 小限宮位 | 第一句。第二句。]\n去年 | [第一句。第二句。]\n今年 | [第一句。第二句。]\n明年 | [第一句。第二句。]\n\n'+
 '===SUMMARY===\n'+(name||'你')+'是這樣一個人：\n• [真相1]\n• [真相2]\n• [真相3]';
