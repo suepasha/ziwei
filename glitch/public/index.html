@@ -60,15 +60,19 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
 .btn-new:hover{border-color:var(--gold);color:var(--gold)}
 .mp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-bottom:1.5rem;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;display:none}
 .mp-grid.show{display:grid}
-.mp-cell{background:#f0ece8;padding:6px;min-height:140px;font-size:11px;position:relative;display:flex;flex-direction:column;gap:2px}
+.mp-cell{background:#f0ece8;padding:6px;min-height:160px;font-size:11px;position:relative;display:flex;flex-direction:column;gap:2px}
 .mp-cell.life{background:#c8a898}.mp-cell.body{background:#dce4ee}.mp-cell.sanfang{background:#dde8dc}
 .mp-cell.center{background:#faf8f5;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:4px}
 .mp-gz{font-size:9px;color:var(--cream3)}.mp-name{font-size:11px;font-weight:600;color:var(--gold)}
-.mp-decade{font-size:9px;color:var(--cream3)}.mp-stars{display:flex;flex-wrap:wrap;gap:2px;font-size:11px}
+.mp-decade{font-size:9px;color:var(--cream3)}
+.mp-ages{font-size:9px;color:#5a7a9a;line-height:1.4;margin-top:1px}.mp-stars{display:flex;flex-wrap:wrap;gap:2px;font-size:11px}
 .zwds-star-main{color:#fff;background:var(--gold);padding:1px 3px;border-radius:2px}
 .zwds-star-neg{color:#8a3030;background:#f0c0c0;padding:1px 3px;border-radius:2px}
 .zwds-star-fx{color:#8a6000;background:#f0e0a0;padding:1px 3px;border-radius:2px}
 .zwds-star-minor{color:var(--cream3);background:var(--ink3);padding:1px 3px;border-radius:2px}
+.zwds-star-adj{color:#6a5a8a;background:#ede8f5;padding:1px 3px;border-radius:2px}
+.zwds-star-cs{color:#2a6a4a;background:#dff0e8;padding:1px 3px;border-radius:2px}
+.zwds-star-bs{color:#7a5a20;background:#f5ecd8;padding:1px 3px;border-radius:2px}
 .zwds-center-title{font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:500;color:var(--gold)}
 .zwds-center-sub{font-size:9px;color:var(--cream3);line-height:1.5}
 @media(max-width:580px){.grid2{grid-template-columns:1fr}.main{padding:1.5rem 1rem}}
@@ -488,9 +492,13 @@ function buildMingpan(){
       h+='<div class="mp-gz">'+p.stem+p.branch+'</div>';
       h+='<div class="mp-name">【'+(isBodyPal?p.name+'-身宮':p.name)+'】</div>';
       h+='<div class="mp-decade">大限:'+(p.decadeRange||'')+'</div>';
+      if(p.ages&&p.ages.length){h+='<div class="mp-ages">小限:'+p.ages.slice(0,7).join(' ')+'</div>';}
       h+='<div class="mp-stars">';
       p.majorStars.forEach(function(s){h+=starTag(s)+' ';});
       p.minorStars.forEach(function(s){h+=starTag(s)+' ';});
+      if(p.adjectiveStars){p.adjectiveStars.forEach(function(s){h+='<span class="zwds-star-adj">'+s.name+'</span> ';});}
+      if(p.changsheng12){h+='<span class="zwds-star-cs">'+p.changsheng12+'</span> ';}
+      if(p.boshi12){h+='<span class="zwds-star-bs">'+p.boshi12+'</span>';}
       h+='</div></div>';
     }
   }
