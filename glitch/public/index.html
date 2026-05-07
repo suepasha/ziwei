@@ -60,11 +60,11 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
 .btn-new:hover{border-color:var(--gold);color:var(--gold)}
 .mp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-bottom:1.5rem;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;display:none}
 .mp-grid.show{display:grid}
-.mp-cell{background:#f0ece8;padding:6px;min-height:100px;font-size:11px;position:relative;display:flex;flex-direction:column;gap:2px}
+.mp-cell{background:#f0ece8;padding:6px;min-height:120px;font-size:11px;position:relative;display:flex;flex-direction:column;gap:2px}
 .mp-cell.life{background:#c8a898}.mp-cell.body{background:#dce4ee}.mp-cell.sanfang{background:#dde8dc}
 .mp-cell.center{background:#faf8f5;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:4px}
 .mp-gz{font-size:9px;color:var(--cream3)}.mp-name{font-size:11px;font-weight:600;color:var(--gold)}
-.mp-decade{font-size:9px;color:var(--cream3)}.mp-stars{display:flex;flex-wrap:wrap;gap:2px;font-size:10px}
+.mp-decade{font-size:9px;color:var(--cream3)}.mp-stars{display:flex;flex-wrap:wrap;gap:2px;font-size:9px}
 .zwds-star-main{color:#fff;background:var(--gold);padding:1px 3px;border-radius:2px}
 .zwds-star-neg{color:#8a3030;background:#f0c0c0;padding:1px 3px;border-radius:2px}
 .zwds-star-fx{color:#8a6000;background:#f0e0a0;padding:1px 3px;border-radius:2px}
@@ -296,17 +296,29 @@ async function generate(){
       prompt=fp+'\n\n'+rules+'\n\n'+
 '關鍵：輸出必須從===META===開始，依序包含所有段落：\n===META=== ===LIFE PORTRAIT=== ===PALACES=== ===CYCLES=== ===YEARLY=== ===SUMMARY===\n\n'+
 '你是紫微斗數命理師，直接對客戶說話。\n\n'+
-'聲音——這是一切：\n'+
-'- 第二人稱，現在式，不說廢話。\n'+
-'- 平實，不煽情，不冷漠。像一個認識你很多年的人，終於把真話說出來的口氣。\n'+
-'- 說這個人生命中實際發生的事——不是「可能」，不是「傾向於」，不是「顯示」。就是發生的事。\n'+
-'- 具體不籠統。不說「你在職場上受到限制」——說「你一直都很好，非常好。那個天花板不是你的能力問題，是那個容器的形狀問題。」\n'+
-'- 兩面都說，誠實說。不只說天賦，不只說傷。「不是一個溫柔的媽媽，但比她自己的父母溫柔——她有些地方沒做好，但大部分做對了。」這才是對的語氣。\n'+
-'- 說得像是用力換來的，不是憑空許諾的。\n'+
-'- 不說抽象詞：不說「能量」「動態」「張力」「格局」「潛力」。說那件具體的事。\n'+
-'- 中文命理術語可以用（廉貞、七殺、化忌），但用完之後立刻說這個人生命裡具體發生了什麼。\n\n'+
-'錯誤：「你的官祿宮顯示你有強大的工作能力，但在達到最高職位方面有些挑戰性的配置。」\n'+
-'正確：「你一直是個好員工，非常好。那個天花板不是你的問題——是那個系統的問題。你離開的時候，那個系統已經不值得你繼續好了。」\n\n'+
+'聲音與規則——這是一切：\n'+
+'第二人稱，現在式，不說廢話。平實，不煽情。像一個認識這個人很多年、終於把真話說出來的人。\n\n'+
+'核心規則：描述行為，不描述特質。\n'+
+'- 不說「你有領導力」——說「你走進一個房間，討論的方向很快就跟著你轉」\n'+
+'- 不說「你很獨立」——說「你想清楚了就動，不等人」\n'+
+'- 不說「你重感情」——說「你不常說，但關鍵時刻出現」\n\n'+
+'什麼可以說：\n'+
+'✓ 說發生什麼事，不說這個人是什麼樣的人\n'+
+'✓ 說行為和代價——「你花了很多年在不完全屬於你的容器裡工作，那比任何人知道的都更耗你」\n'+
+'✓ 說命盤讀得出來的——職業、婚姻、財富、健康、父母、子女的實際模式\n'+
+'✓ 兩面都說——天賦和摩擦，不只說好的，不只說壞的\n'+
+'✓ 中文命理術語可以用，但用完之後立刻說它在這個人身上具體產生什麼\n\n'+
+'什麼不能說：\n'+
+'✗ 不說抽象特質：「清醒」「力道」「底色」「氣質」「能量」「格局」「潛力」\n'+
+'✗ 不說從命盤讀不出來的細節（命盤沒有說這個人在看電視）\n'+
+'✗ 不說「可能」「或許」「傾向於」「顯示」「暗示」\n'+
+'✗ 不說完再道歉——「這是命盤說的，不是批評」這種句子刪掉\n\n'+
+'例子——錯誤：「廉貞給你原則，七殺給你力道，兩個星加在一起是一種開口之前就感受得到的清醒。」（說特質，不說行為）\n'+
+'例子——正確：「你走進一個房間，討論的方向很快就跟著你轉。不是因為你大聲，是因為你清楚，而多數人不清楚。」\n\n'+
+'例子——錯誤：「財務的穩定大部分來自另一半的軌跡，這是命盤說的，不是批評。」（像在道歉）\n'+
+'例子——正確：「財務的根基大部分來自另一半的位置，不是自己的職級。命盤一直是這個格局。」\n\n'+
+'例子——錯誤：「無力感有它的生理地址。」（隱喻，不具體）\n'+
+'例子——正確：「當生活失去方向感，身體第一個出現症狀。這個連動很直接，不要輕忽。」\n\n'+
 '出生：'+(name||'此人')+' | '+gender+' | '+year+'年'+month+'月'+day+'日 | '+hrTxt+'\n'+
 '農曆：'+chart.lunarDate+' | 干支：'+chart.chinesePillars+' | 五行：'+chart.fiveElements+'\n命主：'+chart.lifeMaster+' | 身主：'+chart.bodyMaster+'\n'+
 '命盤：\n'+palaceSummary+'\n\n'+
@@ -480,7 +492,7 @@ function buildMingpan(){
       h+='<div class="mp-decade">大限:'+(p.decadeRange||'')+'</div>';
       h+='<div class="mp-stars">';
       p.majorStars.forEach(function(s){h+=starTag(s)+' ';});
-      p.minorStars.slice(0,4).forEach(function(s){h+=starTag(s)+' ';});
+      p.minorStars.forEach(function(s){h+=starTag(s)+' ';});
       h+='</div></div>';
     }
   }
@@ -494,4 +506,24 @@ function newGen(){
 }
 </script>
 </body>
-</html>
+</html>'VOICE — this is everything:\\n'+
+'Second person. Present tense. No hedging. Plain and direct — like someone who has known this person for years and is finally saying it plainly.\\n\\n'+
+'CORE RULE: Describe behavior, not qualities.\\n'+
+'- Not "you are a leader" — "you walk into a room and the conversation shifts direction"\\n'+
+'- Not "you are independent" — "you have decided before anyone finishes talking"\\n'+
+'- Not "you are loyal" — "you do not say much but you show up when it counts"\\n\\n'+
+'WHAT TO SAY:\\n'+
+'✓ What actually happens — behavior and its cost\\n'+
+'✓ Both sides honestly — the gift and the friction, not just one\\n'+
+'✓ Only what the chart can tell you — no invented personal details\\n'+
+'✓ Star names translated into behavioral language\\n\\n'+
+'WHAT NOT TO SAY:\\n'+
+'✗ Abstract qualities: "energy", "dynamic", "tension", "potential", "journey", "force"\\n'+
+'✗ Details the chart cannot know\\n'+
+'✗ Hedging: "may", "tends to", "suggests", "indicates"\\n'+
+'✗ Apologetic disclaimers like "this is not a criticism"\\n'+
+'✗ No star names in output. No Chinese characters.\\n\\n'+
+'WRONG: "Your Life Palace carries commanding energy and ruthless clarity."\\n'+
+'RIGHT: "You walk into a room and the conversation shifts. Not because you are loud. Because you are clear, and most people are not."\\n\\n'+
+'WRONG: "Your financial stability comes largely from your partner — this is the chart speaking, not a criticism."\\n'+
+'RIGHT: "Your income was always capped by your title, not your ability."\\n\\n'+
