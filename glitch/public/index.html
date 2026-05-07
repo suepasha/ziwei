@@ -344,9 +344,16 @@ async function generate(){
 }
 
 function sec(t,tag){
-  var re=new RegExp('==='+tag+'===[ \t]*[\r\n]([\s\S]*?)(?====|$)');
-  var m=re.exec(t);
-  return m?m[1].trim():'';
+  var marker='==='+tag+'===';
+  var idx=t.indexOf(marker);
+  if(idx<0)return'';
+  var start=idx+marker.length;
+  while(start<t.length&&(t[start]===' '||t[start]==='\t'))start++;
+  if(t[start]==='\r')start++;
+  if(t[start]==='\n')start++;
+  var nextIdx=t.indexOf('\n===',start);
+  var content=nextIdx<0?t.slice(start):t.slice(start,nextIdx);
+  return content.trim();
 }
 function bullets(r){return r.split('\n').map(function(l){return l.replace(/^[•·\-]\s*/,'').trim();}).filter(Boolean);}
 
