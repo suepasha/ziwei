@@ -475,11 +475,19 @@ function buildMingpan(){
     for(var col=0;col<4;col++){
       if((row===1||row===2)&&(col===1||col===2)){
         if(row===1&&col===1){
-          h+='<div class="mp-cell center" style="grid-column:2/4;grid-row:2/4">';
-          h+='<div class="zwds-center-title">紫微斗數</div>';
-          h+='<div class="zwds-center-title" style="font-size:10px">'+(_lastName||'命盤')+'</div>';
-          h+='<div class="zwds-center-sub">'+chart.lunarDate+'<br>'+chart.chinesePillars+'<br>'+chart.fiveElements+'</div>';
-          h+='</div>';
+          var ym=chart.yearMutagen;
+          var ymTxt=ym?[ym.quan,ym.ke,ym.lu,ym.ji].filter(Boolean).join('，'):'';
+          var gLabel=(chart.gender||'女')==='女'?'陰女':'陰男';
+          var sd=chart.solarDate?chart.solarDate.replace(/-/g,'年').replace(/年(\d+)/,'年$1月').replace(/月(\d+)$/,'月$1日'):'';
+          h+='<div class="mp-cell center" style="grid-column:2/4;grid-row:2/4;padding:6px 8px">';
+          h+='<div style="text-align:left;line-height:1.8;font-size:10px;color:var(--cream2)">';
+          h+='<span style="color:var(--cream3)">陽曆：</span>'+sd+' '+gLabel+'<br>';
+          h+='<span style="color:var(--cream3)">農曆：</span>'+chart.lunarDate+'<br>';
+          h+='<span style="color:var(--cream3)">干支：</span>'+chart.chinesePillars+'<br>';
+          h+='<span style="color:var(--cream3)">五行局：</span>'+chart.fiveElements+'<br>';
+          if(ymTxt) h+='<span style="color:var(--cream3)">生年四化：</span>'+ymTxt+'<br>';
+          h+='<span style="color:var(--cream3)">命主：</span>'+chart.lifeMaster+'　<span style="color:var(--cream3)">身主：</span>'+chart.bodyMaster;
+          h+='</div></div>';
         }
         continue;
       }
