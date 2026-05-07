@@ -60,11 +60,11 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
 .btn-new:hover{border-color:var(--gold);color:var(--gold)}
 .mp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-bottom:1.5rem;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;display:none}
 .mp-grid.show{display:grid}
-.mp-cell{background:#f0ece8;padding:6px;min-height:120px;font-size:11px;position:relative;display:flex;flex-direction:column;gap:2px}
+.mp-cell{background:#f0ece8;padding:6px;min-height:140px;font-size:11px;position:relative;display:flex;flex-direction:column;gap:2px}
 .mp-cell.life{background:#c8a898}.mp-cell.body{background:#dce4ee}.mp-cell.sanfang{background:#dde8dc}
 .mp-cell.center{background:#faf8f5;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:4px}
 .mp-gz{font-size:9px;color:var(--cream3)}.mp-name{font-size:11px;font-weight:600;color:var(--gold)}
-.mp-decade{font-size:9px;color:var(--cream3)}.mp-stars{display:flex;flex-wrap:wrap;gap:2px;font-size:9px}
+.mp-decade{font-size:9px;color:var(--cream3)}.mp-stars{display:flex;flex-wrap:wrap;gap:2px;font-size:11px}
 .zwds-star-main{color:#fff;background:var(--gold);padding:1px 3px;border-radius:2px}
 .zwds-star-neg{color:#8a3030;background:#f0c0c0;padding:1px 3px;border-radius:2px}
 .zwds-star-fx{color:#8a6000;background:#f0e0a0;padding:1px 3px;border-radius:2px}
@@ -274,18 +274,20 @@ async function generate(){
 'You are a Zi Wei Dou Shu master. Speak directly to the person.\n\n'+
 'VOICE — this is everything:\\n'+
 'Second person. Present tense. No hedging. Plain and direct.\\n\\n'+
-'CORE RULE: Describe behavior, not qualities.\\n'+
-'- Not "you are a leader" — "you walk into a room and the conversation shifts"\\n'+
-'- Not "you are independent" — "you have decided before anyone finishes talking"\\n'+
-'- Not "you are loyal" — "you do not say much but you show up when it counts"\\n\\n'+
-'SAY: what actually happens, both the gift and the friction, only what the chart can tell you.\\n'+
-'DO NOT: use "energy" "dynamic" "tension" "potential" "journey" — say the specific thing.\\n'+
-'DO NOT: use "may" "tends to" "suggests" "indicates" — state what is true.\\n'+
-'DO NOT: add apologetic disclaimers. No star names. No Chinese characters.\\n\\n'+
-'WRONG: "Your Life Palace carries commanding energy and ruthless clarity."\\n'+
-'RIGHT: "You walk into a room and the conversation shifts. Not because you are loud. Because you are clear."\\n\\n'+
-'WRONG: "Your income was largely from your partner — this is the chart speaking, not a criticism."\\n'+
-'RIGHT: "Your income was always capped by your title, not your ability."\\n\\n'+
+'CORE RULE: Write from the INSIDE, not the outside.\\n'+
+'Most readings describe how others see this person or how others react. That is wrong.\\n'+
+'Write what it feels like to BE this person — what goes on inside them, how they experience their own life.\\n\\n'+
+'INSIDE (correct): "You make a decision and you are already three steps ahead before you say it out loud."\\n'+
+'OUTSIDE (wrong): "People sense your decisiveness before you speak."\\n\\n'+
+'INSIDE (correct): "You do not need approval. You check internally, not externally, before you move."\\n'+
+'OUTSIDE (wrong): "You walk into a room and the conversation shifts."\\n\\n'+
+'Also describe personality and character — who this person actually is, what they value, what they cannot tolerate, what they are like when alone.\\n'+
+'Not just behavior in public. Also: inner experience, what drives them privately, what costs them privately.\\n\\n'+
+'DO NOT: use "energy" "dynamic" "potential" "journey" — say the specific thing.\\n'+
+'DO NOT: use "may" "tends to" "suggests" — state what is true.\\n'+
+'DO NOT: add disclaimers. No star names. No Chinese characters.\\n\\n'+
+'WRONG: "You walk into a room and the conversation shifts. People think you are cold when you are just fast."\\n'+
+'RIGHT: "You process fast and decide alone. By the time others are still talking, you are already somewhere else in your head. This is not arrogance. It is how you are built."\\n\\n'+
 'Birth: '+(name||'this person')+' | '+gender+' | '+year+'/'+month+'/'+day+' | '+hrTxt+'\n'+
 'Chart:\n'+palaceSummary+'\n'+
 'Palace names: 命宮=Life, 兄弟=Siblings, 夫妻=Spouse/Partner, 子女=Children, 財帛=Wealth, 疾厄=Health, 遷移=Travel & Change, 僕役=Friends & Network, 官祿=Career, 田宅=Home, 福德=Inner Life, 父母=Parents\n\n'+
@@ -301,28 +303,21 @@ async function generate(){
 '你是紫微斗數命理師，直接對客戶說話。\n\n'+
 '聲音與規則——這是一切：\n'+
 '第二人稱，現在式，不說廢話。平實，不煽情。像一個認識這個人很多年、終於把真話說出來的人。\n\n'+
-'核心規則：描述行為，不描述特質。\n'+
-'- 不說「你有領導力」——說「你走進一個房間，討論的方向很快就跟著你轉」\n'+
-'- 不說「你很獨立」——說「你想清楚了就動，不等人」\n'+
-'- 不說「你重感情」——說「你不常說，但關鍵時刻出現」\n\n'+
-'什麼可以說：\n'+
-'✓ 說發生什麼事，不說這個人是什麼樣的人\n'+
-'✓ 說行為和代價——「你花了很多年在不完全屬於你的容器裡工作，那比任何人知道的都更耗你」\n'+
-'✓ 說命盤讀得出來的——職業、婚姻、財富、健康、父母、子女的實際模式\n'+
-'✓ 兩面都說——天賦和摩擦，不只說好的，不只說壞的\n'+
-'✓ 中文命理術語可以用，但用完之後立刻說它在這個人身上具體產生什麼\n\n'+
-'什麼不能說：\n'+
-'✗ 不說抽象特質：「清醒」「力道」「底色」「氣質」「能量」「格局」「潛力」\n'+
-'✗ 不說從命盤讀不出來的細節（命盤沒有說這個人在看電視）\n'+
-'✗ 不說「可能」「或許」「傾向於」「顯示」「暗示」\n'+
-'✗ 不說完再道歉——「這是命盤說的，不是批評」這種句子刪掉\n\n'+
-'例子——錯誤：「廉貞給你原則，七殺給你力道，兩個星加在一起是一種開口之前就感受得到的清醒。」（說特質，不說行為）\n'+
-'例子——正確：「你走進一個房間，討論的方向很快就跟著你轉。不是因為你大聲，是因為你清楚，而多數人不清楚。」\n\n'+
-'例子——錯誤：「財務的穩定大部分來自另一半的軌跡，這是命盤說的，不是批評。」（像在道歉）\n'+
-'例子——正確：「財務的根基大部分來自另一半的位置，不是自己的職級。命盤一直是這個格局。」\n\n'+
-'例子——錯誤：「無力感有它的生理地址。」（隱喻，不具體）\n'+
-'例子——正確：「當生活失去方向感，身體第一個出現症狀。這個連動很直接，不要輕忽。」\n\n'+
-'出生：'+(name||'此人')+' | '+gender+' | '+year+'年'+month+'月'+day+'日 | '+hrTxt+'\n'+
+'核心規則：從裡面寫，不從外面寫。\\n'+
+'大多數命盤分析寫的是別人怎麼看這個人、別人怎麼反應。那是錯的。\\n'+
+'要寫的是這個人自己是什麼感覺——他們怎麼經歷自己的生命，裡面發生什麼事。\\n\\n'+
+'從裡面（正確）：「你做決定之前在心裡已經繞了三圈。說出口的時候，你早就走在前面了。」\\n'+
+'從外面（錯誤）：「你的決斷力讓身邊的人感到安心。」\\n\\n'+
+'從裡面（正確）：「你不需要別人點頭你才動。你的驗證在自己這裡，不在外面。」\\n'+
+'從外面（錯誤）：「你走進一個房間，討論的方向很快就跟著你轉。」\\n\\n'+
+'也要描述性格與人格——這個人真正是什麼樣的人，他們重視什麼，無法忍受什麼，一個人的時候是什麼樣子。\\n'+
+'不只是公開場合的行為，也要說：內心的驅動力，私下的代價，一個人面對自己時的狀態。\\n\\n'+
+'不說：「能量」「動態」「底色」「氣質」「潛力」「格局」——說那件具體的事。\\n'+
+'不說：「可能」「或許」「傾向於」「顯示」——直接說是什麼。\\n'+
+'不說：道歉或免責聲明。命理術語可以用，用完立刻說它在這個人身上產生什麼。\\n\\n'+
+'錯誤：「你走進房間，討論方向跟著你轉。大家覺得你冷漠，其實你只是快。」（全部是別人的反應）\\n'+
+'正確：「你的腦子比嘴快，決定在心裡做完，說出來只是通知。這讓你省了很多時間，也讓你習慣一個人扛著走。」\\n\\n'+
+''出生：'+(name||'此人')+' | '+gender+' | '+year+'年'+month+'月'+day+'日 | '+hrTxt+'\n'+
 '農曆：'+chart.lunarDate+' | 干支：'+chart.chinesePillars+' | 五行：'+chart.fiveElements+'\n命主：'+chart.lifeMaster+' | 身主：'+chart.bodyMaster+'\n'+
 '命盤：\n'+palaceSummary+'\n\n'+
 '===META===\n農曆：'+chart.lunarDate+'\n干支：'+chart.chinesePillars+'\n命宮：'+lifePal.branch+'\n身宮：'+(bodyPal?bodyPal.branch:'')+'\n五行局：'+chart.fiveElements+'\n命主：'+chart.lifeMaster+'\n身主：'+chart.bodyMaster+'\n\n'+
