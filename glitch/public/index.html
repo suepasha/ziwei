@@ -329,8 +329,13 @@ async function generate(){
     clearInterval(ticker);
     var text=apiData.content&&apiData.content[0]?apiData.content[0].text:'';
     if(!text)throw new Error('No text returned');
-    // DEBUG - show first 400 chars of Claude response
-    document.getElementById('err-box').innerHTML='<b>Claude raw (first 400 chars):</b><br><pre style="white-space:pre-wrap;font-size:10px">'+text.slice(0,400).replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</pre>';
+    // DEBUG
+    var dbg='Length: '+text.length+'\n';
+    dbg+='Has META: '+(text.indexOf('===META===')>-1)+'\n';
+    dbg+='Has PORTRAIT: '+(text.indexOf('===LIFE PORTRAIT===')>-1)+'\n';
+    dbg+='sec(META): '+sec(text,'META').slice(0,30)+'\n';
+    dbg+='sec(PORTRAIT): '+sec(text,'LIFE PORTRAIT').slice(0,30)+'\n';
+    document.getElementById('err-box').innerHTML='<pre style="font-size:11px">'+dbg+'</pre>';
     document.getElementById('err-box').className='err-box on';
     renderResults(text,name,year,month,day,hrTxt,gender,chart);
 
