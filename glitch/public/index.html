@@ -306,14 +306,16 @@ async function generate(){
 'Output ONLY:\n\n'+
 '===META===\nLunar: '+chart.lunarDate+'\nLife Palace: '+lifePal.branch+'\n5-Element: '+chart.fiveElements+'\n\n'+
 '===QUESTION===\n'+
+'IMPORTANT: The section marker above is ===QUESTION=== — use exactly that, not ===ANSWER=== or anything else.\n'+
 'Asked: '+userQ+'\n'+
-'[Answer directly. Name the relevant palace and transformation. Concrete. 3-5 sentences.]';
+'[Answer directly in plain English. No star names. No Chinese characters. Name the relevant life area (career, wealth, health etc). Give a concrete recommendation. 3-5 sentences.]';
       } else {
         prompt=fp+'\n\n'+
 '\u4f60\u662f\u7d2b\u5fae\u6597\u6578\u547d\u7406\u5e2b\u3002\u53ea\u56de\u7b54\u4e0b\u9762\u554f\u984c\u3002\n'+
 '\u53ea\u8f38\u51fa\uff1a\n\n'+
 '===META===\n\u8fb2\u66c6\uff1a'+chart.lunarDate+'\n\u547d\u5bae\uff1a'+lifePal.branch+'\n\u4e94\u884c\u5c40\uff1a'+chart.fiveElements+'\n\n'+
 '===QUESTION===\n'+
+'\u91cd\u8981\uff1a\u4e0a\u9762\u7684\u6bb5\u843d\u6a19\u8a18\u662f===QUESTION===\uff0c\u4e0d\u662f===ANSWER===\u6216\u5176\u4ed6\u3002\n'+
 '\u554f\uff1a'+userQ+'\n'+
 '[\u76f4\u63a5\u56de\u7b54\u3002\u8aaa\u660e\u6700\u76f8\u95dc\u7684\u5bae\u4f4d\u548c\u56db\u5316\u3002\u5177\u9ad4\u884c\u52d5\u30023-5\u53e5\u3002]';
       }
@@ -339,7 +341,7 @@ async function generate(){
 '===PALACES===\n[12 paragraphs: Life\u00b7Siblings\u00b7Spouse/Partner\u00b7Children\u00b7Wealth\u00b7Health\u00b7Travel & Change\u00b7Friends & Network\u00b7Career\u00b7Home\u00b7Inner Life\u00b7Parents\nFormat: **[Name]** \u2014 [say what happens and what they need. No star names.]\nMajor palaces: 2-3 sentences. Minor: 1-2 sentences.]\n\n'+
 '===CYCLES===\n[ONE LINE per decade: range | phase | S1. S2.]\n3-12 | Early Formation | [S1. S2.]\n13-22 | Exploration | [S1. S2.]\n23-32 | Acceleration | [S1. S2.]\n33-42 | Structuring | [S1. S2.]\n43-52 | Peak Output | [S1. S2.]\n53-62 | Selection | [S1. S2.]\n63-72 | Stabilization | [S1. S2.]\n73-82 | Maintenance | [S1. S2.]\n\n'+
 '===YEARLY===\n[3 lines. Format: YEAR (Age X) | Palace | sentences answering: career (move or hold?), money (in or out?), relationships, overall. Use yearly data provided.]\nLAST_YEAR | [2-3 sentences]\nTHIS_YEAR | [2-3 sentences]\nNEXT_YEAR | [2-3 sentences]\n\n'+
-'===SUMMARY===\n'+(name||'You')+' are someone who:\n\u2022 [essential truth]\n\u2022 [second truth]\n\u2022 [third truth]'+(userQ?'\n\n===QUESTION===\nAsked: '+userQ+'\n[Answer directly. Relevant palace and transformation. Concrete action. 3-5 sentences.]':'');
+'===SUMMARY===\n'+(name||'You')+' are someone who:\n\u2022 [essential truth]\n\u2022 [second truth]\n\u2022 [third truth]'+(userQ?'\n\n===QUESTION===\nAsked: '+userQ+'\n[Answer in plain English. No star names. No Chinese characters. Name the relevant life area (career, money, relationships, health). Concrete recommendation. 3-5 sentences.]':'');
     } else {
       prompt=fp+'\n\n'+
 '\u95dc\u9375\u683c\u5f0f\uff1a\u8f38\u51fa\u5fc5\u9808\u5f9e===META===\u958b\u59cb\uff0c\u4f9d\u5e8f\u5305\u542b\uff1a===META=== ===LIFE PORTRAIT=== ===PALACES=== ===CYCLES=== ===YEARLY=== ===SUMMARY===\n\n'+
