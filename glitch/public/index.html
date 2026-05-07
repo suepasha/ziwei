@@ -308,7 +308,7 @@ async function generate(){
 '===QUESTION===\n'+
 'IMPORTANT: The section marker above is ===QUESTION=== — use exactly that, not ===ANSWER=== or anything else.\n'+
 'Asked: '+userQ+'\n'+
-'[Answer directly in plain English. No star names. No Chinese characters. Name the relevant life area (career, wealth, health etc). Give a concrete recommendation. 3-5 sentences.]';
+'[Answer the way a trusted advisor would — not an astrologer explaining their method. Say what will actually happen or what to do. No jargon: no palace, no affliction, no transformation, no energies. No star names. No Chinese characters. GOOD: "2026 is a difficult year to re-enter work. Wait until 2027 if you can." BAD: "Your Career Palace shows affliction chains." 3-5 sentences. Direct. Concrete.]';
       } else {
         prompt=fp+'\n\n'+
 '\u4f60\u662f\u7d2b\u5fae\u6597\u6578\u547d\u7406\u5e2b\u3002\u53ea\u56de\u7b54\u4e0b\u9762\u554f\u984c\u3002\n'+
@@ -341,7 +341,7 @@ async function generate(){
 '===PALACES===\n[12 paragraphs: Life\u00b7Siblings\u00b7Spouse/Partner\u00b7Children\u00b7Wealth\u00b7Health\u00b7Travel & Change\u00b7Friends & Network\u00b7Career\u00b7Home\u00b7Inner Life\u00b7Parents\nFormat: **[Name]** \u2014 [say what happens and what they need. No star names.]\nMajor palaces: 2-3 sentences. Minor: 1-2 sentences.]\n\n'+
 '===CYCLES===\n[ONE LINE per decade: range | phase | S1. S2.]\n3-12 | Early Formation | [S1. S2.]\n13-22 | Exploration | [S1. S2.]\n23-32 | Acceleration | [S1. S2.]\n33-42 | Structuring | [S1. S2.]\n43-52 | Peak Output | [S1. S2.]\n53-62 | Selection | [S1. S2.]\n63-72 | Stabilization | [S1. S2.]\n73-82 | Maintenance | [S1. S2.]\n\n'+
 '===YEARLY===\n[3 lines. Format: YEAR (Age X) | Palace | sentences answering: career (move or hold?), money (in or out?), relationships, overall. Use yearly data provided.]\nLAST_YEAR | [2-3 sentences]\nTHIS_YEAR | [2-3 sentences]\nNEXT_YEAR | [2-3 sentences]\n\n'+
-'===SUMMARY===\n'+(name||'You')+' are someone who:\n\u2022 [essential truth]\n\u2022 [second truth]\n\u2022 [third truth]'+(userQ?'\n\n===QUESTION===\nAsked: '+userQ+'\n[Answer in plain English. No star names. No Chinese characters. Name the relevant life area (career, money, relationships, health). Concrete recommendation. 3-5 sentences.]':'');
+'===SUMMARY===\n'+(name||'You')+' are someone who:\n\u2022 [essential truth]\n\u2022 [second truth]\n\u2022 [third truth]'+(userQ?'\n\n===QUESTION===\nAsked: '+userQ+'\n[Answer the way a trusted advisor would — not an astrologer explaining their method. Say what will actually happen or what to do. No jargon: no palace, no affliction, no transformation, no energies. No star names. No Chinese characters. GOOD: "2026 is a difficult year to re-enter work. Wait until 2027 if you can." BAD: "Your Career Palace shows affliction chains." 3-5 sentences. Direct. Concrete.]':'');
     } else {
       prompt=fp+'\n\n'+
 '\u95dc\u9375\u683c\u5f0f\uff1a\u8f38\u51fa\u5fc5\u9808\u5f9e===META===\u958b\u59cb\uff0c\u4f9d\u5e8f\u5305\u542b\uff1a===META=== ===LIFE PORTRAIT=== ===PALACES=== ===CYCLES=== ===YEARLY=== ===SUMMARY===\n\n'+
