@@ -99,10 +99,6 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
   <div class="form-card">
     <div class="form-title" id="t-birth">Birth Information</div>
     <div class="field"><label id="t-name">Name (optional)</label><input type="text" id="f-name" placeholder="Enter name…"/></div>
-    <div class="field">
-      <label id="t-q">Your question <span id="t-q-note" style="font-weight:300;text-transform:none;letter-spacing:0;font-size:11px;color:var(--cream3)">(optional)</span></label>
-      <textarea id="f-q" rows="2" placeholder="e.g. Should I change jobs this year? Why do I keep having the same argument with my partner?" style="width:100%;padding:10px 14px;background:var(--ink3);border:1px solid var(--border);border-radius:6px;color:var(--cream);font-family:'Jost',sans-serif;font-size:13px;outline:none;resize:vertical;line-height:1.6"></textarea>
-    </div>
     <div class="field"><label id="t-gender">Gender</label>
       <div class="radios">
         <label><input type="radio" name="gender" value="Male"> <span id="t-male">Male</span></label>
@@ -138,6 +134,10 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
       </div>
     </div>
 
+    <div class="field" style="margin-top:.5rem">
+      <label id="t-q">Your question <span id="t-q-note" style="font-weight:300;text-transform:none;letter-spacing:0;font-size:11px;color:var(--cream3)">(optional — adds a focused answer at the end of your reading)</span></label>
+      <textarea id="f-q" rows="2" placeholder="e.g. Should I change jobs this year? Why do I keep having the same argument with my partner?"></textarea>
+    </div>
   </div>
   <button class="btn-generate" id="btn-gen" onclick="generate()">Generate</button>
   <div class="loading" id="loading"><div class="spinner"></div><p id="load-txt">Calculating chart…</p></div>
