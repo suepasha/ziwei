@@ -384,7 +384,7 @@ cy+'\uff0850\u6b72\u5de6\u53f3\uff09| \u5bae\u4f4d\u540d | [\u53e5\u5b50]\n'+(cy
     clearInterval(ticker);
     var text=apiData.content&&apiData.content[0]?apiData.content[0].text:'';
     if(!text)throw new Error('No text returned');
-    renderResults(text,name,year,month,day,hrTxt,gender,chart,readMode);
+    renderResults(text,name,year,month,day,hrTxt,gender,chart,readMode,userQ);
 
   }catch(e){
     clearInterval(ticker);
@@ -412,7 +412,7 @@ function bullets(r){
   return r.split('\n').map(function(l){return l.replace(/^[\u2022\u00b7\-]\s*/,'').trim();}).filter(Boolean);
 }
 
-function renderResults(text,name,year,month,day,hrTxt,gender,chart,readMode){
+function renderResults(text,name,year,month,day,hrTxt,gender,chart,readMode,userQ){
   _lastChart=chart;
   _lastName=year+'\u5e74'+month+'\u6708'+day+'\u65e5'+hrTxt+' \u9670'+(gender==='Female'?'\u5973':'\u7537');
 
@@ -435,7 +435,7 @@ function renderResults(text,name,year,month,day,hrTxt,gender,chart,readMode){
   h+='<div class="psub">'+genderLabel+' \u00b7 '+month+'/'+day+'/'+year+' \u00b7 '+hrTxt+(LANG!=='en'&&chart.lifeMaster?' \u00b7 \u547d\u4e3b'+chart.lifeMaster+' \u00b7 \u8eab\u4e3b'+chart.bodyMaster:'')+'</div>';
   h+='</div>';
 
-  if(LANG==='zh'){
+  if(LANG==='zh'&&readMode!=='question'){
     h+='<div class="stitle">\u547d\u76e4</div>';
     h+='<div class="mp-grid show" id="mp-grid">'+buildMingpan()+'</div>';
   }
@@ -502,19 +502,23 @@ function renderResults(text,name,year,month,day,hrTxt,gender,chart,readMode){
     var stripped=text.replace(/===META===[\s\S]*?\n\n/,'').trim();
     if(stripped)qRaw=stripped;
   }
+  // Clean answer: remove any "問：..." or "Asked:..." prefix Claude adds
   if(qRaw){
+    var qLines=qRaw.split('\n').filter(Boolean);
+    if(qLines.length>0&&(qLines[0].indexOf('\u554f\uff1a')>-1||qLines[0].toLowerCase().indexOf('asked:')>-1)){
+      qLines=qLines.slice(1);
+    }
+    qRaw=qLines.join('\n').trim();
+  }
+  if(qRaw||userQ){
     h+='<div class="scard-full" style="margin-top:10px;border-left:3px solid var(--gold)">';
     h+='<div class="sh">'+(LANG==='zh'?'\u4f60\u7684\u554f\u984c':'Your Question')+'</div>';
-    var qLines=qRaw.split('\n');
-    var qQuestion='',qAnswer='';
-    if(qLines.length>1&&(qLines[0].indexOf('\u554f\uff1a')>-1||qLines[0].toLowerCase().indexOf('asked:')>-1)){
-      qQuestion=qLines[0];
-      qAnswer=qLines.slice(1).join('\n').trim();
-    } else {
-      qAnswer=qRaw;
+    if(userQ){
+      h+='<p style="font-size:13px;color:var(--cream3);line-height:1.6;margin-bottom:12px;font-style:italic;border-bottom:0.5px solid var(--border);padding-bottom:10px">'+(LANG==='zh'?'\u554f\uff1a':'Q: ')+userQ+'</p>';
     }
-    if(qQuestion)h+='<p style="font-size:12px;color:var(--cream3);line-height:1.6;margin-bottom:8px;font-style:italic">'+qQuestion+'</p>';
-    h+='<p style="font-size:13px;color:var(--cream2);line-height:1.85">'+qAnswer+'</p>';
+    if(qRaw){
+      h+='<p style="font-size:13px;color:var(--cream2);line-height:1.85">'+qRaw+'</p>';
+    }
     h+='</div>';
   }
 
