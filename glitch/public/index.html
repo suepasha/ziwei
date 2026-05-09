@@ -161,8 +161,8 @@ var MO={
   zh:['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月']
 };
 var TX={
-  en:{birth:'Birth Information',name:'Name (optional)',ph:'Enter name…',gender:'Gender',male:'Male',female:'Female',yr:'Year',mo:'Month',dy:'Day',hr:'Birth Hour',btn:'Generate',zi:'Born after midnight?',zino:'No (23:00–23:59)',ziyes:'Yes (00:00–00:59)'},
-  zh:{birth:'出生資料',name:'姓名（選填）',ph:'輸入姓名…',gender:'性別',male:'男',female:'女',yr:'年',mo:'月',dy:'日',hr:'出生時辰',btn:'送出',zi:'午夜後出生？',zino:'否 (23:00–23:59)',ziyes:'是 (00:00–00:59)'}
+  en:{birth:'Birth Information',name:'Name (optional)',ph:'Enter name…',gender:'Gender',male:'Male',female:'Female',yr:'Year',mo:'Month',dy:'Day',hr:'Birth Hour',btn:'Generate',zi:'Born after midnight?',zino:'No (23:00–23:59)',ziyes:'Yes (00:00–00:59)',modelbl:'Reading type',modefull:'Full reading',modeq:'Question only',modeboth:'Both',qlbl:'Your question',qph:'e.g. Should I change jobs this year? Why do I keep having the same argument with my partner?'},
+  zh:{birth:'出生資料',name:'姓名（選填）',ph:'輸入姓名…',gender:'性別',male:'男',female:'女',yr:'年',mo:'月',dy:'日',hr:'出生時辰',btn:'送出',zi:'午夜後出生？',zino:'否 (23:00–23:59)',ziyes:'是 (00:00–00:59)',modelbl:'解讀類型',modefull:'完整解讀',modeq:'僅回答問題',modeboth:'兩者都要',qlbl:'你的問題',qph:'例如：今年適合換工作嗎？為什麼我和另一半總是在吉話不合？'}
 };
 
 function setLang(l){
@@ -190,6 +190,12 @@ function setLang(l){
   document.getElementById('t-zi').textContent=t.zi;
   document.getElementById('t-zi-no').textContent=t.zino;
   document.getElementById('t-zi-yes').textContent=t.ziyes;
+  if(document.getElementById('t-mode-lbl'))document.getElementById('t-mode-lbl').textContent=t.modelbl;
+  if(document.getElementById('t-mode-full'))document.getElementById('t-mode-full').textContent=t.modefull;
+  if(document.getElementById('t-mode-q'))document.getElementById('t-mode-q').textContent=t.modeq;
+  if(document.getElementById('t-mode-both'))document.getElementById('t-mode-both').textContent=t.modeboth;
+  if(document.getElementById('t-q'))document.getElementById('t-q').textContent=t.qlbl;
+  if(document.getElementById('f-q'))document.getElementById('f-q').placeholder=t.qph;
   rebuildMonths();
 }
 
@@ -304,9 +310,9 @@ async function generate(){
     var prompt;
     if(readMode==='question'){
       if(LANG==='en'){
-        prompt=fp+'\n\nYou are a Zi Wei Dou Shu master. Answer ONLY the question. No full reading.\nOutput ONLY:\n\n===META===\nLunar: '+chart.lunarDate+'\nLife Palace: '+lifePal.branch+'\n5-Element: '+chart.fiveElements+'\n\n===QUESTION===\nIMPORTANT: use exactly ===QUESTION=== as the marker above.\nAsked: '+userQ+'\n[Answer the way a trusted advisor would. Say what will actually happen or what to do. No jargon: no palace, no affliction, no transformation, no energies. No star names. No Chinese characters. GOOD: "2026 is a difficult year to re-enter work. Wait until 2027 if you can." BAD: "Your Career Palace shows affliction chains." 3-5 sentences. Direct. Concrete.]';
+        prompt=fp+'\n\nYou are a Zi Wei Dou Shu master. Answer ONLY the question. No full reading.\nOutput ONLY:\n\n===META===\nLunar: '+chart.lunarDate+'\nLife Palace: '+lifePal.branch+'\n5-Element: '+chart.fiveElements+'\n\n===QUESTION===\nIMPORTANT: use exactly ===QUESTION=== as the marker above.\nAsked: '+userQ+'\n[Answer like a trusted friend, not an astrologer. ABSOLUTELY FORBIDDEN: Chinese characters, star names, palace names, terms like 化忌/飛化/三合, markdown headers, bullet points with Chinese. BAD: "夫妻宮 with 文昌化忌 creates instability." GOOD: "Your chart shows relationships matter deeply to you but keep getting complicated — not because you choose wrong, but because your personality is strong enough to either inspire or exhaust people. In 2026 something in your closest relationship comes to a head. Say what needs saying before it says itself." Plain English. Second person. Concrete. 3-5 sentences.]';
       } else {
-        prompt=fp+'\n\n\u4f60\u662f\u7d2b\u5fae\u6597\u6578\u547d\u7406\u5e2b\u3002\u53ea\u56de\u7b54\u4e0b\u9762\u554f\u984c\u3002\n\u53ea\u8f38\u51fa\uff1a\n\n===META===\n\u8fb2\u66c6\uff1a'+chart.lunarDate+'\n\u547d\u5bae\uff1a'+lifePal.branch+'\n\u4e94\u884c\u5c40\uff1a'+chart.fiveElements+'\n\n===QUESTION===\n\u91cd\u8981\uff1a\u4e0a\u9762\u7684\u6bb5\u843d\u6a19\u8a18\u662f===QUESTION===\u3002\n\u554f\uff1a'+userQ+'\n[\u76f4\u63a5\u56de\u7b54\u3002\u8aaa\u660e\u6700\u76f8\u95dc\u7684\u5bae\u4f4d\u548c\u56db\u5316\u3002\u5177\u9ad4\u884c\u52d5\u30023-5\u53e5\u3002\u4e0d\u8aaa\u5ee2\u8a71\u3002]';
+        prompt=fp+'\n\n\u4f60\u662f\u7d2b\u5fae\u6597\u6578\u547d\u7406\u5e2b\u3002\u53ea\u56de\u7b54\u4e0b\u9762\u554f\u984c\u3002\n\u53ea\u8f38\u51fa\uff1a\n\n===META===\n\u8fb2\u66c6\uff1a'+chart.lunarDate+'\n\u547d\u5bae\uff1a'+lifePal.branch+'\n\u4e94\u884c\u5c40\uff1a'+chart.fiveElements+'\n\n===QUESTION===\n\u7121\u8ad6\u554f\u984c\u7528\u4ec0\u9ebc\u8a9e\u8a00\uff0c\u4e00\u5f8b\u7528\u7e41\u9ad4\u4e2d\u6587\u56de\u7b54\u3002\n\u91cd\u8981\uff1a\u4e0a\u9762\u7684\u6bb5\u843d\u6a19\u8a18\u662f===QUESTION===\u3002\n\u554f\uff1a'+userQ+'\n[\u76f4\u63a5\u56de\u7b54\u3002\u8aaa\u660e\u6700\u76f8\u95dc\u7684\u5bae\u4f4d\u548c\u56db\u5316\u3002\u5177\u9ad4\u884c\u52d5\u30023-5\u53e5\u3002\u4e0d\u8aaa\u5ee2\u8a71\u3002]';
       }
     } else if(LANG==='en'){
       prompt=fp+'\n\n'+
@@ -338,7 +344,7 @@ async function generate(){
 cy+' (Age X) | Palace | [career: move or hold? money: in or out? relationships: anything shifting?]\n'+
 (cy+1)+' (Age X) | Palace | [same format]\n'+
 (cy+2)+' (Age X) | Palace | [same format]\n\n'+
-'===SUMMARY===\n'+(name||'You')+' are someone who:\n\u2022 [essential truth]\n\u2022 [second truth]\n\u2022 [third truth]'+(userQ?'\n\n===QUESTION===\nIMPORTANT: use exactly ===QUESTION=== as the marker.\nAsked: '+userQ+'\n[Answer the way a trusted advisor would. No jargon. No palace names. No star names. No Chinese. Say what to do. 3-5 sentences.]':'');
+'===SUMMARY===\n'+(name||'You')+' are someone who:\n\u2022 [essential truth]\n\u2022 [second truth]\n\u2022 [third truth]'+(userQ?'\n\n===QUESTION===\nIMPORTANT: use exactly ===QUESTION=== as the marker.\nAsked: '+userQ+'\n[Answer like a trusted friend, not an astrologer. ABSOLUTELY FORBIDDEN: Chinese characters, star names, palace names, terms like 化忌/飛化/三合, markdown headers, bullet points with Chinese. BAD: "夫妻宮 with 文昌化忌 creates instability." GOOD: "Your chart shows relationships matter deeply to you but keep getting complicated — not because you choose wrong, but because your personality is strong enough to either inspire or exhaust people. In 2026 something in your closest relationship comes to a head. Say what needs saying before it says itself." Plain English. Second person. Concrete. 3-5 sentences.]':'');
     } else {
       prompt=fp+'\n\n'+
 '\u95dc\u9375\u683c\u5f0f\uff1a\u8f38\u51fa\u5fc5\u9808\u5f9e===META===\u958b\u59cb\uff0c\u4f9d\u5e8f\u5305\u542b\uff1a===META=== ===LIFE PORTRAIT=== ===PALACES=== ===CYCLES=== ===YEARLY=== ===SUMMARY===\n\n'+
@@ -361,7 +367,7 @@ cy+' (Age X) | Palace | [career: move or hold? money: in or out? relationships: 
 '===CYCLES===\n[\u6bcf\u5927\u9650\u5169\u53e5\u5beb\u5728\u540c\u4e00\u884c\u3002\u8aaa\u51fa\u88ab\u555f\u52d5\u7684\u5bae\u4f4d\u548c\u5177\u9ad4\u767c\u751f\u4ec0\u9ebc\u3002]\n3-12 | \u6210\u5f62\u671f | [\u7b2c\u4e00\u53e5\u3002\u7b2c\u4e8c\u53e5\u3002]\n13-22 | \u63a2\u7d22\u671f | [\u7b2c\u4e00\u53e5\u3002\u7b2c\u4e8c\u53e5\u3002]\n23-32 | \u52a0\u901f\u671f | [\u7b2c\u4e00\u53e5\u3002\u7b2c\u4e8c\u53e5\u3002]\n33-42 | \u67b6\u69cb\u671f | [\u7b2c\u4e00\u53e5\u3002\u7b2c\u4e8c\u53e5\u3002]\n43-52 | \u9ad8\u5cf0\u671f | [\u7b2c\u4e00\u53e5\u3002\u7b2c\u4e8c\u53e5\u3002]\n53-62 | \u7be9\u9078\u671f | [\u7b2c\u4e00\u53e5\u3002\u7b2c\u4e8c\u53e5\u3002]\n63-72 | \u7a69\u5b9a\u671f | [\u7b2c\u4e00\u53e5\u3002\u7b2c\u4e8c\u53e5\u3002]\n73-82 | \u6c88\u6fb1\u671f | [\u7b2c\u4e00\u53e5\u3002\u7b2c\u4e8c\u53e5\u3002]\n\n'+
 '===YEARLY===\n[3\u884c\u3002\u6bcf\u884c\u5fc5\u9808\u6709\u5169\u500b|\u5206\u9694\u7b26\uff1a\u5e74\u4efd\uff08\u6b32\u6578\uff09| \u5bae\u4f4d | [2-3\u53e5\u56de\u7b54\uff1a\u4e8b\u696d\u8a72\u52d5\u9084\u662f\u5b88\u7a69\uff1f\u9322\u9032\u9084\u662f\u9322\u51fa\uff1f\u611f\u60c5\u6709\u6c92\u6709\u8b8a\u5316\uff1f\u7528\u5c0f\u9650\u8cc7\u6599\u3002]\n'+
 cy+'\uff0850\u6b72\u5de6\u53f3\uff09| \u5bae\u4f4d\u540d | [\u53e5\u5b50]\n'+(cy+1)+'\uff0851\u6b72\u5de6\u53f3\uff09| \u5bae\u4f4d\u540d | [\u53e5\u5b50]\n'+(cy+2)+'\uff0852\u6b72\u5de6\u53f3\uff09| \u5bae\u4f4d\u540d | [\u53e5\u5b50]\n\n'+
-'===SUMMARY===\n'+(name||'\u4f60')+'是這樣一個人：\n\u2022 [\u6700\u6838\u5fc3\u7684\u771f\u76f8]\n\u2022 [\u7b2c\u4e8c\u500b\u771f\u76f8]\n\u2022 [\u8b93\u4eba\u8b80\u4e86\u653e\u4e0b\u624b\u6a5f\u7684\u90a3\u4e00\u884c]'+(userQ?'\n\n===QUESTION===\n\u91cd\u8981\uff1a\u4e0a\u9762\u7684\u6bb5\u843d\u6a19\u8a18\u662f===QUESTION===\u3002\n\u554f\uff1a'+userQ+'\n[\u76f4\u63a5\u56de\u7b54\u3002\u8aaa\u660e\u6700\u76f8\u95dc\u7684\u5bae\u4f4d\u548c\u56db\u5316\u3002\u5177\u9ad4\u884c\u52d5\u30023-5\u53e5\u3002]':'');
+'===SUMMARY===\n'+(name||'\u4f60')+'是這樣一個人：\n\u2022 [\u6700\u6838\u5fc3\u7684\u771f\u76f8]\n\u2022 [\u7b2c\u4e8c\u500b\u771f\u76f8]\n\u2022 [\u8b93\u4eba\u8b80\u4e86\u653e\u4e0b\u624b\u6a5f\u7684\u90a3\u4e00\u884c]'+(userQ?'\n\n===QUESTION===\n\u7121\u8ad6\u554f\u984c\u7528\u4ec0\u9ebc\u8a9e\u8a00\uff0c\u4e00\u5f8b\u7528\u7e41\u9ad4\u4e2d\u6587\u56de\u7b54\u3002\n\u91cd\u8981\uff1a\u4e0a\u9762\u7684\u6bb5\u843d\u6a19\u8a18\u662f===QUESTION===\u3002\n\u554f\uff1a'+userQ+'\n[\u76f4\u63a5\u56de\u7b54\u3002\u8aaa\u660e\u6700\u76f8\u95dc\u7684\u5bae\u4f4d\u548c\u56db\u5316\u3002\u5177\u9ad4\u884c\u52d5\u30023-5\u53e5\u3002]':'');
     }
 
     var res=await fetch('/proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:5000,messages:[{role:'user',content:prompt}]})});
