@@ -42,6 +42,9 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
 .err-box{display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:1rem 1.25rem;margin-bottom:1.25rem;font-size:13px;color:#b91c1c;line-height:1.7}
 .err-box.on{display:block}
 .results{display:none}.results.on{display:block}
+.stream-wrap{background:var(--ink2);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:1rem;min-height:120px}
+.stream-cursor::after{content:'▋';animation:blink 1s step-end infinite;color:var(--gold);font-size:14px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 .prof-hdr{margin-bottom:.75rem;padding-bottom:.75rem;border-bottom:1px solid var(--border)}
 .pname{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:500;color:var(--gold);margin-bottom:4px}
 .psub{font-size:13px;color:var(--cream3)}
@@ -584,16 +587,46 @@ zhHealthGuide+']\n\n'+
 
     }
 
-    var res=await fetch('/proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:5000,messages:[{role:'user',content:prompt}]})});
-    var raw=await res.text();
-    if(!raw)throw new Error('Empty response');
-    var apiData;
-    try{apiData=JSON.parse(raw);}catch(e){throw new Error('Bad JSON: '+raw.slice(0,100));}
-    if(apiData.error)throw new Error(apiData.error.message||'API error');
+    var res=await fetch('/proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:3500,stream:true,messages:[{role:'user',content:prompt}]})});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+
+    // Show streaming container immediately
+    var el=document.getElementById('results');
+    el.innerHTML='<div class="stream-wrap"><div class="stream-cursor"></div><div id="stream-txt" style="white-space:pre-wrap;font-size:13px;color:var(--cream2);line-height:1.8;font-family:inherit"></div></div>';
+    el.className='results on';
+    var streamTxt=document.getElementById('stream-txt');
+
+    var reader=res.body.getReader();
+    var decoder=new TextDecoder();
+    var accumulated='';
+    var buf='';
+
+    while(true){
+      var chunk=await reader.read();
+      if(chunk.done)break;
+      buf+=decoder.decode(chunk.value,{stream:true});
+      var lines=buf.split('\n');
+      buf=lines.pop(); // keep incomplete line
+      for(var i=0;i<lines.length;i++){
+        var line=lines[i].trim();
+        if(!line||line==='data: [DONE]')continue;
+        if(line.startsWith('data: ')){
+          try{
+            var ev=JSON.parse(line.slice(6));
+            if(ev.type==='content_block_delta'&&ev.delta&&ev.delta.type==='text_delta'){
+              accumulated+=ev.delta.text;
+              // Show last ~800 chars so user sees live text
+              streamTxt.textContent=accumulated.length>800?'…'+accumulated.slice(-800):accumulated;
+            }
+            if(ev.type==='error')throw new Error(ev.error&&ev.error.message||'Stream error');
+          }catch(e){if(e.message!=='Unexpected end of JSON input')throw e;}
+        }
+      }
+    }
+
+    if(!accumulated)throw new Error('No text returned');
     clearInterval(ticker);
-    var text=apiData.content&&apiData.content[0]?apiData.content[0].text:'';
-    if(!text)throw new Error('No text returned');
-    renderResults(text,name,year,month,day,hrTxt,gender,chart,readMode,userQ);
+    renderResults(accumulated,name,year,month,day,hrTxt,gender,chart,readMode,userQ);
 
   }catch(e){
     clearInterval(ticker);
