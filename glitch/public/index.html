@@ -284,6 +284,99 @@ async function generate(){
       return p.stem+p.branch+' '+p.name+(p.isBodyPalace?'/\u8eab\u5bae':'')+' \u5927\u9650'+p.decadeRange+(ms?' \u4e3b:'+ms:'')+(mi2?' \u8f14:'+mi2:'')+dm;
     }).join('\n');
 
+    // ── PRE-COMPUTED ASTROLOGICAL ANALYSIS ─────────────────────────────────
+    var LUCKY=['祿存','天魁','天鉞','左輔','右弼','龍池','鳳閣','天官','天福','天壽'];
+    var HARD=['擎羊','陀羅','火星','鈴星','地空','地劫','天空','截路','空亡'];
+    var WEALTH_S=['天府','武曲','太陰'];
+    var STRONG_B=['廟','旺'];
+    var WEAK_B=['陷','落'];
+
+    function gp(key){return chart.palaces.find(function(p){return p.name.indexOf(key)>-1;})||{majorStars:[],minorStars:[],decadeMutagen:[],name:''};}
+    function hasJi(p){return (p.majorStars||[]).some(function(s){return s.mutagen==='忌';});}
+    function allStars(p){return (p.majorStars||[]).concat(p.minorStars||[]);}
+    function isPos(p){
+      var ms=p.majorStars||[];
+      if(!ms.length)return true;
+      var top=ms[0];
+      var strong=STRONG_B.indexOf(top.brightness)>-1;
+      var ji=hasJi(p);
+      var hard=allStars(p).filter(function(s){return HARD.indexOf(s.name)>-1;}).length;
+      if(WEAK_B.indexOf(top.brightness)>-1||ji)return false;
+      return strong&&hard===0;
+    }
+    function tone(p){
+      var ms=p.majorStars||[];
+      if(!ms.length)return 'NEUTRAL';
+      var top=ms[0];
+      var ji=hasJi(p);
+      var hard=allStars(p).filter(function(s){return HARD.indexOf(s.name)>-1;}).length;
+      var lucky=allStars(p).filter(function(s){return LUCKY.indexOf(s.name)>-1;}).length;
+      if(WEAK_B.indexOf(top.brightness)>-1&&ji)return 'CHALLENGING';
+      if(WEAK_B.indexOf(top.brightness)>-1||ji)return 'MIXED-DIFFICULT';
+      if(STRONG_B.indexOf(top.brightness)>-1&&lucky>0&&hard===0)return 'POSITIVE';
+      if(STRONG_B.indexOf(top.brightness)>-1&&hard===0)return 'MOSTLY-POSITIVE';
+      return 'MIXED';
+    }
+
+    var lifePO=gp('命');
+    var wealthPO=gp('財帛');
+    var careerPO=gp('官祿');
+    var travelPO=gp('遷移');
+    var spousePO=gp('夫妻');
+    var fudePO=gp('福德');
+    var sibPO=gp('兄弟');
+    var parentsPO=gp('父母');
+    var healthPO=gp('疾厄');
+    var homePO=gp('田宅');
+    var childPO=gp('子女');
+    var netPO=gp('僕役');
+
+    // Wealth type
+    var wxInLW=WEALTH_S.some(function(n){return lifePO.majorStars.concat(wealthPO.majorStars).some(function(s){return s.name===n&&STRONG_B.indexOf(s.brightness)>-1&&!s.mutagen;});});
+    var wxInCT=WEALTH_S.some(function(n){return careerPO.majorStars.concat(travelPO.majorStars).some(function(s){return s.name===n;});});
+    var wealthType=wxInLW?'先天財 — resources come with the person, not earned from scratch':wxInCT?'後天財 — must be built through work and movement':'後天財 — no wealth stars in Life/Wealth palace';
+
+    // Travel strength
+    var tvStrong=travelPO.majorStars.some(function(s){return STRONG_B.indexOf(s.brightness)>-1;});
+    var tvJi=hasJi(travelPO);
+    var tvLucky=allStars(travelPO).some(function(s){return LUCKY.indexOf(s.name)>-1;});
+    var tvCount=travelPO.majorStars.length;
+    var travelStr=tvCount>=2&&tvStrong&&!tvJi?'DOMINANT — departure is a defining life theme; speak in past/present if person is 40+':tvCount>=1&&!tvJi?'MODERATE — external environment helps; moving cities is a valid expression, not necessarily emigration':'WEAK — rooted path works better for this chart';
+
+    // Marriage
+    var mVerdict=isPos(spousePO)&&isPos(fudePO)?'Both Spouse and Inner Life are favorable — relationship can sustain':isPos(spousePO)&&!isPos(fudePO)?'Spouse palace favorable but Inner Life troubled — sustainability at risk despite surface harmony':!isPos(spousePO)&&isPos(fudePO)?'Spouse palace has friction but Inner Life stable — relationship survives through inner resilience':'Both Spouse and Inner Life show difficulty';
+
+    // Siblings
+    var sibJi=hasJi(sibPO);
+    var sibHard=allStars(sibPO).some(function(s){return HARD.indexOf(s.name)>-1;});
+    var sibVerdict=sibJi?'化忌 present — financial friction from shared dealings is most likely pattern':sibHard?'Difficult stars present — some friction; geographic separation more likely than emotional estrangement':'No major friction — relationship is essentially stable';
+
+    // Per-palace tone verdicts
+    var palTones=[
+      ['命宮',lifePO],['兄弟',sibPO],['夫妻',spousePO],['子女',childPO],
+      ['財帛',wealthPO],['疾厄',healthPO],['遷移',travelPO],['僕役',netPO],
+      ['官祿',careerPO],['田宅',homePO],['福德',fudePO],['父母',parentsPO]
+    ].map(function(pair){
+      var nm=pair[0],po=pair[1];
+      var ms=(po.majorStars||[]).map(function(s){return s.name+(s.mutagen||'')+'('+s.brightness+')';}).join(' ');
+      var lk=allStars(po).filter(function(s){return LUCKY.indexOf(s.name)>-1;}).map(function(s){return s.name;}).join(' ');
+      var hd=allStars(po).filter(function(s){return HARD.indexOf(s.name)>-1;}).map(function(s){return s.name;}).join(' ');
+      return nm+' | stars:'+ms+(lk?' lucky:'+lk:'')+(hd?' hard:'+hd:'')+' | TONE:'+tone(po);
+    }).join('\n');
+
+    var analysisBlock=
+      '=== PRE-COMPUTED CHART ANALYSIS — READ THIS BEFORE WRITING ANYTHING ===\n'+
+      'WEALTH TYPE: '+wealthType+'\n'+
+      'TRAVEL: '+travelStr+'\n'+
+      'MARRIAGE: '+mVerdict+'\n'+
+      'SIBLINGS: '+sibVerdict+'\n\n'+
+      'PALACE TONES — use these, do not override based on Life Palace impression:\n'+
+      palTones+'\n'+
+      'RULE: if a palace shows POSITIVE or MOSTLY-POSITIVE tone, the reading for that domain MUST be fundamentally positive.\n'+
+      'A person with difficult Life Palace stars CAN have a peaceful Parents palace. Read the palace tone above, not your impression of the chart.\n'+
+      '=== END PRE-COMPUTED ANALYSIS ===';
+
+
     var SFMAP={'\u5b50':['\u8fb0','\u7533','\u5348'],'\u4e11':['\u5df3','\u9149','\u672a'],'\u5bc5':['\u5348','\u620c','\u7533'],'\u536f':['\u672a','\u4ea5','\u9149'],'\u8fb0':['\u7533','\u5b50','\u620c'],'\u5df3':['\u9149','\u4e11','\u4ea5'],'\u5348':['\u620c','\u5bc5','\u5b50'],'\u672a':['\u4ea5','\u536f','\u4e11'],'\u7533':['\u5b50','\u8fb0','\u5bc5'],'\u9149':['\u4e11','\u5df3','\u536f'],'\u620c':['\u5bc5','\u5348','\u8fb0'],'\u4ea5':['\u536f','\u672a','\u5df3']};
     var sfBranches=SFMAP[lifePal.branch]||[];
     var sfPalaces=chart.palaces.filter(function(p){return sfBranches.indexOf(p.branch)>-1;}).map(function(p){return p.name+'['+p.majorStars.map(function(s){return s.name+'('+s.brightness+')';}).join('\u00b7')+']';}).join(' | ');
@@ -312,8 +405,9 @@ async function generate(){
       'Harmonious palaces: '+sfPalaces+'\n'+
       (ymStr?'Life transforms: '+ymStr+'\n':'')+
       (flyJiStr?'Friction chains: '+flyJiStr+'\n':'')+
-      'Life Master: '+chart.lifeMaster+' Body: '+chart.bodyMaster+' Five Elements: '+chart.fiveElements+
-      (yearlyStr?'\nRecent yearly context (small cycle + annual friction, for question-mode use):\n'+yearlyStr:'');
+      'Life Master: '+chart.lifeMaster+' Body: '+chart.bodyMaster+' Five Elements: '+chart.fiveElements+'\n'+
+      analysisBlock+
+      (yearlyStr?'\nRecent yearly context:\n'+yearlyStr:'');
 
     var prompt;
     if(readMode==='question'){
@@ -348,10 +442,8 @@ async function generate(){
 'RULE 1 \u2014 NO TECHNICAL TERMS IN OUTPUT:\n'+
 'Never name stars, palaces, transformations, or astrological terms in the output. No Chinese characters in English output. Translate every configuration into what the person actually experiences.\n\n'+
 
-'RULE 2 \u2014 READ EACH PALACE FROM ITS OWN STARS:\n'+
-'Before writing any palace paragraph: (1) identify the stars actually in that specific palace; (2) note whether dominant stars are strong (\u5edf/\u65fa) or weak (\u964f/\u843d); (3) note luck stars vs difficult stars; (4) only then write.\n'+
-'Do not project from Life Palace onto other palaces. A chart with difficult Life Palace stars can still have peaceful Parents palace if the stars there are peaceful. Read what is actually there.\n'+
-'STAR POLARITY: if the dominant star in a palace is auspicious, the reading for that domain must be fundamentally positive \u2014 regardless of what Life Palace shows.\n\n'+
+'RULE 2 \u2014 USE THE PRE-COMPUTED ANALYSIS:\n'+
+'The chart data above contains a PRE-COMPUTED ANALYSIS section with palace tones already calculated. Before writing any palace paragraph, look up that palace\'s TONE in the analysis. POSITIVE or MOSTLY-POSITIVE means write a fundamentally positive reading. MIXED-DIFFICULT or CHALLENGING means acknowledge real friction. Do not override these verdicts based on your impression of Life Palace.\n\n'+
 
 'RULE 3 \u2014 VOICE:\n'+
 'Write what specifically happens, not what the person generally feels. Name the actual situation, not a metaphor for it. No brackets of any kind. No abstract words standing in for concrete events.\n\n'+
@@ -435,10 +527,8 @@ async function generate(){
 '\u898f\u5247\u4e00\u2014\u2014\u8f38\u51fa\u4e0d\u8aaa\u8853\u8a9e\uff1a\n'+
 '\u4e0d\u8aaa\u661f\u540d\u3001\u5bae\u4f4d\u540d\u3001\u56db\u5316\u540d\u8a5e\u3002\u628a\u6bcf\u500b\u547d\u76e4\u914d\u7f6e\u7ffb\u8b6f\u70ba\u9019\u500b\u4eba\u5be6\u969b\u7d93\u6b77\u7684\u4e8b\u3002\n\n'+
 
-'\u898f\u5247\u4e8c\u2014\u2014\u5148\u770b\u5bae\u4f4d\u81ea\u8eab\u7684\u661f\u66dc\uff1a\n'+
-'\u5beb\u4efb\u4f55\u5bae\u4f4d\u4e4b\u524d\uff1a\uff081\uff09\u77e5\u9053\u90a3\u500b\u5bae\u4f4d\u91cc\u6709\u54ea\u4e9b\u5177\u9ad4\u7684\u661f\u66dc\uff1b\uff082\uff09\u4e3b\u661f\u5f37\uff08\u5edf\u65fa\uff09\u9084\u662f\u5f31\uff08\u964f\u843d\uff09\uff1f\u5409\u9084\u662f\u51f6\uff1f\uff083\uff09\u6709\u6c92\u6709\u5409\u661f\u6216\u96e3\u661f\uff1b\uff084\uff09\u624d\u5beb\u3002\n'+
-'\u4e0d\u8981\u5f9e\u547d\u5bae\u63a8\u6f14\u5176\u4ed6\u5bae\u4f4d\u3002\u547d\u5bae\u56f0\u96e3\u4e0d\u4ee3\u8868\u7236\u6bcd\u5bae\u56f0\u96e3\u3002\u770b\u5b83\u5178\u5be6\u969b\u6709\u4ec0\u9ebc\u3002\n'+
-'\u661f\u66dc\u6b63\u8ca0\u6027\uff1a\u5bae\u4f4d\u4e3b\u661f\u5409\u5229\uff0c\u5c31\u5beb\u6b63\u9762\u7684\u89e3\u8b80\u2014\u2014\u4e0d\u8ad6\u547d\u5bae\u5c55\u793a\u4ec0\u9ebc\u6027\u683c\u3002\n\n'+
+'\u898f\u5247\u4e8c\u2014\u2014\u4f7f\u7528\u9810\u5148\u8a08\u7b97\u7684\u5206\u6790\uff1a\n'+
+'\u4e0a\u65b9\u7684\u547d\u76e4\u8cc7\u6599\u4e2d\u5df2\u7d93\u9810\u5148\u8a08\u7b97\u4e86\u6bcf\u500b\u5bae\u4f4d\u7684\u8abf\u6027\u3002\u5beb\u4efb\u4f55\u5bae\u4f4d\u4e4b\u524d\uff0c\u5148\u770b\u90a3\u500b\u5bae\u4f4d\u7684TONE\u6a19\u8a18\u3002POSITIVE\u6216MOSTLY-POSITIVE\u5c31\u8981\u5beb\u6b63\u9762\u7684\u89e3\u8b80\u3002MIXED-DIFFICULT\u6216CHALLENGING\u5c31\u627f\u8a8d\u771f\u5be6\u7684\u7d77\u6170\u3002\u4e0d\u8981\u7528\u547d\u5bae\u7684\u5370\u8c61\u53bb\u8986\u84cb\u9019\u4e9b\u5df2\u7d93\u8a08\u7b97\u597d\u7684\u7d50\u679c\u3002\n\n'+
 
 '\u898f\u5247\u4e09\u2014\u2014\u8072\u97f3\uff1a\n'+
 '\u5beb\u5177\u9ad4\u767c\u751f\u7684\u4e8b\uff0c\u4e0d\u8981\u5beb\u6284\u8c61\u7684\u611f\u53d7\u3002\u4e0d\u8981\u7528\u6bd4\u55bb\u4ee3\u66ff\u5177\u9ad4\u5c40\u9762\u3002\u4e0d\u52a0\u4efb\u4f55\u62ec\u865f\u3002\n\n'+
