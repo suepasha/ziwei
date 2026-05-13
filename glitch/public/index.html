@@ -54,16 +54,13 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
 .pal-name{font-weight:600;color:var(--gold);margin-right:4px}
 .scard-full{background:var(--ink2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.125rem;margin-bottom:10px}
 .sh{font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
-.blist{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px}
-.blist li{font-size:13px;color:var(--cream2);line-height:1.65;padding-left:14px;position:relative}
-.blist li::before{content:"—";position:absolute;left:0;color:var(--gold2);font-size:11px;line-height:1.7}
 .cycles{display:flex;flex-direction:column;gap:7px}
 .cyc{padding:10px 14px;background:var(--ink3);border-radius:6px;border-left:2px solid var(--border2)}
 .cy-lbl{font-size:12px;font-weight:500;color:var(--cream);margin-bottom:3px}
 .cy-txt{font-size:13px;color:var(--cream3);line-height:1.7}
 .btn-new{width:100%;padding:12px;background:none;border:1px solid var(--border2);border-radius:8px;color:var(--cream2);font-family:'Jost',sans-serif;font-size:14px;cursor:pointer;margin-top:1.5rem;transition:.2s}
 .btn-new:hover{border-color:var(--gold);color:var(--gold)}
-.mp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-bottom:1.5rem;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;display:none}
+.mp-grid{grid-template-columns:repeat(4,1fr);gap:2px;margin-bottom:1.5rem;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;display:none}
 .mp-grid.show{display:grid}
 .mp-cell{background:#f0ece8;padding:6px;min-height:160px;font-size:11px;display:flex;flex-direction:column;gap:2px}
 .mp-cell.life{background:#c8a898}.mp-cell.body{background:#dce4ee}.mp-cell.sanfang{background:#dde8dc}
@@ -196,12 +193,12 @@ function setLang(l){
   document.getElementById('t-zi').textContent=t.zi;
   document.getElementById('t-zi-no').textContent=t.zino;
   document.getElementById('t-zi-yes').textContent=t.ziyes;
-  if(document.getElementById('t-mode-lbl'))document.getElementById('t-mode-lbl').textContent=t.modelbl;
-  if(document.getElementById('t-mode-full'))document.getElementById('t-mode-full').textContent=t.modefull;
-  if(document.getElementById('t-mode-q'))document.getElementById('t-mode-q').textContent=t.modeq;
-  if(document.getElementById('t-mode-both'))document.getElementById('t-mode-both').textContent=t.modeboth;
-  if(document.getElementById('t-q'))document.getElementById('t-q').textContent=t.qlbl;
-  if(document.getElementById('f-q'))document.getElementById('f-q').placeholder=t.qph;
+  document.getElementById('t-mode-lbl').textContent=t.modelbl;
+  document.getElementById('t-mode-full').textContent=t.modefull;
+  document.getElementById('t-mode-q').textContent=t.modeq;
+  document.getElementById('t-mode-both').textContent=t.modeboth;
+  document.getElementById('t-q').textContent=t.qlbl;
+  document.getElementById('f-q').placeholder=t.qph;
   rebuildMonths();
 }
 
@@ -241,7 +238,7 @@ function rebuildMonths(){
 </script>
 <script>
 
-var _lastChart=null,_lastName='';
+var _lastChart=null;
 
 async function generate(){
   var name=document.getElementById('f-name').value.trim();
@@ -254,9 +251,9 @@ async function generate(){
   var hrTxt=hrSel.options[hrSel.selectedIndex].text;
   var gender=document.querySelector('input[name=gender]:checked').value;
   var nightZi=document.querySelector('input[name=nightzi]:checked');
-  var isNightZi=hourIndex==='0'&&nightZi&&nightZi.value==='true'?'true':'false';
+  var isNightZi=String(hourIndex==='0'&&!!nightZi&&nightZi.value==='true');
   var readMode=document.querySelector('input[name=readmode]:checked').value;
-  var userQ=(readMode==='question'||readMode==='both')&&document.getElementById('f-q')?document.getElementById('f-q').value.trim():'';
+  var userQ=(readMode==='question'||readMode==='both')?document.getElementById('f-q').value.trim():'';
 
   document.getElementById('btn-gen').disabled=true;
   document.getElementById('results').className='results';
@@ -341,8 +338,6 @@ async function generate(){
     var parentsPO=gp('父母');
     var healthPO=gp('疾厄');
     var homePO=gp('田宅');
-    var childPO=gp('子女');
-    var netPO=gp('僕役');
 
     // Wealth type
     var wxInLW=WEALTH_S.some(function(n){return lifePO.majorStars.concat(wealthPO.majorStars).some(function(s){return s.name===n&&STRONG_B.indexOf(s.brightness)>-1&&s.mutagen!=='\u5fcc';});});
@@ -353,7 +348,7 @@ async function generate(){
     var tvStrong=travelPO.majorStars.some(function(s){return STRONG_B.indexOf(s.brightness)>-1;});
     var tvJi=hasJi(travelPO);
     var tvCount=travelPO.majorStars.length;
-    var travelStr=tvCount>=2&&tvStrong&&!tvJi?'DOMINANT — departure is a defining life theme; speak in past/present if person is 40+':tvCount>=1&&tvStrong&&!tvJi?'MODERATE — external helps; moving cities is a valid expression, not necessarily emigration':tvCount>=1&&!tvJi?'MILD — slight outward preference but not a defining theme':'WEAK — rooted path works better for this chart';
+    var travelStr=tvCount>=2&&tvStrong&&!tvJi?'DOMINANT — departure is a defining life theme; speak in past/present if person is 40+':tvCount>=1&&tvStrong&&!tvJi?'MODERATE — external helps; moving to a different city is enough, this does not require leaving the country':tvCount>=1&&!tvJi?'MILD — slight outward preference but not a defining theme':'WEAK — rooted path works better for this chart';
 
     // Marriage
     var mVerdict=isPos(spousePO)&&isPos(fudePO)?'Both Spouse and Inner Life are favorable — relationship can sustain':isPos(spousePO)&&!isPos(fudePO)?'Spouse palace favorable but Inner Life troubled — sustainability at risk despite surface harmony':!isPos(spousePO)&&isPos(fudePO)?'Spouse palace has friction but Inner Life stable — relationship survives through inner resilience':'Both Spouse and Inner Life show difficulty';
@@ -365,8 +360,8 @@ async function generate(){
 
     // Per-palace tone verdicts
     var palTones=[
-      ['命宮',lifePO],['兄弟',sibPO],['夫妻',spousePO],['子女',childPO],
-      ['財帛',wealthPO],['疾厄',healthPO],['遷移',travelPO],['僕役',netPO],
+      ['命宮',lifePO],['兄弟',sibPO],['夫妻',spousePO],['子女',gp('子女')],
+      ['財帛',wealthPO],['疾厄',healthPO],['遷移',travelPO],['僕役',gp('僕役')],
       ['官祿',careerPO],['田宅',homePO],['福德',fudePO],['父母',parentsPO]
     ].map(function(pair){
       var nm=pair[0],po=pair[1];
@@ -598,15 +593,12 @@ async function generate(){
 
 '===CYCLES===\n'+
 '[Find which palace has \u5927\u9650XX-XX in the chart data \u2014 that is the life domain activated for that decade.\n'+
-'Also check DECADE \u5316\u5fcc in the pre-computed analysis \u2014 this tells you which palace is under friction stress. The activated palace is the main stage; the \u5316\u5fcc palace is where the cost lands.\n'+
+'Also check DECADE \u5316\u5fcc in the pre-computed analysis \u2014 the activated palace is the main stage; the \u5316\u5fcc palace shows where the cost lands. Both shape the reading.\n'+
 'Label: derive from the actual palace and its stars for THIS person \u2014 not a generic life stage.\n'+
-'WRONG labels: \"Self-Formation,\" \"Study Period,\" \"Career Friction,\" \"Health Phase\" \u2014 these are horoscope labels.\n'+
-'RIGHT labels: derive from what the decade palace actually activates. If Wealth palace is activated with difficult stars, the label should reflect what money does in this person\'s life that decade. If Travel is activated, reflect the outward movement theme specifically for this chart.\n'+
-'Format: RANGE (YEARS) | [specific label] | [what this decade means including \u5316\u5fcc impact] [one concrete directive]\n'+
-'All on one line. Never write palace names, star names in the output.\n'+
-'Flag the decade that represents this chart\'s peak.]\n'+
-'Format: RANGE (YEARS) | [label] | [what this decade means including where \u5316\u5fcc lands] [one directive]\n'+
-'All on one line. Never write palace names, star names, or generic labels like "Stabilization" in output.]\n'+
+'WRONG labels: Self-Formation, Study Period, Career Friction, Health Phase \u2014 these are horoscope labels, not chart readings.\n'+
+'RIGHT labels: derived from what the decade palace actually activates for this specific chart. Flag the decade that represents this chart\'s peak.\n'+
+'Format: RANGE (YEARS) | [label] | [what this decade means including \u5316\u5fcc impact] [one concrete directive]\n'+
+'All on one line. Never write palace names, star names, or generic labels in output.]\n'+
 '3-12 ('+( +year+ 3)+'-'+(+year+12)+') | [label] | [text]\n'+
 '13-22 ('+(+year+13)+'-'+(+year+22)+') | [label] | [text]\n'+
 '23-32 ('+(+year+23)+'-'+(+year+32)+') | [label] | [text]\n'+
@@ -641,11 +633,16 @@ async function generate(){
 '\u7981\u6b62\u6307\u4ee4\u8a5e\u5f59\u6d41\u51fa\u8f38\u51fa\uff1a\u4e0d\u8981\u628a\u6307\u5c0e\u8a9e\u8a00\u5beb\u9032\u89e3\u8b80\u4e2d\u3002\u300c\u96d9\u5200\u5291\u300d\u3001\u300c\u5929\u82b1\u677f\u300d\u3001\u300c\u8abf\u6027\u300d\u3001\u300c\u5f8c\u5929\u8ca1\u300d\u7b49\u8a5e\u5f59\u662f\u5206\u6790\u5de5\u5177\uff0c\u4e0d\u662f\u8f38\u51fa\u8a9e\u8a00\u3002\n\n'+
 
 '\u898f\u5247\u4e8c\u2014\u2014\u4f7f\u7528\u9810\u5148\u8a08\u7b97\u7684\u5206\u6790\uff1a\n'+
-'\u4e0a\u65b9\u7684\u547d\u76e4\u8cc7\u6599\u4e2d\u5df2\u7d93\u9810\u5148\u8a08\u7b97\u4e86\u6bcf\u500b\u5bae\u4f4d\u7684\u8abf\u6027\u3002\u5beb\u4efb\u4f55\u5bae\u4f4d\u4e4b\u524d\uff0c\u5148\u770b\u90a3\u500b\u5bae\u4f4d\u7684TONE\u6a19\u8a18\u3002POSITIVE\u6216MOSTLY-POSITIVE\u5c31\u8981\u5beb\u6b63\u9762\u7684\u89e3\u8b80\u3002MIXED-DIFFICULT\u6216CHALLENGING\u5c31\u627f\u8a8d\u771f\u5be6\u7684\u7d77\u6170\u3002\u4e0d\u8981\u7528\u547d\u5bae\u7684\u5370\u8c61\u53bb\u8986\u84cb\u9019\u4e9b\u5df2\u7d93\u8a08\u7b97\u597d\u7684\u7d50\u679c\u3002\n\n'+
+'\u4e0a\u65b9\u7684\u547d\u76e4\u8cc7\u6599\u4e2d\u5df2\u7d93\u9810\u5148\u8a08\u7b97\u4e86\u6bcf\u500b\u5bae\u4f4d\u7684\u8abf\u6027\u3002\u5beb\u4efb\u4f55\u5bae\u4f4d\u4e4b\u524d\uff0c\u5148\u770b\u90a3\u500b\u5bae\u4f4d\u7684TONE\u6a19\u8a18\u3002\n'+
+'POSITIVE\u6216MOSTLY-POSITIVE\uff1a\u5beb\u6b63\u9762\u7684\u89e3\u8b80\u3002\n'+
+'MIXED\uff1a\u9019\u500b\u5bae\u4f4d\u6709\u771f\u5be6\u7684\u512a\u9ede\u4e5f\u6709\u9700\u8981\u6ce8\u610f\u7684\u5730\u65b9\u2014\u2014\u5169\u8005\u90fd\u5beb\u3002\u4e0d\u8981\u628a MIXED\u5beb\u6210\u6574\u9ad4\u8ca0\u9762\u3002\n'+
+'MIXED-DIFFICULT\u6216CHALLENGING\uff1a\u627f\u8a8d\u771f\u5be6\u3001\u53cd\u8986\u51fa\u73fe\u7684\u7d77\u6170\u3002\n'+
+'\u4e0d\u8981\u7528\u547d\u5bae\u7684\u5370\u8c61\u53bb\u8986\u84cb\u9019\u4e9b\u5df2\u7d93\u8a08\u7b97\u597d\u7684\u7d50\u679c\u3002\n\n'+
 
 '\u898f\u5247\u4e09\u2014\u2014\u8072\u97f3\uff1a\n'+
 '\u5beb\u5177\u9ad4\u767c\u751f\u7684\u4e8b\uff0c\u4e0d\u8981\u5beb\u6284\u8c61\u7684\u611f\u53d7\u3002\u4e0d\u8981\u7528\u6bd4\u55bb\u4ee3\u66ff\u5177\u9ad4\u5c40\u9762\u3002\u4e0d\u52a0\u4efb\u4f55\u62ec\u865f\u3002\n'+
 '\u4e0d\u7528\u6bd4\u55bb\u3002\u4e0d\u8981\u7528\u5f62\u8c61\u5316\u8a9e\u8a00\u63cf\u8ff0\u6027\u683c\u6216\u60c5\u5883\u3002\u76f4\u63a5\u8aaa\u3002\n'+
+'\u76f4\u63a5\u7684\u6027\u683c\u8ff0\u8ff0\u53ef\u4ee5\u7528\uff0c\u4e5f\u9f13\u52f5\u7528\uff1a\u300c\u91cd\u611f\u60c5\u300d\u3001\u300c\u500b\u6027\u7387\u76f4\u300d\u3001\u300c\u8aaa\u8a71\u76f4\u63a5\u300d\u2014\u2014\u9019\u4e9b\u4e0d\u662f\u6bd4\u55bb\uff0c\u662f\u6027\u683c\u4e8b\u5be6\u3002\u4e0d\u5141\u8a31\u7684\u662f\uff1a\u7528\u6bd4\u55bb\u4ee3\u66ff\u5177\u9ad4\u5c40\u9762\u3002\n'+
 '\u932f\u8aa4\uff1a\u300c\u4f60\u5167\u5fc3\u6709\u4e00\u628a\u5c3a\uff0c\u800c\u90a3\u628a\u5c3a\u7684\u5239\u5ea6\u6bd4\u5927\u90e8\u5206\u4eba\u5bc6\u300d\n'+
 '\u6b63\u78ba\uff1a\u300c\u4f60\u5c0d\u7d30\u7bc0\u7684\u8981\u6c42\u6bd4\u5927\u591a\u6578\u4eba\u9ad8\uff0c\u5225\u4eba\u8aaa\u5920\u4e86\u4f60\u9084\u6c92\u505c\u300d\n\n'+
 
@@ -654,7 +651,6 @@ async function generate(){
 '\u9810\u5148\u8a08\u7b97\u6c92\u6709\u8986\u84cb\u7684\u90e8\u5206\u2014\u2014\u81ea\u5df1\u61c9\u7528\uff1a\n'+
 '\u2022 \u547d\u5bae\uff1a\u548c\u8eab\u5bae\u4e00\u8d77\u770b\u2014\u2014\u5169\u8005\u76f8\u4e92\u5f37\u5316\u9084\u662f\u77db\u76fe\uff1f\n\u2022 \u672c\u5730\u9084\u662f\u5411\u5916\uff1a\u53ea\u6709\u9077\u79fb\u5f37\uff08DOMINANT\uff09\u6216\u5f31\uff08WEAK\uff09\u624d\u9700\u8981\u660e\u78ba\u8aaa\u3002\u4e2d\u7b49\uff08MODERATE/MILD\uff09\u7684\u548c\u5730\u7406\u6c92\u6c7a\u5b9a\u6027\u95dc\u4fc2\uff0c\u8df3\u904e\u4e0d\u8aaa\u3002\n'+
 '\u2022 \u798f\u5fb7\u5bae\uff1a\u63ed\u793a\u9019\u500b\u4eba\u5c0d\u751f\u6d3b\u6709\u6c92\u6709\u57fa\u672c\u7684\u8f15\u9b06\u611f\u3001\u80fd\u4e0d\u80fd\u76f8\u4fe1\u597d\u4e8b\u6703\u6301\u7e8c\u3001\u4eb2\u5bc6\u95dc\u4fc2\u80fd\u4e0d\u80fd\u649e\u884c\u3002\u8b93\u5b83\u5851\u9020\u958b\u5834\u3002\n'+
-'\u2022 \u5b98\u797f\uff1a\uff081\uff09\u5de5\u4f5c\u6027\u8cea\u2014\u2014\u6709\u6b0a\u578b\u661f\u66dc\u9700\u8981\u81ea\u5df1\u6389\u7684\u9818\u57df\uff0c\u4e0d\u4e00\u5b9a\u662f\u5275\u8fa6\u4eba\uff1b\uff082\uff09\u5929\u82b1\u677f\u2014\u2014\u8aa0\u5be6\u56de\u7b54\uff0c\u4e0d\u8981\u628a\u4e0a\u9650\u7576\u547d\u904b\u5beb\u3002\n'+
 '\u2022 \u5316\u5fcc\uff1a\u8aaa\u5be6\u969b\u7d50\u679c\uff0c\u4e0d\u8aaa\u6a5f\u5236\u3002\n\n'+
 
 '\u5f9e\u773e\u591a\u54e1\u6aa2\u67e5\uff1a\u5beb\u4efb\u4f55\u4e00\u53e5\u4e4b\u524d\uff0c\u554f\u2014\u2014\u9019\u53e5\u8a71\u80fd\u7528\u5230\u534a\u6578\u4ee5\u4e0a\u7684\u547d\u76e4\u55ce\uff1f\u5982\u679c\u53ef\u4ee5\uff0c\u91cd\u5beb\uff1a\n'+
@@ -705,14 +701,11 @@ async function generate(){
 
 '===SUMMARY===\n'+
 '[3-4句。這個段落不能重複已經在宮位中說過的內容。它的工作是找到只有把宮位放在一起看才呈現的真相——單一宮位無法告訴你的那個连結。不要整理已經說過的内容。問自己：官祿、財帛、疾厄三個宮位放在一起看呈現什麼？遷移和田宅合起來說什麼單一宮位說不到的？然後：這張命盤最重要的一件事。以及命盤對哪一個領域沒有定論，完全由自己决定。]'+
-'\uff081\uff09\u9019\u500b\u751f\u547d\u7684\u6574\u9ad4\u8ecc\u8de1\u2014\u2014\u4e0d\u662f\u5bae\u4f4d\u6e05\u55ae\uff0c\u800c\u662f\u7a7f\u901a\u6240\u6709\u5bae\u4f4d\u7684\u90a3\u4e00\u689d\u6558\u4e8b\u7dda\uff1b\n'+
-'\uff082\uff09\u9019\u5f35\u547d\u76e4\u6700\u91cd\u8981\u7684\u4e00\u4ef6\u4e8b\u2014\u2014\u9084\u5f13\u63bc\u4f4f\u5176\u4ed6\u4e00\u5207\u7684\u6d1e\u898b\uff1b\n'+
-'\uff083\uff09\u9019\u5f35\u547d\u76e4\u6c89\u9ed8\u7684\u4e00\u500b\u9818\u57df\u2014\u2014\u547d\u904b\u5728\u90a3\u88e1\u6c92\u6709\u5b9a\u8ad6\uff0c\u4e00\u5207\u7531\u81ea\u5df1\u51b3\u5b9a\u3002\u8acb\u660e\u78ba\u8aaa\u51fa\u4f86\u3002]'+
 (userQ?'\n\n===QUESTION===\n\u91cd\u8981\uff1a\u6a19\u8a18\u5c31\u662f===QUESTION===\u3002\u554f\uff1a'+userQ+'\n[\u4e0d\u8aaa\u661f\u540d\u3002\u4e0d\u8aaa\u5bae\u4f4d\u3002\u5beb\u5177\u9ad4\u767c\u751f\u7684\u4e8b\u30023-5\u53e5\u3002]':'');
 
     }
 
-    var res=await fetch('/proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:3500,stream:true,messages:[{role:'user',content:prompt}]})});
+    var res=await fetch('/proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:5000,stream:true,messages:[{role:'user',content:prompt}]})});
     if(!res.ok)throw new Error('HTTP '+res.status);
 
     // Show streaming container immediately
@@ -763,25 +756,22 @@ async function generate(){
 }
 
 function sec(t,tag){
+  // Normalize markdown the model sometimes adds before section markers
+  var normalized=t.replace(/^[#\s\-]*(?====)/gm,'');
   var marker='==='+tag+'===';
-  var idx=t.indexOf(marker);
+  var idx=normalized.indexOf(marker);
   if(idx<0)return'';
   var start=idx+marker.length;
-  while(start<t.length&&(t[start]===' '||t[start]==='\t'))start++;
-  if(start<t.length&&t[start]==='\r')start++;
-  if(start<t.length&&t[start]==='\n')start++;
-  var nextIdx=t.indexOf('\n===',start);
-  var content=nextIdx<0?t.slice(start):t.slice(start,nextIdx);
+  while(start<normalized.length&&(normalized[start]===' '||normalized[start]==='\t'))start++;
+  if(start<normalized.length&&normalized[start]==='\r')start++;
+  if(start<normalized.length&&normalized[start]==='\n')start++;
+  var nextIdx=normalized.indexOf('\n===',start);
+  var content=nextIdx<0?normalized.slice(start):normalized.slice(start,nextIdx);
   return content.trim();
-}
-
-function bullets(r){
-  return r.split('\n').map(function(l){return l.replace(/^[\u2022\u00b7\-]\s*/,'').trim();}).filter(Boolean);
 }
 
 function renderResults(text,name,year,month,day,hrTxt,gender,chart,readMode,userQ){
   _lastChart=chart;
-  _lastName=year+'\u5e74'+month+'\u6708'+day+'\u65e5'+hrTxt+' \u9670'+(gender==='Female'?'\u5973':'\u7537');
 
   // Join continuation lines (lines without | ) to previous cycle row
   var cycLines=sec(text,'CYCLES').split('\n').filter(Boolean);
@@ -816,7 +806,6 @@ function renderResults(text,name,year,month,day,hrTxt,gender,chart,readMode,user
     var paras=palacesRaw.split(/\n(?=[A-Za-z\u4e00-\u9fff][A-Za-z\u4e00-\u9fff ]{1,19}\s*\u2014)/);
     paras.forEach(function(para){
       para=para.trim();if(!para)return;
-      para=para.replace(/\*\*([^*]+)\*\*/g,'$1');
       para=para.replace(/^([A-Za-z\u4e00-\u9fff \/&]{2,20})\s*\u2014\s*/,'<span class="pal-name">$1</span> \u2014 ');
       h+='<div class="pal-para">'+para+'</div>';
     });
@@ -862,7 +851,7 @@ function renderResults(text,name,year,month,day,hrTxt,gender,chart,readMode,user
     h+='<div class="scard-full" style="margin-top:10px;border-left:3px solid var(--gold)">';
     h+='<div class="sh">'+(LANG==='zh'?'\u4f60\u7684\u554f\u984c':'Your Question')+'</div>';
     if(userQ){
-      h+='<p style="font-size:13px;color:var(--cream3);line-height:1.6;margin-bottom:12px;font-style:italic;border-bottom:0.5px solid var(--border);padding-bottom:10px">'+(LANG==='zh'?'\u554f\uff1a':'Q: ')+userQ+'</p>';
+      h+='<p style="font-size:13px;color:var(--cream3);line-height:1.6;margin-bottom:12px;font-style:italic;border-bottom:0.5px solid var(--border);padding-bottom:10px">'+(LANG==='zh'?'\u554f\uff1a':'Q: ')+escHtml(userQ)+'</p>';
     }
     if(qRaw){
       h+='<p style="font-size:13px;color:var(--cream2);line-height:1.85">'+qRaw+'</p>';
@@ -939,6 +928,7 @@ function buildMingpan(){
   return h;
 }
 
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function newGen(){
   document.getElementById('results').className='results';
   document.getElementById('results').innerHTML='';
