@@ -449,6 +449,7 @@ async function generate(){
 'RULE 1 \u2014 NO TECHNICAL TERMS IN OUTPUT:\n'+
 'Never name stars, palaces, transformations, or astrological terms in the output. No Chinese characters in English output. Translate every configuration into what the person actually experiences.\n'+
 'Also banned: palace location references like \u300c\u547d\u5bae\u5728\u4e11\u300d or \u300c\u5f9e\u81ea\u8eab\u4f4d\u7f6e\u4f86\u770b\u300d \u2014 never name which branch or position a palace sits in.\n'+
+'Also banned in output: instruction vocabulary like "double edge," "ceiling," "DOMINANT," "NEUTRAL-THIN," "inherited wealth," "earned wealth." These are analysis labels, not reading language. Translate them into what actually happens.\n'+
 'Also banned in Career: abstract management language like \u300c\u63a5\u63a1\u8cc7\u6e90\u300d\u3001\u300c\u5be6\u6b0a\u300d\u3001\u300c\u91cd\u5927\u8f49\u6298\u300d\u3001\u300c\u8017\u76e1\u80fd\u91cf\u300d. Replace with what actually happens: what kind of work, what it feels like when it goes right, what happens when they stay too long in the wrong place.\n\n'+
 
 'RULE 2 \u2014 USE THE PRE-COMPUTED ANALYSIS:\n'+
@@ -486,11 +487,11 @@ async function generate(){
 '[12 paragraphs in this order: Life \u00b7 Siblings \u00b7 Spouse \u00b7 Children \u00b7 Wealth \u00b7 Health \u00b7 Travel \u00b7 Network \u00b7 Career \u00b7 Home \u00b7 Inner Life \u00b7 Parents\n'+
 'Format: [Name] \u2014 [text]. No ** bold markers. No markdown. Every sentence must add new information \u2014 do not explain or restate the previous one.\n'+
 'LIFE (4 sentences): Read with Body Palace \u2014 do they reinforce or contradict? Cover: (1) personality, temperament, character specific to this chart\'s stars; (2) the double edge \u2014 greatest strength and most reliable liability in one statement; (3) what this person is built for and what environment defeats them; (4) only if Travel is DOMINANT or WEAK: local vs outward path \u2014 otherwise omit.\n'+
-'SIBLINGS (2-3 sentences): Covers blood siblings AND peers, close friends, business partners at same level. Cover: relationship quality and closeness; how they affect this person\'s life. Only mention financial dealings if \u5316\u5fcc is present in this palace.\n'+
+'SIBLINGS (2-3 sentences): Covers blood siblings AND peers, close friends, business partners at same level. Cover: relationship quality and closeness; how they affect this person\'s life. NEUTRAL-THIN means the relationship exists but is not a major theme \u2014 do not write it as warm and supportive. NEUTRAL-LUCKY means quietly fine, not prominently helpful. Only mention financial dealings if \u5316\u5fcc is present.\n'+
 'SPOUSE (3-4 sentences): (1) Partner characteristics \u2014 temperament, appearance, ability, wealth tendency; (2) relationship quality and longevity using pre-computed Marriage verdict; (3) timing \u2014 early, mid-life, or late?; (4) does it improve or deteriorate? If Inner Life TONE is difficult, note internal capacity shapes the outcome.\n'+
 'CHILDREN (2 sentences): Relationship with children and impact on life. Only if the palace is genuinely weak or empty, note the energy may express differently \u2014 do not force a creative or teaching interpretation if it does not clearly fit.\n'+
 'WEALTH (3 sentences): (1) Inherited vs earned wealth from pre-computed analysis \u2014 one flat sentence; (2) wealth across life stages \u2014 when does it build, peak, thin?; (3) the specific leak. Cross-reference Career and Travel verdicts.\n'+
-'HEALTH (3 sentences): (1) Overall constitution \u2014 strong or fragile baseline?; (2) specific body systems from Health palace stars; (3) recurring pattern to watch. Never write stress.\n'+
+'HEALTH (3 sentences): (1) Overall constitution \u2014 read the TONE carefully: POSITIVE/MOSTLY-POSITIVE means genuinely strong baseline; MIXED means generally fine but with specific vulnerable systems; MIXED-DIFFICULT means real recurring issues; CHALLENGING means significant health concerns. Do not write "moderately weak" for MIXED \u2014 that is not what it means. (2) Specific body systems from Health palace stars \u2014 these are areas to watch, not a general health verdict. (3) Recurring pattern to watch. Never write stress as the answer.\n'+
 '  \u5929\u6a5f/\u5929\u540c \u2192 nervous system, sleep, chronic overthinking\n'+
 '  \u592a\u967d/\u5de8\u9580 \u2192 digestive, stomach, throat\n'+
 '  \u5ec9\u8c1e/\u706b\u661f/\u9234\u661f \u2192 blood, inflammation, skin, infection\n'+
@@ -547,7 +548,9 @@ async function generate(){
 '\u5f8c\u8005\u66f4\u6709\u7528\uff0c\u56e0\u70ba\u5c0d\u65b9\u77e5\u9053\u8a72\u600e\u9ebc\u505a\u3002\n\n'+
 
 '\u898f\u5247\u4e00\u2014\u2014\u8f38\u51fa\u4e0d\u8aaa\u8853\u8a9e\uff1a\n'+
-'\u4e0d\u8aaa\u661f\u540d\u3001\u5bae\u4f4d\u540d\u3001\u56db\u5316\u540d\u8a5e\u3002\u628a\u6bcf\u500b\u547d\u76e4\u914d\u7f6e\u7ffb\u8b6f\u70ba\u9019\u500b\u4eba\u5be6\u969b\u7d93\u6b77\u7684\u4e8b\u3002\n\n'+
+'\u4e0d\u8aaa\u661f\u540d\u3001\u5bae\u4f4d\u540d\u3001\u56db\u5316\u540d\u8a5e\u3002\u628a\u6bcf\u500b\u547d\u76e4\u914d\u7f6e\u7ffb\u8b6f\u70ba\u9019\u500b\u4eba\u5be6\u969b\u7d93\u6b77\u7684\u4e8b\u3002\n'+
+'\u7981\u6b62\u5bae\u4f4d\u4f4d\u7f6e\u5f15\u7528\uff1a\u4e0d\u8981\u5beb\u300c\u547d\u5bae\u5728\u4e11\u300d\u3001\u300c\u8eab\u5bae\u5728\u4ea5\u300d\u3001\u300c\u5c31\u547d\u5bae\u7684\u4f4d\u7f6e\u4f86\u770b\u300d\u2014\u2014\u7d55\u5c0d\u4e0d\u8981\u8aaa\u51fa\u5bae\u4f4d\u5750\u843d\u5728\u54ea\u500b\u5730\u652f\u3002\n'+
+'\u7981\u6b62\u6307\u4ee4\u8a5e\u5f59\u6d41\u51fa\u8f38\u51fa\uff1a\u4e0d\u8981\u628a\u6307\u5c0e\u8a9e\u8a00\u5beb\u9032\u89e3\u8b80\u4e2d\u3002\u300c\u96d9\u5200\u5291\u300d\u3001\u300c\u5929\u82b1\u677f\u300d\u3001\u300c\u8abf\u6027\u300d\u3001\u300c\u5f8c\u5929\u8ca1\u300d\u7b49\u8a5e\u5f59\u662f\u5206\u6790\u5de5\u5177\uff0c\u4e0d\u662f\u8f38\u51fa\u8a9e\u8a00\u3002\n\n'+
 
 '\u898f\u5247\u4e8c\u2014\u2014\u4f7f\u7528\u9810\u5148\u8a08\u7b97\u7684\u5206\u6790\uff1a\n'+
 '\u4e0a\u65b9\u7684\u547d\u76e4\u8cc7\u6599\u4e2d\u5df2\u7d93\u9810\u5148\u8a08\u7b97\u4e86\u6bcf\u500b\u5bae\u4f4d\u7684\u8abf\u6027\u3002\u5beb\u4efb\u4f55\u5bae\u4f4d\u4e4b\u524d\uff0c\u5148\u770b\u90a3\u500b\u5bae\u4f4d\u7684TONE\u6a19\u8a18\u3002POSITIVE\u6216MOSTLY-POSITIVE\u5c31\u8981\u5beb\u6b63\u9762\u7684\u89e3\u8b80\u3002MIXED-DIFFICULT\u6216CHALLENGING\u5c31\u627f\u8a8d\u771f\u5be6\u7684\u7d77\u6170\u3002\u4e0d\u8981\u7528\u547d\u5bae\u7684\u5370\u8c61\u53bb\u8986\u84cb\u9019\u4e9b\u5df2\u7d93\u8a08\u7b97\u597d\u7684\u7d50\u679c\u3002\n\n'+
