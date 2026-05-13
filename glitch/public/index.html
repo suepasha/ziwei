@@ -512,11 +512,11 @@ async function generate(){
     var lifePalaceStars=lifePal.majorStars.map(function(s){return s.name+(s.mutagen||'')+'('+s.brightness+')';}).join('\u00b7');
     var bodyPalaceStr=bodyPal?bodyPal.name+'('+bodyPal.branch+')':'';
 
+    var cy=new Date().getFullYear();
     var yearlyStr='';
     if(chart.yearlyData){
       var palNameMap={'\u547d\u5bae':'Life','\u5144\u5f1f':'Siblings','\u592b\u59bb':'Spouse/Partner','\u5b50\u5973':'Children','\u8ca1\u5e1b':'Wealth','\u75be\u5384':'Health','\u9077\u79fb':'Life Beyond Home','\u50d5\u5f79':'Friends & Network','\u5b98\u797f':'Career','\u7530\u5b85':'Home & Property','\u798f\u5fb7':'Inner Life','\u7236\u6bcd':'Parents'};
-      var cy2=new Date().getFullYear();
-      [cy2-1,cy2,cy2+1].forEach(function(yr){
+      [cy-1,cy,cy+1].forEach(function(yr){
         var yd=chart.yearlyData[yr];
         if(yd){var pe=palNameMap[yd.xiaoXianPalace]||yd.xiaoXianPalace;yearlyStr+=yr+' (Age '+yd.age+') | '+yd.xiaoXianPalace+'('+pe+') | \u5c0f\u9650\u5fcc:'+yd.xiaoXianMutagen[3]+' \u6d41\u5e74\u5fcc:'+yd.yearlyMutagen[3]+'\n';}
       });
