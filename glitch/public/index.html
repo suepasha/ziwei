@@ -273,7 +273,7 @@ async function generate(){
       var ms=p.majorStars.map(function(s){return s.name+(s.mutagen||'')+'('+s.brightness+')';}).join('\u00b7');
       var minorStr=p.minorStars.map(function(s){return s.name+(s.mutagen||'');}).join('\u00b7');
       var dm=p.decadeMutagen&&p.decadeMutagen.length?' \u5927\u9650[\u7984'+p.decadeMutagen[0]+'\u00b7\u5fcc'+p.decadeMutagen[3]+']':'';
-      return p.stem+p.branch+' '+p.name+(p.isBodyPalace?'/\u8eab\u5bae':'')+' \u5927\u9650'+p.decadeRange+(ms?' \u4e3b:'+ms:'')+(minorStr?' \u8f14:'+mi2:'')+dm;
+      return p.stem+p.branch+' '+p.name+(p.isBodyPalace?'/\u8eab\u5bae':'')+' \u5927\u9650'+p.decadeRange+(ms?' \u4e3b:'+ms:'')+(minorStr?' \u8f14:'+minorStr:'')+dm;
     }).join('\n');
 
     // ── PRE-COMPUTED ASTROLOGICAL ANALYSIS ─────────────────────────────────
