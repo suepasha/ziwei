@@ -316,9 +316,13 @@ async function generate(){
         return 'NEUTRAL-THIN';
       }
       var top=ms[0];
+      var topHasLu=top.mutagen==='祿'||top.mutagen==='科'; // 化祿/化科 on dominant star = strong positive
       if(WEAK_B.indexOf(top.brightness)>-1&&ji)return 'CHALLENGING';
       if(WEAK_B.indexOf(top.brightness)>-1||ji)return 'MIXED-DIFFICULT';
+      // Strong dominant star
+      if(topHasLu)return hard===0?'POSITIVE':'MOSTLY-POSITIVE'; // 化祿/化科 overrides hard stars
       if(STRONG_B.indexOf(top.brightness)>-1&&lucky>0&&hard===0)return 'POSITIVE';
+      if(STRONG_B.indexOf(top.brightness)>-1&&lucky>0&&hard<=1)return 'MOSTLY-POSITIVE'; // lucky compensates 1 hard star
       if(STRONG_B.indexOf(top.brightness)>-1&&hard===0)return 'MOSTLY-POSITIVE';
       return 'MIXED';
     }
@@ -535,7 +539,7 @@ async function generate(){
 'STRICTLY EXCLUDED from Life Palace: work type, career environment, organizational preferences, professional ceiling \u2014 those belong entirely in Career. If you find yourself writing about what kind of job suits them or what organizational structure fails them, stop. That goes in Career.\n'+
 'SIBLINGS (2-3 sentences): Covers blood siblings AND peers, close friends, business partners at same level. Cover: relationship quality and closeness; how they affect this person\'s life. NEUTRAL-THIN means the relationship exists but is not a major theme \u2014 do not write it as warm and supportive. NEUTRAL-LUCKY means quietly fine, not prominently helpful. Only mention financial dealings if \u5316\u5fcc is present.\n'+
 'SPOUSE (3 sentences): (1) Partner characteristics \u2014 temperament, appearance, ability, wealth tendency; (2) relationship quality and longevity using pre-computed Marriage verdict; (3) does it improve or deteriorate over time? If Inner Life TONE is difficult, note that internal capacity shapes the outcome regardless of who the partner is.\n'+
-'CHILDREN (2 sentences): Relationship with children and impact on life. Only if the palace is genuinely weak or empty, note the energy may express differently \u2014 do not force a creative or teaching interpretation if it does not clearly fit.\n'+
+'CHILDREN (2 sentences): Relationship with children and impact on life. Do NOT add the subordinate/student alternative unless the palace is genuinely empty — if there are actual positive stars present, just read the children relationship directly.\n'+
 'WEALTH (3 sentences): (1) Inherited vs earned wealth from pre-computed analysis \u2014 one flat sentence; (2) wealth across life stages \u2014 when does it build, peak, thin?; (3) the specific leak. Cross-reference Career and Travel verdicts.\n'+
 'HEALTH (3 sentences): (1) Overall constitution \u2014 read the TONE carefully: POSITIVE/MOSTLY-POSITIVE means genuinely strong baseline; MIXED means generally fine but with specific vulnerable systems; MIXED-DIFFICULT means real recurring issues; CHALLENGING means significant health concerns. Do not write "moderately weak" for MIXED \u2014 that is not what it means. (2) Specific body systems from Health palace stars \u2014 these are areas to watch, not a general health verdict. (3) Recurring pattern to watch. Never write stress as the answer.\n'+
 '  \u5929\u6a5f/\u5929\u540c \u2192 nervous system, sleep, chronic overthinking\n'+
