@@ -860,20 +860,32 @@ function renderResults(text,name,year,month,day,hrTxt,gender,chart,readMode,user
     h+='<div class="mp-grid show" id="mp-grid">'+buildMingpan()+'</div>';
   }
 
-  var palacesRaw=sec(text,'PALACES');
-  if(palacesRaw){
-    // Strip markdown artifacts the model sometimes adds
-    palacesRaw=palacesRaw.replace(/^[-=]{2,}\s*$/gm,'').replace(/^#+\s*/gm,'').replace(/\*\*([^*]+)\*\*/g,'$1');
-    h+='<div class="stitle">'+(LANG==='zh'?'\u5341\u4e8c\u5bae\u6982\u89bd':'12 Palace Overview')+'</div>';
-    h+='<div class="pal-paras">';
-    var paras=palacesRaw.split(/\n(?=[A-Za-z\u4e00-\u9fff][A-Za-z\u4e00-\u9fff ]{1,19}\s*\u2014)/);
-    paras.forEach(function(para){
-      para=para.trim();if(!para)return;
-      para=para.replace(/^([A-Za-z\u4e00-\u9fff \/&]{2,20})\s*\u2014\s*/,'<span class="pal-name">$1</span> \u2014 ');
-      h+='<div class="pal-para">'+para+'</div>';
-    });
-    h+='</div>';
-  }
+    var palacesRaw=sec(text,'PALACES');
+    if(palacesRaw){
+      palacesRaw=palacesRaw.replace(/^[-=]{2,}\s*$/gm,'').replace(/^#+\s*/gm,'').replace(/\*\*([^*]+)\*\*/g,'$1');
+      h+='<div class="stitle">'+(LANG==='zh'?'\u5341\u4e8c\u5bae\u6982\u89bd':'12 Palace Overview')+'</div>';
+      h+='<div class="pal-paras">';
+      var EN_PAL=/^(Life|Spouse|Career|Wealth|Inner Life|Health|Children|Parents|Siblings|Travel|Network|Home)\s*\u2014?\s*/;
+      var ZH_PAL=/^(\u547d\u5bae|\u592b\u59bb|\u5b98\u797f|\u8ca1\u5e1b|\u798f\u5fb7|\u75be\u5384|\u5b50\u5973|\u7236\u6bcd|\u5144\u5f1f|\u9077\u79fb|\u50d5\u5f79|\u7530\u5b85)\s*\u2014?\s*/;
+      var groups=[],cur='';
+      palacesRaw.split('\n').forEach(function(line){
+        var t=line.trim();
+        if(EN_PAL.test(t)||ZH_PAL.test(t)){
+          if(cur.trim())groups.push(cur.trim());
+          cur=line;
+        } else {
+          cur+='\n'+line;
+        }
+      });
+      if(cur.trim())groups.push(cur.trim());
+      groups.forEach(function(para){
+        if(!para)return;
+        para=para.replace(EN_PAL,'<span class="pal-name">$1</span> \u2014 ');
+        para=para.replace(ZH_PAL,'<span class="pal-name">$1</span> \u2014 ');
+        h+='<div class="pal-para">'+para+'</div>';
+      });
+      h+='</div>';
+    }
 
   if(cycRows.length){
     h+='<div class="scard-full"><div class="sh">'+(LANG==='zh'?'\u5927\u9650\u6d41\u5e74':'10 Year Life Cycles')+'</div><div class="cycles">';
