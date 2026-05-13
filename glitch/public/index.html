@@ -500,7 +500,6 @@ async function generate(){
         prompt=fp+'\n\n'+
 '\u4f60\u662f\u7d2b\u5fae\u6597\u6578\u547d\u7406\u5e2b\u3002\u53ea\u56de\u7b54\u4e0b\u5217\u554f\u984c\uff0c\u4e0d\u505a\u5b8c\u6574\u89e3\u8b80\u3002\u4e00\u5f8b\u7e41\u9ad4\u4e2d\u6587\u3002\n\n'+
 '===QUESTION===\n'+
-'\u4e0d\u8aaa\u661f\u540d\u3001\u5bae\u4f4d\u540d\u3001\u4efb\u4f55\u547d\u7406\u8853\u8a9e\u3002\u5beb\u5177\u9ad4\u767c\u751f\u7684\u4e8b\uff0c\u4e0d\u8981\u7528\u6284\u8c61\u8aaa\u6cd5\u3002\u7b2c\u4e8c\u4eba\u7a31\u3002\u73fe\u5728\u5f0f\u3002 3-5\u53e5\u3002\n'+
 '\u554f\uff1a'+userQ+'\n';
       }
     } else if(LANG==='en'){
@@ -609,7 +608,7 @@ async function generate(){
 '73-82 ('+(+year+73)+'-'+(+year+82)+') | [label] | [text]\n\n'+
 
 '===SUMMARY===\n'+
-'[3-4 sentences. This section must NOT repeat what individual palaces already said. Its job is to find what only emerges when the palaces are read together — the connection between domains that no single palace reveals on its own. Do not summarize: the person with high standards who is internally restless. Ask instead: how do the Career, Wealth, and Health palaces interact? What does the combination of Travel and Home say that neither alone does? Then: the single most important thing this person should know. Then: one domain where the chart is neutral and choices entirely determine the outcome.]'+
+'[3-4 sentences. RULE 1 applies here too — no star names, no palace names, no astrological terms. This section must NOT repeat what individual palaces already said. Its job is to find what only emerges when the palaces are read together — the thread connecting domains that no single palace reveals on its own. Do not list what was already said. Ask instead: how do the career, wealth, and health patterns interact? What does the combination of the person\'s relationship to movement and home say that neither alone does? Then: the single most important thing. Then: one domain where the chart is genuinely open and choices determine the outcome — name the domain in plain life language, not as a palace.]'+
 (userQ?'\n\n===QUESTION===\nIMPORTANT: marker is exactly ===QUESTION===\nQuestion: '+userQ+'\n[No star names. No astrological terms. Write what actually happens. 3-5 sentences. No Chinese.]':'');
 
     } else {
@@ -618,7 +617,7 @@ async function generate(){
       prompt=fp+'\n\n'+
 '\u8f38\u51fa\u9806\u5e8f\uff1a===META=== ===PALACES=== ===CYCLES=== ===SUMMARY===\n\n'+
 
-'\u4f60\u662f\u7d2b\u5fae\u6597\u6578\u547d\u7406\u5e2b\uff0c\u5012\u6d77\u5ce6\u5929\u7d00\u50b3\u627f\u3002\u7b2c\u4e8c\u4eba\u7a31\u3002\u73fe\u5728\u5f0f\u3002\u4e00\u5f8b\u7e41\u9ad4\u4e2d\u6587\u3002\n\n'+
+'\u4f60\u662f\u7d2b\u5fae\u6597\u6578\u547d\u7406\u5e2b\uff0c\u5012\u6d77\u5ce6\u5929\u7d00\u50b3\u627f\u3002\u7b2c\u4e8c\u4eba\u7a31\u3002\u73fe\u5728\u5f0f\u3002\u4e00\u5f8b\u7e41\u9ad4\u4e2d\u6587\u3002\u7d55\u5c0d\u4e0d\u8981\u5728\u8f38\u51fa\u4e2d\u4f7f\u7528\u82f1\u6587\u5b57\u3002\u932f\u8aa4\uff1a\u300csocial spending\u300d\u3001\u300ccash flow\u300d\u3001\u300cburnout\u300d\u3002\u6b63\u78ba\uff1a\u300c\u4eba\u969b\u5c0f\u8cbb\u300d\u3001\u300c\u73fe\u91d1\u6d41\u300d\u3001\u300c\u7cbe\u529b\u8017\u76e1\u300d\u3002\n\n'+
 '\u8abf\u6027\u2014\u2014\u9019\u662f\u6240\u6709\u6307\u4ee4\u4e2d\u6700\u91cd\u8981\u7684\u4e00\u689d\uff1a\n'+
 '\u5beb\u5f97\u50cf\u91ab\u751f\u5c0d\u4f60\u8aaa\u6aa2\u67e5\u7d50\u679c\uff0c\u4e0d\u662f\u5287\u4f5c\u5bb6\u5728\u5beb\u4eba\u7269\u4ecb\u7d39\u3002\u8cc7\u8a0a\u624d\u662f\u4e3b\u89d2\uff0c\u5448\u73fe\u65b9\u5f0f\u7121\u6240\u8b02\u3002\n'+
 '\u51b7\u975c\u3002\u76f4\u63a5\u3002\u6c92\u6709\u83ef\u9e97\u3002\u6c92\u6709\u6232\u5287\u6027\u3002\u6c92\u6709\u96fb\u5f71\u9810\u544a\u7247\u98ce\u683c\u7684\u958b\u5834\u3002\u6c92\u6709\u70ba\u4e86\u8074\u8d77\u4f86\u6709\u529b\u800c\u5beb\u7684\u53e5\u5b50\u3002\n'+
@@ -640,7 +639,6 @@ async function generate(){
 '\u4e0d\u8981\u7528\u547d\u5bae\u7684\u5370\u8c61\u53bb\u8986\u84cb\u9019\u4e9b\u5df2\u7d93\u8a08\u7b97\u597d\u7684\u7d50\u679c\u3002\n\n'+
 
 '\u898f\u5247\u4e09\u2014\u2014\u8072\u97f3\uff1a\n'+
-'\u5beb\u5177\u9ad4\u767c\u751f\u7684\u4e8b\uff0c\u4e0d\u8981\u5beb\u6284\u8c61\u7684\u611f\u53d7\u3002\u4e0d\u8981\u7528\u6bd4\u55bb\u4ee3\u66ff\u5177\u9ad4\u5c40\u9762\u3002\u4e0d\u52a0\u4efb\u4f55\u62ec\u865f\u3002\n'+
 '\u4e0d\u7528\u6bd4\u55bb\u3002\u4e0d\u8981\u7528\u5f62\u8c61\u5316\u8a9e\u8a00\u63cf\u8ff0\u6027\u683c\u6216\u60c5\u5883\u3002\u76f4\u63a5\u8aaa\u3002\n'+
 '\u76f4\u63a5\u7684\u6027\u683c\u8ff0\u8ff0\u53ef\u4ee5\u7528\uff0c\u4e5f\u9f13\u52f5\u7528\uff1a\u300c\u91cd\u611f\u60c5\u300d\u3001\u300c\u500b\u6027\u7387\u76f4\u300d\u3001\u300c\u8aaa\u8a71\u76f4\u63a5\u300d\u2014\u2014\u9019\u4e9b\u4e0d\u662f\u6bd4\u55bb\uff0c\u662f\u6027\u683c\u4e8b\u5be6\u3002\u4e0d\u5141\u8a31\u7684\u662f\uff1a\u7528\u6bd4\u55bb\u4ee3\u66ff\u5177\u9ad4\u5c40\u9762\u3002\n'+
 '\u932f\u8aa4\uff1a\u300c\u4f60\u5167\u5fc3\u6709\u4e00\u628a\u5c3a\uff0c\u800c\u90a3\u628a\u5c3a\u7684\u5239\u5ea6\u6bd4\u5927\u90e8\u5206\u4eba\u5bc6\u300d\n'+
@@ -700,7 +698,7 @@ async function generate(){
 '73-82 ('+(+year+73)+'-'+(+year+82)+') | [\u6a19\u7c64] | [\u5167\u5bb9]\n\n'+
 
 '===SUMMARY===\n'+
-'[3-4句。這個段落不能重複已經在宮位中說過的內容。它的工作是找到只有把宮位放在一起看才呈現的真相——單一宮位無法告訴你的那個连結。不要整理已經說過的内容。問自己：官祿、財帛、疾厄三個宮位放在一起看呈現什麼？遷移和田宅合起來說什麼單一宮位說不到的？然後：這張命盤最重要的一件事。以及命盤對哪一個領域沒有定論，完全由自己决定。]'+
+'[3-4句。規則一在這裡同樣適用——不說星名、宮位名、任何命理術語。這個段落不能重複已經在宮位中說過的內容。它的工作是找到只有把所有宮位放在一起看才呈現的真相——單一宮位無法告訴你的那個連結。問自己：這個人的事業、財富、健康三個模式放在一起看呈現什麼？這個人對移動和根的關係，合起來說什麼單一角度說不到的？然後：這張命盤最重要的一件事。以及命盤對哪一個生活領域沒有定論，一切由自己決定——用日常語言說出那個領域，不要用宮位名稱。]'+
 (userQ?'\n\n===QUESTION===\n\u91cd\u8981\uff1a\u6a19\u8a18\u5c31\u662f===QUESTION===\u3002\u554f\uff1a'+userQ+'\n[\u4e0d\u8aaa\u661f\u540d\u3002\u4e0d\u8aaa\u5bae\u4f4d\u3002\u5beb\u5177\u9ad4\u767c\u751f\u7684\u4e8b\u30023-5\u53e5\u3002]':'');
 
     }
@@ -872,7 +870,6 @@ function buildMingpan(){
   var POS={'\u5df3':[0,0],'\u5348':[0,1],'\u672a':[0,2],'\u7533':[0,3],'\u8fb0':[1,0],'\u9149':[1,3],'\u536f':[2,0],'\u620c':[2,3],'\u5bc5':[3,0],'\u4e11':[3,1],'\u5b50':[3,2],'\u4ea5':[3,3]};
   var SANFANG_MAP={'\u5b50':['\u8fb0','\u7533','\u5348'],'\u4e11':['\u5df3','\u9149','\u672a'],'\u5bc5':['\u5348','\u620c','\u7533'],'\u536f':['\u672a','\u4ea5','\u9149'],'\u8fb0':['\u7533','\u5b50','\u620c'],'\u5df3':['\u9149','\u4e11','\u4ea5'],'\u5348':['\u620c','\u5bc5','\u5b50'],'\u672a':['\u4ea5','\u536f','\u4e11'],'\u7533':['\u5b50','\u8fb0','\u5bc5'],'\u9149':['\u4e11','\u5df3','\u536f'],'\u620c':['\u5bc5','\u5348','\u8fb0'],'\u4ea5':['\u536f','\u672a','\u5df3']};
   var NEG=['\u64ce\u7f8a','\u9640\u7f85','\u706b\u661f','\u9234\u661f','\u5730\u7a7a','\u5730\u52ab'];
-  var brMap={};chart.palaces.forEach(function(p){brMap[p.branch]=p;});
   var lifeBranch='';chart.palaces.forEach(function(p){if(p.isLifePalace)lifeBranch=p.branch;});
   var sfBranches=SANFANG_MAP[lifeBranch]||[];
   function starTag(s){
