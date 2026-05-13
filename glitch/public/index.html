@@ -348,7 +348,7 @@ async function generate(){
     var tvStrong=travelPO.majorStars.some(function(s){return STRONG_B.indexOf(s.brightness)>-1;});
     var tvJi=hasJi(travelPO);
     var tvCount=travelPO.majorStars.length;
-    var travelStr=tvCount>=2&&tvStrong&&!tvJi?'DOMINANT — departure is a defining life theme; speak in past/present if person is 40+':tvCount>=1&&tvStrong&&!tvJi?'MODERATE — external helps; moving to a different city is enough, this does not require leaving the country':tvCount>=1&&!tvJi?'MILD — slight outward preference but not a defining theme':'WEAK — rooted path works better for this chart';
+    var travelStr=tvCount>=2&&tvStrong&&!tvJi?'DOMINANT — departure is a defining life theme; speak in past/present if person is 40+':tvCount>=1&&tvStrong&&!tvJi?'MODERATE — external movement and change of environment consistently opens things up for this person; staying still tends to limit':tvCount>=1&&!tvJi?'MILD — slight outward preference but not a defining theme':'WEAK — rooted path works better for this chart';
 
     // Marriage
     var mVerdict=isPos(spousePO)&&isPos(fudePO)?'Both Spouse and Inner Life are favorable — relationship can sustain':isPos(spousePO)&&!isPos(fudePO)?'Spouse palace favorable but Inner Life troubled — sustainability at risk despite surface harmony':!isPos(spousePO)&&isPos(fudePO)?'Spouse palace has friction but Inner Life stable — relationship survives through inner resilience':'Both Spouse and Inner Life show difficulty';
@@ -379,15 +379,15 @@ async function generate(){
       '\u592a\u967d':'giving and outward-facing — generous, warm, public presence; emotionally open and expressive; can over-extend; rarely holds grudges',
       '\u6b66\u66f2':'decisive and practical — money-minded, direct, action-oriented; terse under pressure; can seem cold but is reliable; doesn\'t waste words',
       '\u5929\u540c':'gentle and harmony-seeking — pleasure-oriented, adaptable; avoids confrontation; runs cool; absorbs difficulty rather than fighting it',
-      '\u5ec9\u8c1e':'principled, proud, and deeply feeling \u2014 loyalty runs deep; cares more than she shows; when she decides someone matters, that doesn\'t change easily; complex emotionally: the outside is composed but the inside is strongly attached; pride turns to stubbornness when crossed; dignity is non-negotiable',
+      '\u5ec9\u8c1e':'principled, proud, and deeply feeling \u2014 loyalty runs deep; cares more than they show; when they decide someone matters, that doesn\'t change easily; complex emotionally: the outside is composed but the inside is strongly attached; pride turns to stubbornness when crossed; dignity is non-negotiable',
       '\u5929\u5e9c':'stable and accumulating — conservative, responsible, treasury energy; patient, steady, hard to destabilize; doesn\'t rush; builds quietly',
       '\u592a\u9670':'sensitive and inward — emotionally deep, aesthetic, needs privacy; absorbs the mood of the room; can be wounded quietly; runs cool on the surface, deep underneath',
       '\u8ca2\u72fc':'charming and multi-talented — desire-driven, relationship energy; magnetic, wants everything; can scatter; enthusiasm is genuine but short-lived on any single thing',
       '\u5de8\u9580':'communicative but friction-prone — analytical, skeptical, words can cut; tends to argue even when not angry; others experience as blunt or suspicious',
       '\u5929\u76f8':'supportive and structure-seeking — diplomatic, mediating, needs a system to work within; doesn\'t lead naturally but executes well within order',
       '\u5929\u6882':'wise and protective — elder energy, principled, carries others; patient and long-view; can be self-righteous; dignity through endurance',
-      '\u4e03\u6bba':'direct, strong-charactered, and clear \u2014 says what she thinks without dressing it up; can be funny because she says what others won\'t; emotionally straightforward; meets things head on; runs hot when standards aren\'t met but doesn\'t hold grudges; the sharpness is honest, not malicious; independent to the point of isolation when pushed',
-      '\u7834\u8ecd':'disruptive rebuilder — pioneer who loses interest once stable; restless energy, chafes under routine; not hot-tempered but destabilizing; the room after she\'s done rearranging it'
+      '\u4e03\u6bba':'direct, strong-charactered, and clear \u2014 says what they think without dressing it up; can be funny because they say what others won\'t; emotionally straightforward; meets things head on; runs hot when standards aren\'t met but doesn\'t hold grudges; the sharpness is honest, not malicious; independent to the point of isolation when pushed',
+      '\u7834\u8ecd':'disruptive rebuilder — pioneer who loses interest once stable; restless energy, chafes under routine; not hot-tempered but destabilizing; the room after they\'re done rearranging it'
     };
     var lifeCharParts=(lifePO.majorStars||[]).map(function(s){
       var m=STAR_CHAR[s.name];
@@ -417,35 +417,37 @@ async function generate(){
         var bTone=tone(bpo);
         if(bSame)return 'BODY PALACE: same as Life Palace — driving force unified, no internal contradiction.\n';
         return 'BODY PALACE: '+bpo.name+' | stars:'+bStars+(bLucky?' lucky:'+bLucky:'')+(bHard?' hard:'+bHard:'')+' | TONE:'+bTone+'\n'+
-          (gender==='Female'?
-            'For this woman: Body Palace shows the environment where she naturally operates best and what drives her in practice — may differ from her Life Palace presentation.\n':
-            'For this man: Body Palace shows the direction his energy flows in the second half of life and what drives him beneath the surface.\n');
+          'Body Palace shows where this person naturally operates best and what drives them beneath the surface.\n';
       })()+'\n'+
 
-      // Decade 化忌
+      // Decade 化忌 + Decade palace lookup (pre-computed)
       (function(){
         function findStarPal(sn){return chart.palaces.find(function(p){return (p.majorStars||[]).some(function(s){return s.name===sn;});});}
-        var rows=chart.palaces.map(function(p){
+        var jiRows=chart.palaces.map(function(p){
           if(!p.decadeRange||!p.decadeMutagen||!p.decadeMutagen[3])return null;
           var jiStar=p.decadeMutagen[3];
           var jiPal=findStarPal(jiStar);
-          return '  大限'+p.decadeRange+': 化忌['+jiStar+'] → '+(jiPal?jiPal.name:'unknown')+' palace';
+          return '  大限'+p.decadeRange+': 化忌['+jiStar+'] → '+(jiPal?jiPal.name:'unknown');
         }).filter(Boolean).join('\n');
-        return 'DECADE 化忌 (where friction lands each decade — tell the model what domain is under stress):\n'+rows+'\n';
+        var pals=chart.palaces.filter(function(p){return p.decadeRange;}).slice().sort(function(a,b){return parseInt(a.decadeRange,10)-parseInt(b.decadeRange,10);});
+        var palRows=pals.map(function(p){
+          var ms=(p.majorStars||[]).map(function(s){return s.name+(s.mutagen||'')+'('+s.brightness+')';}).join('·');
+          var lk=allStars(p).filter(function(s){return LUCKY.indexOf(s.name)>-1;}).map(function(s){return s.name;}).join(' ');
+          var hd=allStars(p).filter(function(s){return HARD.indexOf(s.name)>-1;}).map(function(s){return s.name;}).join(' ');
+          return '  '+p.decadeRange+' → '+p.name+(ms?' | '+ms:'')+(lk?' lucky:'+lk:'')+(hd?' hard:'+hd:'')+' | TONE:'+tone(p);
+        }).join('\n');
+        return 'DECADE 化忌 (where friction lands each decade):\n'+jiRows+'\n\n'+
+               'DECADE PALACES (use these to write cycle labels and readings):\n'+palRows+'\n';
       })()+'\n'+
 
-      // Gender guidance
-      (gender==='Female'?
-        'GENDER — FEMALE CHART:\n'+
-        '• Spouse palace: describes the man she attracts and marries — his temperament, appearance, ability, wealth tendency. Read as a portrait of her partner.\n'+
-        '• Inner Life (福德) strongly shapes marriage quality — internal restlessness erodes relationships regardless of the partner.\n'+
-        '• Career palace also reflects her partnership dynamic and how her work life and marriage interact.\n'+
-        '• Children palace also reflects how she is received by others and her relational style.\n'+
-        '• Body Palace: the environment where she naturally thrives.\n':
-        'GENDER — MALE CHART:\n'+
-        '• Spouse palace: describes the woman he attracts and marries — her temperament, appearance, ability, wealth tendency.\n'+
-        '• Career is the primary domain of life output — wealth and recognition flow from here.\n'+
-        '• Body Palace: direction his energy flows in the second half of life.\n')+'\n'+
+
+      // Chart context — gender-aware, orientation-inclusive
+      'CHART CONTEXT:\n'+
+      '• Birth gender registered as '+gender+'. This affects the astrological calculation only.\n'+
+      '• Spouse palace: describes the person they attract and partner with — their temperament, appearance, ability, financial tendency. Read as a portrait of their partner regardless of the partner\'s gender. Do not assume the partner\'s gender or orientation.\n'+
+      '• Inner Life (福德) strongly shapes relationship quality — internal restlessness erodes partnerships regardless of partner or orientation.\n'+
+      '• Career, wealth, health, and all other palaces: read the same regardless of this person\'s gender.\n'+
+      '• Use they/them pronouns throughout the reading unless the person\'s name clearly indicates their pronoun.\n'+'\n'+
 
       'PALACE TONES — use these, do not override based on Life Palace impression:\n'+
       palTones+'\n'+
@@ -498,8 +500,9 @@ async function generate(){
 'Question: '+userQ+'\n';
       } else {
         prompt=fp+'\n\n'+
-'\u4f60\u662f\u7d2b\u5fae\u6597\u6578\u547d\u7406\u5e2b\u3002\u53ea\u56de\u7b54\u4e0b\u5217\u554f\u984c\uff0c\u4e0d\u505a\u5b8c\u6574\u89e3\u8b80\u3002\u4e00\u5f8b\u7e41\u9ad4\u4e2d\u6587\u3002\n\n'+
+'\u4f60\u662f\u7d2b\u5fae\u6597\u6578\u547d\u7406\u5e2b\u3002\u53ea\u56de\u7b54\u4e0b\u5217\u554f\u984c\uff0c\u4e0d\u505a\u5b8c\u6574\u89e3\u8b80\u3002\u4e00\u5f8b\u7e41\u9ad4\u4e2d\u6587\u3002\u7d55\u5c0d\u4e0d\u8981\u5728\u8f38\u51fa\u4e2d\u4f7f\u7528\u82f1\u6587\u5b57\u3002\n\n'+
 '===QUESTION===\n'+
+'\u4e0d\u8aaa\u661f\u540d\u3001\u5bae\u4f4d\u540d\u3001\u4efb\u4f55\u547d\u7406\u8853\u8a9e\u3002\u5beb\u5177\u9ad4\u767c\u751f\u7684\u4e8b\uff0c\u4e0d\u8981\u7528\u6284\u8c61\u8aaa\u6cd5\u3002\u4e0d\u7528\u6bd4\u55bb\u3002\u7b2c\u4e8c\u4eba\u7a31\u3002\u73fe\u5728\u5f0f\u30023-5\u53e5\u3002\n'+
 '\u554f\uff1a'+userQ+'\n';
       }
     } else if(LANG==='en'){
@@ -533,7 +536,7 @@ async function generate(){
 
 'RULE 3 \u2014 VOICE:\n'+
 'No metaphors or figurative language. Say the plain thing directly.\n'+
-'Direct personality statements ARE allowed and encouraged: "她重感情," "個性率直," "說話直接" — these are not metaphors, they are facts about who the person is.\n'+
+'Direct personality statements ARE allowed and encouraged: "重感情," "個性率直," "說話直接" — these are not metaphors, they are facts about who the person is.\n'+
 'What is NOT allowed: figurative substitutes for concrete reality. Say what actually happens.\n'+
 'WRONG (metaphor): "你內心有一把尺，而那把尺的刻度比大部分人密"\n'+
 'RIGHT (direct): "你對細節的要求比大多數人高，別人說夠了你還沒停"\n'+
@@ -542,7 +545,7 @@ async function generate(){
 'READING METHOD (\u5012\u6d77\u5ce6 \u5929\u7d00):\n'+
 'The pre-computed analysis above has already determined: Wealth type, Travel strength, Marriage verdict, Siblings pattern, and tone for each palace. Use those verdicts. Do not re-assess them.\n'+
 'What the pre-computed analysis does NOT cover — apply these yourself:\n'+
-'\u2022 Life Palace: read with Body Palace (\u8eab\u5bae) from META \u2014 note what they reinforce or contradict in this person\'s nature.\n'+'\u2022 Local vs outward path: only state this if Travel is DOMINANT or WEAK. Skip entirely if MODERATE or MILD \u2014 geography is not defining for this chart.\n'+
+'\u2022 Life Palace: read with Body Palace (\u8eab\u5bae) from META \u2014 note what they reinforce or contradict in this person\'s nature.\n'+'\u2022 Local vs outward path: only state this if Travel is DOMINANT or WEAK. Skip entirely if MILD \u2014 geography is not defining. For MODERATE, the Travel palace instruction already covers it.\n'+
 '\u2022 Inner Life (\u798f\u5fb7): governs whether this person has fundamental ease or friction with life — whether they trust good things to last, whether intimacy can hold. Shapes both the Life Palace and Spouse readings.\n'+
 '\u2022 \u5316\u5fcc: translate to the real-life outcome only \u2014 never the astrological mechanism. State what actually happens in the person\'s life.\n\n'+
 
@@ -585,19 +588,21 @@ async function generate(){
 'CHILDREN (2 sentences): Relationship with children and impact on life. Do NOT add the subordinate/student alternative unless the palace is genuinely empty — if there are actual positive stars present, just read the children relationship directly.\n'+
 'PARENTS (2-3 sentences): Which parent is more defining MUST come from the stars \u2014 do not guess. \u592a\u967d or strong yang/father-energy stars \u2192 father more defining. \u592a\u9670 or strong yin/mother-energy stars \u2192 mother more defining. If neither clearly present, say both parents influenced differently rather than picking one. Then: relationship quality and what was received emotionally and financially in early life; how parents shaped this person\'s trajectory.\n'+
 'SIBLINGS (2-3 sentences): Covers blood siblings AND peers, close friends, business partners at same level. Cover: relationship quality and closeness; how they affect this person\'s life. NEUTRAL-THIN means the relationship exists but is not a major theme \u2014 do not write it as warm and supportive. NEUTRAL-LUCKY means quietly fine, not prominently helpful. Only mention financial dealings if \u5316\u5fcc is present.\n'+
-'TRAVEL (2-3 sentences): Use pre-computed Travel verdict. DOMINANT means the departure is a structural fact of this life \u2014 do not soften it to "helpful" or "not necessary." Say clearly what leaving opened that staying would not have. For 40+ with DOMINANT Travel, speak in past and present about what the departure already produced and what it continues to enable.\n'+
+'TRAVEL (2-3 sentences): Use pre-computed Travel verdict. DOMINANT means the departure is a structural fact of this life \u2014 do not soften it. MODERATE means external movement consistently opens things up \u2014 do not tell this person to stay local or that going abroad is unnecessary. Say what leaving has opened or would open. For 40+ with DOMINANT or MODERATE Travel, speak in past and present about what movement already produced and continues to enable.\n'+
 'NETWORK (2-3 sentences): Helpers, supporters, subordinates. Cross-reference Siblings \u2014 together they show the complete social world. What kind of people surround this person and do they benefit or drain?\n'+
 'HOME (2 sentences): Property accumulation and relationship to home base. Cross-reference Parents palace and Travel verdict.]\n\n'+
 
 
 '===CYCLES===\n'+
-'[Find which palace has \u5927\u9650XX-XX in the chart data \u2014 that is the life domain activated for that decade.\n'+
-'Also check DECADE \u5316\u5fcc in the pre-computed analysis \u2014 the activated palace is the main stage; the \u5316\u5fcc palace shows where the cost lands. Both shape the reading.\n'+
-'Label: derive from the actual palace and its stars for THIS person \u2014 not a generic life stage.\n'+
-'WRONG labels: Self-Formation, Study Period, Career Friction, Health Phase \u2014 these are horoscope labels, not chart readings.\n'+
-'RIGHT labels: derived from what the decade palace actually activates for this specific chart. Flag the decade that represents this chart\'s peak.\n'+
-'Format: RANGE (YEARS) | [label] | [what this decade means including \u5316\u5fcc impact] [one concrete directive]\n'+
-'All on one line. Never write palace names, star names, or generic labels in output.]\n'+
+'[Use DECADE PALACES from the pre-computed analysis above — the activated palace and its stars are already identified for each decade. Do not guess from age.\n'+
+'The label must come from what that palace rules in this person\'s life combined with the specific stars present — not from the person\'s age or generic life stages.\n'+
+'Also check DECADE \u5316\u5fcc — shows which domain carries cost that decade.\n'+
+'WRONG labels (age-based): Self-Formation, Study Period, Career Building, Family Years, Reflection Phase\n'+
+'WRONG labels (palace name as label): Wealth Decade, Travel Period, Health Phase — these are just the palace name, not a reading.\n'+
+'RIGHT labels: derived from the activated palace\'s stars for THIS chart. Example: if decade activates the Network palace with 天機廟, the label reflects strategic relationships and advisory influence — not "social period."\n'+
+'Flag the peak decade. End each line with one concrete directive.\n'+
+'Format: RANGE (YEARS) | [specific label] | [what this decade means, 化忌 impact, directive]\n'+
+'All on one line. Never write palace names, star names in output.]\n'+
 '3-12 ('+( +year+ 3)+'-'+(+year+12)+') | [label] | [text]\n'+
 '13-22 ('+(+year+13)+'-'+(+year+22)+') | [label] | [text]\n'+
 '23-32 ('+(+year+23)+'-'+(+year+32)+') | [label] | [text]\n'+
@@ -608,7 +613,7 @@ async function generate(){
 '73-82 ('+(+year+73)+'-'+(+year+82)+') | [label] | [text]\n\n'+
 
 '===SUMMARY===\n'+
-'[3-4 sentences. RULE 1 applies here too — no star names, no palace names, no astrological terms. This section must NOT repeat what individual palaces already said. Its job is to find what only emerges when the palaces are read together — the thread connecting domains that no single palace reveals on its own. Do not list what was already said. Ask instead: how do the career, wealth, and health patterns interact? What does the combination of the person\'s relationship to movement and home say that neither alone does? Then: the single most important thing. Then: one domain where the chart is genuinely open and choices determine the outcome — name the domain in plain life language, not as a palace.]'+
+'[3-4 sentences. RULE 1 applies here too — no star names, no palace names, no astrological terms. This section must NOT repeat what individual palaces already said. Its job is to find what only emerges when the palaces are read together — the thread connecting domains that no single palace reveals on its own. Do not list what was already said. Ask instead: how do the career, wealth, and health patterns interact? What does the combination of the person\'s relationship to movement and home say that neither alone does? End on the single most important thing this person should know — something concrete and specific to this chart, not a generic closing line.]'+
 (userQ?'\n\n===QUESTION===\nIMPORTANT: marker is exactly ===QUESTION===\nQuestion: '+userQ+'\n[No star names. No astrological terms. Write what actually happens. 3-5 sentences. No Chinese.]':'');
 
     } else {
@@ -629,7 +634,8 @@ async function generate(){
 '\u4e0d\u8aaa\u661f\u540d\u3001\u5bae\u4f4d\u540d\u3001\u56db\u5316\u540d\u8a5e\u3002\u628a\u6bcf\u500b\u547d\u76e4\u914d\u7f6e\u7ffb\u8b6f\u70ba\u9019\u500b\u4eba\u5be6\u969b\u7d93\u6b77\u7684\u4e8b\u3002\n'+
 '\u7981\u6b62\u5bae\u4f4d\u4f4d\u7f6e\u5f15\u7528\uff1a\u4e0d\u8981\u5beb\u300c\u547d\u5bae\u5728\u4e11\u300d\u3001\u300c\u8eab\u5bae\u5728\u4ea5\u300d\u3001\u300c\u8eab\u5bae\u843d\u5728\u300d\u3001\u300c\u5c31\u547d\u5bae\u7684\u4f4d\u7f6e\u4f86\u770b\u300d\u2014\u2014\u7d55\u5c0d\u4e0d\u8981\u8aaa\u51fa\u5bae\u4f4d\u5750\u843d\u5728\u54ea\u500b\u5730\u652f\u3002\n'+
 '\u7981\u6b62\u5bae\u4f4d\u89e3\u8b80\u4e2d\u51fa\u73fe\u5e74\u9f61\u5f15\u7528\uff1a\u4e0d\u8aaa\u300c\u4e09\u5341\u5c81\u4ee5\u5f8c\u300d\u3001\u300c\u4e2d\u5e74\u300d\u3001\u300c\u65e9\u671f\u95dc\u4fc2\u300d\u3001\u300c\u56db\u5341\u6b72\u5f8c\u300d\u6216\u4efb\u4f55\u5177\u9ad4\u5e74\u9f61\u3002\u6642\u9593\u9ede\u5c6c\u65bc\u5927\u9650\uff0c\u4e0d\u5c6c\u65bc\u5bae\u4f4d\u89e3\u8b80\u3002\u547d\u76e4\u986f\u793a\u6a21\u5f0f\uff0c\u4e0d\u662f\u65f6\u9593\u8868\u3002\n'+
-'\u7981\u6b62\u6307\u4ee4\u8a5e\u5f59\u6d41\u51fa\u8f38\u51fa\uff1a\u4e0d\u8981\u628a\u6307\u5c0e\u8a9e\u8a00\u5beb\u9032\u89e3\u8b80\u4e2d\u3002\u300c\u96d9\u5200\u5291\u300d\u3001\u300c\u5929\u82b1\u677f\u300d\u3001\u300c\u8abf\u6027\u300d\u3001\u300c\u5f8c\u5929\u8ca1\u300d\u7b49\u8a5e\u5f59\u662f\u5206\u6790\u5de5\u5177\uff0c\u4e0d\u662f\u8f38\u51fa\u8a9e\u8a00\u3002\n\n'+
+'\u7981\u6b62\u6307\u4ee4\u8a5e\u5f59\u6d41\u51fa\u8f38\u51fa\uff1a\u4e0d\u8981\u628a\u6307\u5c0e\u8a9e\u8a00\u5beb\u9032\u89e3\u8b80\u4e2d\u3002\u300c\u96d9\u5200\u5291\u300d\u3001\u300c\u5929\u82b1\u677f\u300d\u3001\u300c\u8abf\u6027\u300d\u3001\u300c\u5f8c\u5929\u8ca1\u300d\u7b49\u8a5e\u5f59\u662f\u5206\u6790\u5de5\u5177\uff0c\u4e0d\u662f\u8f38\u51fa\u8a9e\u8a00\u3002\n'+
+'\u7981\u6b62markdown\u683c\u5f0f\uff1a\u4e0d\u8981\u5728\u5bae\u4f4d\u4e4b\u9593\u5beb---\u3001##\u6216\u4efb\u4f55\u5206\u9694\u7b26\u3002\u5bae\u4f4d\u6a19\u8a18\uff08===CYCLES===\u7b49\uff09\u76f4\u63a5\u5beb\uff0c\u524d\u9762\u4e0d\u52a0\u4efb\u4f55\u5167\u5bb9\u3002\n\n'+
 
 '\u898f\u5247\u4e8c\u2014\u2014\u4f7f\u7528\u9810\u5148\u8a08\u7b97\u7684\u5206\u6790\uff1a\n'+
 '\u4e0a\u65b9\u7684\u547d\u76e4\u8cc7\u6599\u4e2d\u5df2\u7d93\u9810\u5148\u8a08\u7b97\u4e86\u6bcf\u500b\u5bae\u4f4d\u7684\u8abf\u6027\u3002\u5beb\u4efb\u4f55\u5bae\u4f4d\u4e4b\u524d\uff0c\u5148\u770b\u90a3\u500b\u5bae\u4f4d\u7684TONE\u6a19\u8a18\u3002\n'+
@@ -642,12 +648,13 @@ async function generate(){
 '\u4e0d\u7528\u6bd4\u55bb\u3002\u4e0d\u8981\u7528\u5f62\u8c61\u5316\u8a9e\u8a00\u63cf\u8ff0\u6027\u683c\u6216\u60c5\u5883\u3002\u76f4\u63a5\u8aaa\u3002\n'+
 '\u76f4\u63a5\u7684\u6027\u683c\u8ff0\u8ff0\u53ef\u4ee5\u7528\uff0c\u4e5f\u9f13\u52f5\u7528\uff1a\u300c\u91cd\u611f\u60c5\u300d\u3001\u300c\u500b\u6027\u7387\u76f4\u300d\u3001\u300c\u8aaa\u8a71\u76f4\u63a5\u300d\u2014\u2014\u9019\u4e9b\u4e0d\u662f\u6bd4\u55bb\uff0c\u662f\u6027\u683c\u4e8b\u5be6\u3002\u4e0d\u5141\u8a31\u7684\u662f\uff1a\u7528\u6bd4\u55bb\u4ee3\u66ff\u5177\u9ad4\u5c40\u9762\u3002\n'+
 '\u932f\u8aa4\uff1a\u300c\u4f60\u5167\u5fc3\u6709\u4e00\u628a\u5c3a\uff0c\u800c\u90a3\u628a\u5c3a\u7684\u5239\u5ea6\u6bd4\u5927\u90e8\u5206\u4eba\u5bc6\u300d\n'+
-'\u6b63\u78ba\uff1a\u300c\u4f60\u5c0d\u7d30\u7bc0\u7684\u8981\u6c42\u6bd4\u5927\u591a\u6578\u4eba\u9ad8\uff0c\u5225\u4eba\u8aaa\u5920\u4e86\u4f60\u9084\u6c92\u505c\u300d\n\n'+
+'\u6b63\u78ba\uff1a\u300c\u4f60\u5c0d\u7d30\u7bc0\u7684\u8981\u6c42\u6bd4\u5927\u591a\u6578\u4eba\u9ad8\uff0c\u5225\u4eba\u8aaa\u5920\u4e86\u4f60\u9084\u6c92\u505c\u300d\n'+
+'\u4e0d\u52a0\u4efb\u4f55\u62ec\u865f\u3002\u4e0d\u7528\u62bd\u8c61\u8a5e\u5f59\u4ee3\u66ff\u5177\u9ad4\u5c40\u9762\u3002\n\n'+
 
 '\u89e3\u76e4\u898f\u5247\uff08\u5012\u6d77\u5ce6\u5929\u7d00\uff09\uff1a\n'+
 '\u4e0a\u65b9\u7684\u9810\u5148\u8a08\u7b97\u5206\u6790\u5df2\u7d93\u78ba\u5b9a\uff1a\u8ca1\u5fb7\u4f86\u6e90\u3001\u9077\u79fb\u5f37\u5ea6\u3001\u5a5a\u59fb\u7d50\u8ad6\u3001\u5144\u5f1f\u7d50\u8ad6\u3001\u5404\u5bae\u4f4d\u8abf\u6027\u3002\u76f4\u63a5\u7528\u9019\u4e9b\u7d50\u679c\uff0c\u4e0d\u8981\u518d\u81ea\u5df1\u91cd\u65b0\u8a55\u4f30\u3002\n'+
 '\u9810\u5148\u8a08\u7b97\u6c92\u6709\u8986\u84cb\u7684\u90e8\u5206\u2014\u2014\u81ea\u5df1\u61c9\u7528\uff1a\n'+
-'\u2022 \u547d\u5bae\uff1a\u548c\u8eab\u5bae\u4e00\u8d77\u770b\u2014\u2014\u5169\u8005\u76f8\u4e92\u5f37\u5316\u9084\u662f\u77db\u76fe\uff1f\n\u2022 \u672c\u5730\u9084\u662f\u5411\u5916\uff1a\u53ea\u6709\u9077\u79fb\u5f37\uff08DOMINANT\uff09\u6216\u5f31\uff08WEAK\uff09\u624d\u9700\u8981\u660e\u78ba\u8aaa\u3002\u4e2d\u7b49\uff08MODERATE/MILD\uff09\u7684\u548c\u5730\u7406\u6c92\u6c7a\u5b9a\u6027\u95dc\u4fc2\uff0c\u8df3\u904e\u4e0d\u8aaa\u3002\n'+
+'\u2022 \u547d\u5bae\uff1a\u548c\u8eab\u5bae\u4e00\u8d77\u770b\u2014\u2014\u5169\u8005\u76f8\u4e92\u5f37\u5316\u9084\u662f\u77db\u76fe\uff1f\n\u2022 \u672c\u5730\u9084\u662f\u5411\u5916\uff1a\u53ea\u6709\u9077\u79fb\u5f37\uff08DOMINANT\uff09\u6216\u5f31\uff08WEAK\uff09\u624d\u9700\u8981\u660e\u78ba\u8aaa\u3002\u5c11\u91cf\uff08MILD\uff09\u7684\u8df3\u904e\u4e0d\u8aaa\u3002MODERATE\u7684\u7531\u9077\u79fb\u5bae\u6307\u4ee4\u8986\u84cb\u3002\n'+
 '\u2022 \u798f\u5fb7\u5bae\uff1a\u63ed\u793a\u9019\u500b\u4eba\u5c0d\u751f\u6d3b\u6709\u6c92\u6709\u57fa\u672c\u7684\u8f15\u9b06\u611f\u3001\u80fd\u4e0d\u80fd\u76f8\u4fe1\u597d\u4e8b\u6703\u6301\u7e8c\u3001\u4eb2\u5bc6\u95dc\u4fc2\u80fd\u4e0d\u80fd\u649e\u884c\u3002\u8b93\u5b83\u5851\u9020\u958b\u5834\u3002\n'+
 '\u2022 \u5316\u5fcc\uff1a\u8aaa\u5be6\u969b\u7d50\u679c\uff0c\u4e0d\u8aaa\u6a5f\u5236\u3002\n\n'+
 
@@ -666,13 +673,13 @@ async function generate(){
 '[12\u6bb5\u9806\u5e8f\uff1a\u547d\u5bae\u00b7\u592b\u59bb\u00b7\u5b98\u797f\u00b7\u8ca1\u5e1b\u00b7\u798f\u5fb7\u00b7\u75be\u5384\u00b7\u5b50\u5973\u00b7\u7236\u6bcd\u00b7\u5144\u5f1f\u00b7\u9077\u79fb\u00b7\u50d5\u5f79\u00b7\u7530\u5b85\n'+
 '\u683c\u5f0f\uff1a[\u5bae\u4f4d\u540d] \u2014 [\u5167\u5bb9]\u3002\u4e0d\u8981\u7528**\u7c97\u9ad4\u6a19\u8a18\u3002\u4e0d\u8981\u7528markdown\u683c\u5f0f\u3002\u6bcf\u53e5\u8a71\u52a0\u5165\u65b0\u8cc7\u8a0a\uff0c\u4e0d\u89e3\u91cb\u4e5f\u4e0d\u91cd\u8ff0\u4e0a\u4e00\u53e5\u3002\n'+
 '\u8de8\u5bae\u4f4d\u4e0d\u91cd\u8907\uff1a\u6bcf\u500b\u5bae\u4f4d\u5fc5\u9808\u8aaa\u5176\u4ed6\u5bae\u4f4d\u9084\u6c92\u8aaa\u7684\u4e8b\u3002\u547d\u5bae\u5beb\u4e86\u9ad8\u6a19\u6e96\u548c\u9510\u5229\uff0c\u592b\u59bb\u5bae\u5c31\u5beb\u914d\u5076\u7279\u8cea\u548c\u95dc\u4fc2\u8cea\u5730\u3002\u5beb\u4e0b\u4e00\u500b\u5bae\u4f4d\u4e4b\u524d\u5148\u628a\u5df2\u7d93\u5beb\u7684\u90fd\u5f80\u56de\u770b\u4e00\u9065\u3002\n'+
-'\u547d\u5bae\uff083-5\u53e5\uff09\uff1a\u5beb\u9019\u500b\u4eba\u662f\u8ab0\u3002\u7528LIFE PALACE CHARACTER\u7684\u5177\u9ad4\u6c23\u8cea\u548c\u6027\u683c\u3002\u7528\u76f4\u63a5\u7684\u6027\u683c\u8ff0\u8bed\u4e00\u500b\u71df\u8b58\u5979\u7684\u4eba\u5411\u9676\u751f\u4eba\u4ecb\u7d39\u5979\u7684\u65b9\u5f0f\u2014\u2014\u6bd4\u5982\uff1a\u91cd\u611f\u60c5\u3001\u7387\u76f4\u3001\u500b\u6027\u525b\u5f37\u3001\u722a\u723d\u3002\u9019\u4e9b\u4e0d\u662f\u6bd4\u55bb\uff0c\u662f\u76f4\u63a5\u7684\u6027\u683c\u8ff0\u8ff0\u3002\u5f8c\u9762\u7528\u4e00\u500b\u5177\u9ad4\u884c\u70ba\u8aaa\u660e\u90a3\u500b\u7279\u8cea\u3002\u6700\u5927\u512a\u52e2\u8207\u6700\u53ef\u9760\u5f31\u9ede\u61c9\u5f9e\u63cf\u8ff0\u4e2d\u81ea\u7136\u6d6e\u73fe\uff0c\u4e0d\u8981\u8ca7\u7dda\u6a19\u8a18\u3002\n'+
+'\u547d\u5bae\uff083-5\u53e5\uff09\uff1a\u5beb\u9019\u500b\u4eba\u662f\u8ab0\u3002\u7528LIFE PALACE CHARACTER\u7684\u5177\u9ad4\u6c23\u8cea\u548c\u6027\u683c\u3002\u7528\u76f4\u63a5\u7684\u6027\u683c\u8ff0\u8bed\u4e00\u500b\u71df\u8b58\u5c0d\u65b9\u7684\u4eba\u5411\u9676\u751f\u4eba\u4ecb\u7d39\u5c0d\u65b9\u7684\u65b9\u5f0f\u2014\u2014\u6bd4\u5982\uff1a\u91cd\u611f\u60c5\u3001\u7387\u76f4\u3001\u500b\u6027\u525b\u5f37\u3001\u722a\u723d\u3002\u9019\u4e9b\u4e0d\u662f\u6bd4\u55bb\uff0c\u662f\u76f4\u63a5\u7684\u6027\u683c\u8ff0\u8ff0\u3002\u5f8c\u9762\u7528\u4e00\u500b\u5177\u9ad4\u884c\u70ba\u8aaa\u660e\u90a3\u500b\u7279\u8cea\u3002\u6700\u5927\u512a\u52e2\u8207\u6700\u53ef\u9760\u5f31\u9ede\u61c9\u5f9e\u63cf\u8ff0\u4e2d\u81ea\u7136\u6d6e\u73fe\uff0c\u4e0d\u8981\u8ca7\u7dda\u6a19\u8a18\u3002\n'+
 '\u5982\u679c\u8eab\u5bae\u8207\u547d\u5bae\u4e0d\u540c\uff0c\u7528\u4e00\u53e5\u8aaa\u5169\u8005\u5982\u4f55\u4fee\u6b63\u5c0d\u65b9\uff0c\u4f46\u4e0d\u8981\u8aaa\u8eab\u5bae\u5728\u54ea\u500b\u5bae\u4f4d\u3002\n'+
 '\u4e0d\u5305\u542b\uff1a\u5de5\u4f5c\u985e\u578b\u3001\u6a5f\u69cb\u5c64\u7d1a\u3001\u5929\u82b1\u677f\u3002\u4e0d\u63d0\u8eab\u5bae\u540d\u7a31\u6216\u4f4d\u7f6e\u3002\n'+
-'\u592b\u59bb\uff083\u53e5\uff09\uff1a\u7b2c\u4e00\u53e5\u5fc5\u9808\u63cf\u8ff0\u914d\u5076\u2014\u2014\u4ed6\u7684\u6c23\u8cea\u3001\u5916\u8c8c\u3001\u80fd\u529b\u3001\u8ca1\u5bcc\u5080\u5411\u3002\u7b2c\u4e8c\u53e5\uff1a\u95dc\u4fc2\u8cea\u5730\u8207\u9577\u4e45\u5ea6\uff08\u7528\u9810\u5148\u8a08\u7b97\u7684\u5a5a\u59fb\u7d50\u8ad6\uff09\u3002\u7b2c\u4e09\u53e5\uff1a\u5a5a\u59fb\u96a8\u6642\u9593\u662f\u6539\u5584\u9084\u662f\u60aa\u5316\u3002\u9019\u500b\u4eba\u7684\u5167\u5fc3\u72c0\u614b\u5c6c\u65bc\u798f\u5fb7\u5bae\uff0c\u4e0d\u8981\u7528\u300c\u5167\u5fc3\u4e0d\u5b89\u5f71\u97ff\u5a5a\u59fb\u300d\u958b\u5834\u3002\n'+
+'\u592b\u59bb\uff083\u53e5\uff09\uff1a\u7b2c\u4e00\u53e5\u5fc5\u9808\u63cf\u8ff0\u914d\u5076\u2014\u2014\u5c0d\u65b9\u7684\u6c23\u8cea\u3001\u5916\u8c8c\u3001\u80fd\u529b\u3001\u8ca1\u5bcc\u5080\u5411\u3002\u7b2c\u4e8c\u53e5\uff1a\u95dc\u4fc2\u8cea\u5730\u8207\u9577\u4e45\u5ea6\uff08\u7528\u9810\u5148\u8a08\u7b97\u7684\u5a5a\u59fb\u7d50\u8ad6\uff09\u3002\u7b2c\u4e09\u53e5\uff1a\u5a5a\u59fb\u96a8\u6642\u9593\u662f\u6539\u5584\u9084\u662f\u60aa\u5316\u3002\u9019\u500b\u4eba\u7684\u5167\u5fc3\u72c0\u614b\u5c6c\u65bc\u798f\u5fb7\u5bae\uff0c\u4e0d\u8981\u7528\u300c\u5167\u5fc3\u4e0d\u5b89\u5f71\u97ff\u5a5a\u59fb\u300d\u958b\u5834\u3002\n'+
 '\u5b98\u797f\uff084\u53e5\u6700\u591a\uff09\uff1a\u63cf\u8ff0\u4e8b\u696d\u751f\u6d3b\u5f9e\u5916\u9762\u770b\u8d77\u4f86\u7684\u6a23\u5b50\u3002\u4e0d\u8981\u91cd\u8907\u547d\u5bae\u6027\u683c\u3002\u7b2c\u4e00\u53e5\u5fc5\u9808\u662f\u5de5\u4f5c\u985e\u578b\u3002\u8acb\u8aaa\u660e\uff1a\uff081\uff09\u5177\u9ad4\u4ec0\u9ebc\u6a23\u7684\u5de5\u4f5c\uff1b\uff082\uff09\u6574\u500b\u4e8b\u696d\u5c55\u958b\u2014\u2014\u958b\u59cb\u3001\u767c\u529b\u3001\u6210\u529f\u3001\u6298\u8fd4\uff1b\uff083\uff09\u9322\u8ddf\u4e8b\u696d\u7684\u6642\u9593\u8ecc\u8de1\uff1b\uff084\uff09\u5c0d\u9019\u5f35\u547d\u76e4\u4f86\u8aaa\u5960\u932f\u7684\u8def\u5177\u9ad4\u662f\u4ec0\u9ebc\u3002\u4e0d\u8981\u7528\u5177\u9ad4\u5e74\u9f61\u3002\n'+
 '\u8ca1\u5e1b\uff083\u53e5\uff09\uff1a\uff081\uff09\u5148\u5929\u9084\u662f\u5f8c\u5929\u8ca1\u2014\u2014\u4e00\u53e5\u8a71\uff1b\uff082\uff09\u8ca1\u5bcc\u5728\u4e0d\u540c\u4eba\u751f\u968e\u6bb5\u7684\u8d70\u52e2\u2014\u2014\u4f55\u6642\u7d2f\u7a4d\u3001\u4f55\u6642\u81f3\u5cf0\u3001\u4f55\u6642\u7a0e\u5c11\uff1b\uff083\uff09\u6f0f\u6d1e\u5728\u54ea\u88e1\u3002\u5c0d\u7167\u5b98\u797f\u548c\u9077\u79fb\u7d50\u679c\u3002\n'+
-'\u798f\u5fb7\uff083\u53e5\uff09\uff1a\u63cf\u8ff0\u5167\u5fc3\u7684\u5be6\u969b\u611f\u53d7\uff0c\u4e0d\u662f\u5b83\u5982\u4f55\u5f71\u97ff\u5225\u4eba\u3002\uff081\uff09\u5167\u5fc3\u4e16\u754c\u7684\u8cea\u5730\u2014\u2014\u662f\u771f\u6b63\u80fd\u4eab\u53d7\u5df2\u7d93\u5f97\u5230\u7684\uff0c\u9084\u662f\u5373\u4f7f\u4e8b\u60c5\u5f88\u597d\u4e5f\u5c4a\u4e0d\u4e86\u7684\u4e0d\u5b89\u5c45\uff1f\uff082\uff09\u5177\u9ad4\u662f\u4ec0\u9ebc\u89f8\u767c\u9019\u500b\u72c0\u614b\u3001\u4ec0\u9ebc\u80fd\u7e93\u89e3\u5979\u3002\uff083\uff09\u9577\u58fd\u5080\u5411\u3002\u4e0d\u8981\u91cd\u8907\u592b\u59bb\u5bae\u5df2\u7d93\u8aaa\u904e\u7684\u5185\u5fc3\u4e0d\u5b89\u5f71\u97ff\u95dc\u4fc2\u3002\n'+
+'\u798f\u5fb7\uff083\u53e5\uff09\uff1a\u63cf\u8ff0\u5167\u5fc3\u7684\u5be6\u969b\u611f\u53d7\uff0c\u4e0d\u662f\u5b83\u5982\u4f55\u5f71\u97ff\u5225\u4eba\u3002\uff081\uff09\u5167\u5fc3\u4e16\u754c\u7684\u8cea\u5730\u2014\u2014\u662f\u771f\u6b63\u80fd\u4eab\u53d7\u5df2\u7d93\u5f97\u5230\u7684\uff0c\u9084\u662f\u5373\u4f7f\u4e8b\u60c5\u5f88\u597d\u4e5f\u5c4a\u4e0d\u4e86\u7684\u4e0d\u5b89\u5c45\uff1f\uff082\uff09\u5177\u9ad4\u662f\u4ec0\u9ebc\u89f8\u767c\u9019\u500b\u72c0\u614b\u3001\u4ec0\u9ebc\u80fd\u7e93\u89e3\u7576\u4e8b\u4eba\u3002\uff083\uff09\u9577\u58fd\u5080\u5411\u3002\u4e0d\u8981\u91cd\u8907\u592b\u59bb\u5bae\u5df2\u7d93\u8aaa\u904e\u7684\u5185\u5fc3\u4e0d\u5b89\u5f71\u97ff\u95dc\u4fc2\u3002\n'+
 '\u75be\u5384\uff083\u53e5\uff09\uff1a\uff081\uff09\u6574\u9ad4\u9ad4\u8cea\u2014\u2014\u4ed4\u7d30\u770b\u8abf\u6027\uff1aPOSITIVE/MOSTLY-POSITIVE\u8868\u793a\u771f\u6b63\u5f37\u5065\u7684\u57fa\u7dda\uff1bMIXED\u8868\u793a\u5927\u9ad4\u6c92\u554f\u984c\u4f46\u6709\u5177\u9ad4\u7cfb\u7d71\u8981\u6ce8\u610f\uff0c\u4e0d\u662f\u300c\u4e2d\u7b49\u504f\u5f31\u300d\uff1bMIXED-DIFFICULT\u8868\u793a\u771f\u5be6\u7684\u53cd\u8986\u554f\u984c\u3002\uff082\uff09\u75be\u5384\u5bae\u661f\u66dc\u986f\u793a\u7684\u5177\u9ad4\u8eab\u9ad4\u7cfb\u7d71\u3002\uff083\uff09\u53cd\u8986\u6a21\u5f0f\u8207\u9700\u8981\u8b66\u60d5\u7684\u4e8b\u9805\u3002\u7981\u5beb\u58d3\u529b\u3002\n'+
 '  \u5929\u6a5f/\u5929\u540c \u2192 \u795e\u7d93\u3001\u5931\u7720\u3001\u6162\u6027\u601d\u8616\n'+
 '  \u592a\u967d/\u5de8\u9580 \u2192 \u6d88\u5316\u3001\u8184\u80c3\u3001\u55c5\u5480\n'+
@@ -684,11 +691,18 @@ async function generate(){
 '\u5b50\u5973\uff082\u53e5\uff09\uff1a\u8207\u5b50\u5973\u7684\u95dc\u4fc2\u8cea\u5730\u53ca\u5c0d\u751f\u6d3b\u7684\u5f71\u97ff\u3002\u5982\u679c\u5b50\u5973\u5bae\u7a2e\u82b1\u7a7a\u6216\u8ca0\u9762\uff0c\u624d\u8aaa\u80fd\u91cf\u6709\u5225\u7684\u8868\u73fe\u65b9\u5f0f\u3002\n'+
 '\u7236\u6bcd\uff082-3\u53e5\uff09\uff1a\u54ea\u4e00\u4f4d\u7236\u6bcd\u5f71\u97ff\u66f4\u5927\u5fc5\u9808\u5f9e\u5bae\u4f4d\u5167\u7684\u661f\u66dc\u63a8\u5c0e\uff0c\u4e0d\u8981\u731c\u6e2c\u3002\u592a\u967d\u6216\u7b49\u7b49\u967d\u6027\u661f\u66dc\u2192\u7236\u89aa\u5f71\u97ff\u66f4\u5927\u3002\u592a\u9670\u6216\u7b49\u7b49\u9670\u6027\u661f\u66dc\u2192\u6bcd\u89aa\u5f71\u97ff\u66f4\u5927\u3002\u5982\u679c\u4e0d\u6e05\u695a\uff0c\u8aaa\u5169\u4f4d\u7236\u6bcd\u4ee5\u4e0d\u540c\u65b9\u5f0f\u5f71\u97ff\u4e86\u9019\u500b\u4eba\u3002\u7136\u5f8c\u8aaa\uff1a\u95dc\u4fc2\u8cea\u5730\u8207\u5e7c\u5e74\u6240\u53d7\u5230\u7684\u8ca1\u52d9\u548c\u60c5\u611f\u652f\u6301\uff1b\u7236\u6bcd\u5982\u4f55\u5851\u9020\u9019\u500b\u4eba\u7684\u8ecc\u8de1\u3002\n'+
 '\u5144\u5f1f\uff082-3\u53e5\uff09\uff1a\u8840\u89aa\u5144\u5f1f\u4e5f\u4ee3\u8868\u540c\u7d1a\u7684\u540c\u5b78\u3001\u4eb2\u5bc6\u670b\u53cb\u3001\u5546\u696d\u5408\u4f5c\u4eba\u3002\u8acb\u8aaa\uff1a\u95dc\u4fc2\u8cea\u5730\u8207\u89aa\u5bc6\u7a0b\u5ea6\uff1b\u9019\u4e9b\u4eba\u5c0d\u9019\u500b\u4eba\u7684\u751f\u6d3b\u5f71\u97ff\u3002NEUTRAL-THIN\u8868\u793a\u95dc\u4fc2\u5b58\u5728\u4f46\u4e0d\u662f\u4e3b\u8981\u4e3b\u984c\u3002\u5982\u679c\u5144\u5f1f\u5bae\u6709\u5316\u5fcc\u624d\u63d0\u9322\u9322\u7cbe\u845b\u554f\u984c\u3002\n'+
-'\u9077\u79fb\uff082-3\u53e5\uff09\uff1a\u7528\u9810\u5148\u8a08\u7b97\u7684\u9077\u79fb\u5f37\u5ea6\u7d50\u679c\u3002\u8aaa\u660e\u79fb\u52d5\u5982\u4f55\u5f71\u97ff\u9019\u500b\u4eba\u7684\u751f\u6d3b\u2014\u2014\u52d5\u4e86\u4ec0\u9ebc\u6703\u6253\u958b\uff0c\u4e0d\u52d5\u4ec0\u9ebc\u6703\u5c01\u4f4f\u3002\u5982\u679c40\u6b72\u4ee5\u4e0a\u4e14\u9077\u79fb\u5f37\uff0c\u7528\u904e\u53bb\u5f0f\u548c\u73fe\u5728\u5f0f\u8aaa\u5df2\u7d93\u7522\u751f\u7684\u7d50\u679c\u3002\n'+
+'\u9077\u79fb\uff082-3\u53e5\uff09\uff1a\u7528\u9810\u5148\u8a08\u7b97\u7684\u9077\u79fb\u5f37\u5ea6\u7d50\u679c\u3002DOMINANT\u8868\u793a\u79bb\u958b\u662f\u9019\u500b\u751f\u547d\u7684\u7d50\u69cb\u6027\u4e8b\u5be6\uff0c\u4e0d\u8981\u8edf\u5316\u3002MODERATE\u8868\u793a\u5411\u5916\u79fb\u52d5\u6301\u7e8c\u70ba\u9019\u500b\u4eba\u6253\u958b\u5c40\u9762\uff0c\u4e0d\u8981\u544a\u8a34\u5c0d\u65b9\u505c\u5728\u672c\u5730\u5c31\u597d\u6216\u4e0d\u9700\u8981\u51fa\u570b\u3002\u8aaa\u6e05\u695a\u79fb\u52d5\u6253\u958b\u4e86\u4ec0\u9ebc\u3002\u5982\u679c40\u6b72\u4ee5\u4e0a\u4e14\u9077\u79fb\u5f37\uff08DOMINANT\u6216MODERATE\uff09\uff0c\u7528\u904e\u53bb\u5f0f\u548c\u73fe\u5728\u5f0f\u8aaa\u5df2\u7d93\u7522\u751f\u7684\u7d50\u679c\u3002\n'+
 '\u50d5\u5f79\uff082-3\u53e5\uff09\uff1a\u52a9\u624b\u3001\u652f\u6301\u8005\u3001\u4e0b\u5c6c\u3002\u5c0d\u7167\u5144\u5f1f\u5bae\uff08\u540c\u5c64\u4eba\uff09\u2014\u2014\u5169\u8005\u4e00\u8d77\u663e\u793a\u5b8c\u6574\u7684\u793e\u4e1a\u9762\u8c8c\u3002\u8aaa\u660e\u5468\u570d\u7684\u4eba\u662f\u8acf\u52a9\u9084\u662f\u62d6\u7d2f\u3002\n'+
 '\u7530\u5b85\uff082\u53e5\uff09\uff1a\u4e0d\u52d5\u7522\u7d2f\u7a4d\u5080\u5411\u8207\u5c0d\u5bb6\u9109\u7684\u7d81\u7e1b\u611f\u3002\u5c0d\u7167\u7236\u6bcd\u5bae\uff08\u539f\u751f\u5bb6\u5ead\u8cc7\u6e90\uff09\u8207\u9077\u79fb\u7d50\u679c\u3002]\n\n'+
 '===CYCLES===\n'+
-'[\u5728\u547d\u76e4\u8cc7\u6599\u4e2d\u627e\u51fa\u5404\u5e74\u9f61\u6bb5\u7684\u5927\u9650\u5bae\u4f4d\u3002\u540c\u6642\u67e5\u770b\u9810\u5148\u8a08\u7b97\u5206\u6790\u4e2d\u7684DECADE \u5316\u5fcc\u2014\u2014\u5927\u9650\u5bae\u4f4d\u662f\u4e3b\u821e\u53f0\uff0c\u5316\u5fcc\u843d\u5165\u7684\u5bae\u4f4d\u662f\u4ee3\u50f9\u6216\u969c\u7919\u6240\u5728\u3002\u6a19\u7c64\u8981\u5f9e\u5be6\u969b\u5bae\u4f4d\u5c0e\u51fa\uff0c\u4e0d\u8981\u7528\u901a\u7528\u5e74\u9f61\u968e\u6bb5\u8a5e\u5f59\u3002\u932f\u8aa4\uff1a\u81ea\u6211\u6210\u5f62\u3001\u5b78\u696d\u63a2\u7d22\u3001\u8eab\u5fc3\u7a69\u5b9a\u671f\u3002\u6b63\u78ba\uff1a\u9019\u5341\u5e74\u88ab\u555f\u52d5\u7684\u5bae\u4f4d\u548c\u5177\u9ad4\u60c5\u5883\u5c0e\u51fa\u7684\u6a19\u7c64\u3002\u5bae\u4f4d\u540d\u3001\u661f\u540d\u4e0d\u8981\u51fa\u73fe\u5728\u8f38\u51fa\u4e2d\u3002\u6bcf\u884c\u7d50\u5c3e\u7d66\u4e00\u500b\u5177\u9ad4\u6307\u4ee4\u3002\u8f38\u51fa\u524d\u4e0d\u8981\u52a0---\u6216##\u6a19\u8a18\u3002]\n'+'3-12 ('+(+year+3)+'-'+(+year+12)+') | [\u6a19\u7c64] | [\u5167\u5bb9]\n'+
+'[\u7528\u4e0a\u65b9\u9810\u5148\u8a08\u7b97\u5206\u6790\u4e2d\u7684DECADE PALACES\u2014\u2014\u6bcf\u500b\u5e74\u9f61\u6bb5\u7684\u5927\u9650\u5bae\u4f4d\u548c\u661f\u66dc\u5df2\u7d93\u6a19\u660e\u3002\u4e0d\u8981\u5f9e\u5e74\u9f61\u731c\u6e2c\u3002\n'+
+'\u6a19\u7c64\u5fc5\u9808\u4f86\u81ea\uff1a\u90a3\u500b\u5bae\u4f4d\u5728\u9019\u5f35\u547d\u76e4\u88e1\u7ba1\u4ec0\u9ebc\uff0c\u52a0\u4e0a\u5177\u9ad4\u7684\u661f\u66dc\u3002\u4e0d\u662f\u5e74\u9f61\uff0c\u4e0d\u662f\u901a\u7528\u4eba\u751f\u968e\u6bb5\u3002\n'+
+'\u540c\u6642\u67e5\u770b DECADE \u5316\u5fcc\u2014\u2014\u986f\u793a\u90a3\u5341\u5e74\u54ea\u500b\u9818\u57df\u627f\u53d7\u6469\u64e6\u3002\n'+
+'\u932f\u8aa4\u6a19\u7c64\uff08\u5e74\u9f61\u5c0e\u5411\uff09\uff1a\u81ea\u6211\u6210\u5f62\u3001\u5b78\u696d\u63a2\u7d22\u3001\u8eab\u5fc3\u7a69\u5b9a\u671f\u3001\u5bb6\u5ead\u5e74\u3001\u53cd\u601d\u671f\u3002\n'+
+'\u932f\u8aa4\u6a19\u7c64\uff08\u5bae\u4f4d\u540d\u7a31\u6539\u88dd\uff09\uff1a\u8ca1\u5bcc\u5e74\u3001\u5065\u5eb7\u671f\u3001\u4e8b\u696d\u968e\u6bb5\u2014\u2014\u9019\u4e9b\u53ea\u662f\u5bae\u4f4d\u540d\u7a31\uff0c\u4e0d\u662f\u89e3\u8b80\u3002\n'+
+'\u6b63\u78ba\u6a19\u7c64\uff1a\u5f9e\u90a3\u500b\u5927\u9650\u5bae\u4f4d\u7684\u661f\u66dc\u5c0e\u51fa\u3002\u6a19\u51fa\u9019\u5f35\u547d\u76e4\u7684\u9ad8\u9ede\u5e74\u9f61\u6bb5\u3002\u6bcf\u884c\u7d50\u5c3e\u7d66\u4e00\u500b\u6307\u4ee4\u3002\n'+
+'\u683c\u5f0f\uff1a\u5e74\u9f61\uff08\u5e74\u4efd\uff09 | [\u6a19\u7c64] | [\u9019\u5341\u5e74\u7684\u610f\u7fa9\u3001\u5316\u5fcc\u5f71\u97ff\u3001\u6307\u4ee4]\uff08\u540c\u4e00\u884c\uff0c\u4e0d\u63db\u884c\uff09\u3002\u4e0d\u8aaa\u5bae\u4f4d\u540d\u3001\u661f\u540d\u3002\n'+
+'\u8f38\u51fa\u524d\u4e0d\u8981\u52a0---\u6216##\u6a19\u8a18\u3002]\n'+'3-12 ('+(+year+3)+'-'+(+year+12)+') | [\u6a19\u7c64] | [\u5167\u5bb9]\n'+
 '13-22 ('+(+year+13)+'-'+(+year+22)+') | [\u6a19\u7c64] | [\u5167\u5bb9]\n'+
 '23-32 ('+(+year+23)+'-'+(+year+32)+') | [\u6a19\u7c64] | [\u5167\u5bb9]\n'+
 '33-42 ('+(+year+33)+'-'+(+year+42)+') | [\u6a19\u7c64] | [\u5167\u5bb9]\n'+
@@ -698,7 +712,7 @@ async function generate(){
 '73-82 ('+(+year+73)+'-'+(+year+82)+') | [\u6a19\u7c64] | [\u5167\u5bb9]\n\n'+
 
 '===SUMMARY===\n'+
-'[3-4句。規則一在這裡同樣適用——不說星名、宮位名、任何命理術語。這個段落不能重複已經在宮位中說過的內容。它的工作是找到只有把所有宮位放在一起看才呈現的真相——單一宮位無法告訴你的那個連結。問自己：這個人的事業、財富、健康三個模式放在一起看呈現什麼？這個人對移動和根的關係，合起來說什麼單一角度說不到的？然後：這張命盤最重要的一件事。以及命盤對哪一個生活領域沒有定論，一切由自己決定——用日常語言說出那個領域，不要用宮位名稱。]'+
+'[3-4句。規則一在這裡同樣適用——不說星名、宮位名、任何命理術語。這個段落不能重複已經在宮位中說過的內容。它的工作是找到只有把所有宮位放在一起看才呈現的真相——單一宮位無法告訴你的那個連結。問自己：這個人的事業、財富、健康三個模式放在一起看呈現什麼？這個人對移動和根的關係，合起來說什麼單一角度說不到的？用這張命盤最重要的一件事結尾——必須是具體的、只屬於這張命盤的洞見，不要用通用的收尾句。]'+
 (userQ?'\n\n===QUESTION===\n\u91cd\u8981\uff1a\u6a19\u8a18\u5c31\u662f===QUESTION===\u3002\u554f\uff1a'+userQ+'\n[\u4e0d\u8aaa\u661f\u540d\u3002\u4e0d\u8aaa\u5bae\u4f4d\u3002\u5beb\u5177\u9ad4\u767c\u751f\u7684\u4e8b\u30023-5\u53e5\u3002]':'');
 
     }
@@ -779,7 +793,7 @@ function renderResults(text,name,year,month,day,hrTxt,gender,chart,readMode,user
     else if(cycJoined.length>0){cycJoined[cycJoined.length-1]+=' '+l.trim();}
   });
   var cycRows=cycJoined.map(function(l){
-    var p=l.split('|');return p.length>=3?{range:p[0].trim(),phase:p[1].trim(),text:p[2].trim()}:null;
+    var p=l.split('|');return p.length>=3?{range:p[0].trim(),phase:p[1].trim(),text:p.slice(2).join('|').trim()}:null;
   }).filter(Boolean);
 
   var genderLabel=LANG==='zh'?(gender==='Male'?'\u7537':'\u5973'):gender;
