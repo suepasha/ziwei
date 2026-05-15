@@ -334,13 +334,13 @@ async function generate(){
     // Wealth type
     var wxInLW=WEALTH_S.some(function(n){return lifePO.majorStars.concat(wealthPO.majorStars).some(function(s){return s.name===n&&STRONG_B.indexOf(s.brightness)>-1&&s.mutagen!=='\u5fcc';});});
     var wxInCT=WEALTH_S.some(function(n){return careerPO.majorStars.concat(travelPO.majorStars).some(function(s){return s.name===n&&STRONG_B.indexOf(s.brightness)>-1&&s.mutagen!=='\u5fcc';});});
-    var wealthType=wxInLW?'先天財 — resources come with the person, not earned from scratch':wxInCT?'後天財 — must be built through work and movement':'後天財 — no wealth stars in Life/Wealth palace';
+    var wealthType=wxInLW?'先天財 — resources come with the person, not earned from scratch':wxInCT?'後天財 — must be built through work and movement':'後天財 — no strong wealth indicators found; must build from scratch through sustained effort';
 
     // Travel strength
     var tvStrong=travelPO.majorStars.some(function(s){return STRONG_B.indexOf(s.brightness)>-1;});
     var tvJi=hasJi(travelPO);
     var tvCount=travelPO.majorStars.length;
-    var travelStr=tvCount>=2&&tvStrong&&!tvJi?'DOMINANT — departure is a defining life theme; speak in past/present if person is 40+':tvCount>=1&&tvStrong&&!tvJi?'MODERATE — external movement and change of environment consistently opens things up for this person; staying still tends to limit':tvCount>=1&&!tvJi?'MILD — slight outward preference but not a defining theme':'WEAK — rooted path works better for this chart';
+    var travelStr=tvCount>=2&&tvStrong&&!tvJi?'DOMINANT — departure is a defining life theme; speak in past/present if person is 40+':tvCount>=1&&tvStrong&&!tvJi?'MODERATE — external movement and change of environment consistently opens things up for this person; staying still tends to limit':tvCount>=1&&!tvStrong&&!tvJi?'MILD — slight outward preference but not a defining theme':'WEAK — rooted path works better for this chart';
 
     // Marriage
     var mVerdict=isPos(spousePO)&&isPos(fudePO)?'Both Spouse and Inner Life are favorable — relationship can sustain':isPos(spousePO)&&!isPos(fudePO)?'Spouse palace favorable but Inner Life troubled — sustainability at risk despite surface harmony':!isPos(spousePO)&&isPos(fudePO)?'Spouse palace has friction but Inner Life stable — relationship survives through inner resilience':'Both Spouse and Inner Life show difficulty';
@@ -377,7 +377,6 @@ async function generate(){
       var hd=allStars(po).filter(function(s){return HARD.indexOf(s.name)>-1;}).map(function(s){return s.name;}).join(' ');
       return nm+' | stars:'+ms+(lk?' lucky:'+lk:'')+(hd?' hard:'+hd:'')+' | TONE:'+tone(po);
     }).join('\n');
-
 
     // ── LIFE PALACE CHARACTER INTERPRETATION ────────────────────────────────
     var STAR_CHAR={
@@ -435,6 +434,7 @@ async function generate(){
       'WARNING: other palaces may contain different major stars. Do NOT apply their energy to the Life Palace paragraph.\n':
       '';
 
+    var sortedDecades=chart.palaces.filter(function(p){return p.decadeRange;}).slice().sort(function(a,b){return parseInt(a.decadeRange,10)-parseInt(b.decadeRange,10);});
     var analysisBlock=
       '=== PRE-COMPUTED CHART ANALYSIS — READ THIS BEFORE WRITING ANYTHING ===\n'+
       lifeCharStr+
@@ -466,7 +466,7 @@ async function generate(){
           var jiPal=findStarPal(jiStar);
           return '  大限'+p.decadeRange+': 化忌['+jiStar+'] → '+(jiPal?jiPal.name:'unknown');
         }).filter(Boolean).join('\n');
-        var pals=chart.palaces.filter(function(p){return p.decadeRange;}).slice().sort(function(a,b){return parseInt(a.decadeRange,10)-parseInt(b.decadeRange,10);});
+        var pals=sortedDecades;
         var palRows=pals.map(function(p){
           var ms=(p.majorStars||[]).map(function(s){return s.name+(s.mutagen||'')+'('+s.brightness+')';}).join('·');
           var lk=allStars(p).filter(function(s){return LUCKY.indexOf(s.name)>-1;}).map(function(s){return s.name;}).join(' ');
@@ -477,14 +477,13 @@ async function generate(){
                'DECADE PALACES (use these to write cycle labels and readings):\n'+palRows+'\n';
       })()+'\n'+
 
-
       // Chart context — gender-aware, orientation-inclusive
       'CHART CONTEXT:\n'+
       '• Birth gender registered as '+gender+'. This affects the astrological calculation only.\n'+
       '• Spouse palace: describes the person they attract and partner with — their temperament, appearance, ability, financial tendency. Read as a portrait of their partner regardless of the partner\'s gender. Do not assume the partner\'s gender or orientation.\n'+
       '• Inner Life (福德) strongly shapes relationship quality — internal restlessness erodes partnerships regardless of partner or orientation.\n'+
       '• Career, wealth, health, and all other palaces: read the same regardless of this person\'s gender.\n'+
-      '• Use they/them pronouns throughout the reading unless the person\'s name clearly indicates their pronoun.\n'+'\n'+
+      '• Use they/them pronouns throughout the reading unless the person\'s name clearly indicates their pronoun.\n\n'+
 
       'PALACE TONES:\n'+
       'Star = the nature of that domain. Brightness = how reliably that nature expresses. 廟/旺 = steady and accessible. 陷/落 = same nature but harder to control, prone to excess or shadow side. 平 = variable.\n'+
@@ -492,6 +491,11 @@ async function generate(){
       'Follow the TONE above for each palace. Two-star palaces: describe both natures, each calibrated by its brightness. NEUTRAL-THIN = not defining, do not write warmly. NEUTRAL-LUCKY = quietly supportive. Read each palace from its own data only.\n'+
       '=== END PRE-COMPUTED ANALYSIS ===';
 
+    // Dynamic cycle template from actual decade ranges (水二局 starts at 2, 木三局 at 3, etc.)
+    var cycleTemplate=sortedDecades.slice(0,8).map(function(p){
+      var r=p.decadeRange,s=parseInt(r,10),e=parseInt(r.split('-')[1],10);
+      return r+' ('+(+year+s)+'-'+(+year+e)+') | [label] | [content]';
+    }).join('\n')+'\n';
 
     var sfBranches=SFMAP[lifePal.branch]||[];
     var sfPalaces=chart.palaces.filter(function(p){return sfBranches.indexOf(p.branch)>-1;}).map(function(p){return p.name+'['+p.majorStars.map(function(s){return s.name+'('+s.brightness+')';}).join('\u00b7')+']';}).join(' | ');
@@ -554,12 +558,12 @@ async function generate(){
 'The plain version is more useful because the person can actually do something with it.\n\n'+
 
 'RULE 1 \u2014 NO ASTROLOGICAL TERMS IN OUTPUT:\n'+
-'Never name stars, palaces, transformations, or astrological terms. No Chinese characters in English output. No palace location references. No age references anywhere in the output except inside ===CYCLES=== — not in palaces, not in Summary, not in the question answer. Age and timing belong in Cycles only. The chart shows patterns, not schedules.\n\n'+
+'Never name stars, palaces, transformations, or astrological terms. Specifically banned: huaji (化忌), brightness (亮度), stars (星曜), configuration (配置), decade (大限). No Chinese characters in English output. No palace location references. No age references anywhere except inside ===CYCLES===. The chart shows patterns, not schedules.\n\n'+
 
 'RULE 2 \u2014 NO INSTRUCTION VOCABULARY IN OUTPUT:\n'+
 'Analysis labels stay in the analysis \u2014 never in the reading. Banned: "double edge," "ceiling," "DOMINANT," "NEUTRAL-THIN," "inherited wealth," "earned wealth." Banned: ---, ## markdown between sections. Banned in Career: abstract management language. Replace everything with what actually happens.\n\n'+
 
-'RULE 3 — USE THE PRE-COMPUTED ANALYSIS:\n'+
+'RULE 3 \u2014 USE THE PRE-COMPUTED ANALYSIS:\n'+
 'Follow the pre-computed verdicts — brightness is already computed, do not re-assess.\n'+
 'POSITIVE/MOSTLY-POSITIVE: write fundamentally positive. MIXED: write both strengths and friction. MIXED-DIFFICULT/CHALLENGING: acknowledge real recurring friction. Do not override.\n\n'+
 
@@ -568,7 +572,7 @@ async function generate(){
 'Direct personality statements ARE allowed: "values relationships deeply," "says what they think," "direct and clear" \u2014 these are facts, not metaphors.\n'+
 'WRONG: "You carry a measuring stick inside, and its markings are finer than most people\'s."\n'+
 'RIGHT: "Your standards for detail are higher than most \u2014 when others say it\'s done, you\'re still checking."\n'+
-'No brackets. No abstract words standing in for concrete events.\n\n'+
+'No brackets of any kind: (), [], Chinese \uff08\uff09 or \u300c\u300d. No em dash \u2014\u2014 anywhere. Every sentence must describe something that can actually happen to a real person, not a category label for that experience. Test: can you picture this sentence as a concrete scene? If no, it is a label — rewrite it. WRONG: "social position re-anchors" "metabolic turning point" "financial pressure" — these are labels. RIGHT: "the money you have stops being enough" "people start coming to you rather than you going to them."\n\n'+
 
 'RULE 5 \u2014 EARN EVERY SENTENCE:\n'+
 'Every sentence must tell the person something they could not have assumed. Before keeping a sentence, ask: if I removed this, would the person miss something specific to their chart? If no, cut it.\n'+
@@ -620,7 +624,6 @@ async function generate(){
 'NETWORK (2-3 sentences): TONE drives this: POSITIVE means genuine asset, CHALLENGING means they drain. Cross-reference Siblings for the complete social picture.\n'+
 'HOME (2 sentences): Property accumulation and relationship to home base. Cross-reference Parents palace and Travel verdict.]\n\n'+
 
-
 '===CYCLES===\n'+
 '[Use DECADE PALACES from the pre-computed analysis above — the activated palace and its stars are already identified for each decade. Do not guess from age.\n'+
 'The label must come from what that palace rules in this person\'s life combined with the specific stars present — not from the person\'s age or generic life stages.\n'+
@@ -628,17 +631,11 @@ async function generate(){
 'WRONG labels (age-based): Self-Formation, Study Period, Career Building, Family Years, Reflection Phase\n'+
 'WRONG labels (palace name as label): Wealth Decade, Travel Period, Health Phase — these are just the palace name, not a reading.\n'+
 'RIGHT labels: derived from the activated palace\'s stars for THIS chart. Example: if decade activates the Network palace with 天機廟, the label reflects strategic relationships and advisory influence — not "social period."\n'+
+'Each decade paragraph must open with the specific content of that decade — never with a generic opener like "But this decade also" or "During this period similarly.\'\n'+
 'Flag the peak decade. End each line with one concrete directive.\n'+
 'Format: RANGE (YEARS) | [specific label] | [what this decade means, 化忌 impact, directive]\n'+
 'All on one line. Never write palace names, star names in output.]\n'+
-'3-12 ('+( +year+ 3)+'-'+(+year+12)+') | [label] | [text]\n'+
-'13-22 ('+(+year+13)+'-'+(+year+22)+') | [label] | [text]\n'+
-'23-32 ('+(+year+23)+'-'+(+year+32)+') | [label] | [text]\n'+
-'33-42 ('+(+year+33)+'-'+(+year+42)+') | [label] | [text]\n'+
-'43-52 ('+(+year+43)+'-'+(+year+52)+') | [label] | [text]\n'+
-'53-62 ('+(+year+53)+'-'+(+year+62)+') | [label] | [text]\n'+
-'63-72 ('+(+year+63)+'-'+(+year+72)+') | [label] | [text]\n'+
-'73-82 ('+(+year+73)+'-'+(+year+82)+') | [label] | [text]\n\n'+
+cycleTemplate+
 
 '===SUMMARY===\n'+
 '[3-4 sentences. RULE 1 applies here too — no star names, no palace names, no astrological terms, no age references. This section must NOT repeat what individual palaces already said — if Travel already said movement opens things up, do not say it again here. Its job is to find what only emerges when palaces are read TOGETHER — the thread connecting domains that no single palace reveals on its own. Ask: what is the tension or contradiction between two or more domains? What does the combination of how this person operates in work AND relationships AND inner life reveal that neither alone does? What is the single most important thing this person should know that is specific to this chart and cannot be inferred from any one palace reading? End on that insight — concrete, chart-specific, not a generic closing line.]'+
@@ -659,7 +656,7 @@ async function generate(){
 '\u5f8c\u8005\u66f4\u6709\u7528\uff0c\u56e0\u70ba\u5c0d\u65b9\u77e5\u9053\u8a72\u600e\u9ebc\u505a\u3002\n\n'+
 
 '\u898f\u5247\u4e00\u2014\u2014\u8f38\u51fa\u4e0d\u8aaa\u8853\u8a9e\uff1a\n'+
-'不說星名、宮位名、四化名詞。把每個命盤配置翻譯為這個人實際經歷的事。禁止宮位位置引用。禁止在輸出的任何地方使用年齡——包括宮位解讀、結語、回答問題——除了===CYCLES===之外，一律不說年齡。命盤顯示模式，不是時間表。\n\n'+
+'不說星名、宮位名、四化名詞。具體禁止用詞：化忌、亮度、星曜、配置、主星、輔星、大限、小限——這些是分析工具，不是輸出。把每個命盤配置翻譯為這個人實際經歷的事。禁止宮位位置引用。禁止在輸出的任何地方使用年齡——包括宮位解讀、結語、回答問題——除了===CYCLES===之外，一律不說年齡。命盤顯示模式，不是時間表。\n\n'+
 
 '\u898f\u5247\u4e8c\u2014\u2014\u6307\u4ee4\u8a5e\u5f59\u4e0d\u9032\u8f38\u51fa\uff1a\n'+
 '\u5206\u6790\u6a19\u7c64\u7559\u5728\u5206\u6790\u88e1\uff0c\u4e0d\u9032\u89e3\u8b80\u3002\u7981\u6b62\uff1a\u300c\u96d9\u5200\u5291\u300d\u3001\u300c\u5929\u82b1\u677f\u300d\u3001\u300c\u8abf\u6027\u300d\u3001\u300c\u5f8c\u5929\u8ca1\u300d\u7b49\u8a5e\u5f59\u3002\u7981\u6b62---\u6216##\u683c\u5f0f\u7b26\u3002\u7981\u6b62\u5728\u5b98\u797f\u5bae\u7528\u6284\u8c61\u7ba1\u7406\u8a9e\u8a00\uff0c\u624b\u8aa4\u4e00\u5f8b\u6539\u6210\u5be6\u969b\u767c\u751f\u7684\u4e8b\u3002\n\n'+
@@ -672,7 +669,7 @@ async function generate(){
 '\u76f4\u63a5\u7684\u6027\u683c\u8ff0\u8ff0\u53ef\u4ee5\u7528\uff0c\u4e5f\u9f13\u52f5\u7528\uff1a\u300c\u91cd\u611f\u60c5\u300d\u3001\u300c\u500b\u6027\u7387\u76f4\u300d\u3001\u300c\u8aaa\u8a71\u76f4\u63a5\u300d\u2014\u2014\u9019\u4e9b\u4e0d\u662f\u6bd4\u55bb\uff0c\u662f\u6027\u683c\u4e8b\u5be6\u3002\u4e0d\u5141\u8a31\u7684\u662f\uff1a\u7528\u6bd4\u55bb\u4ee3\u66ff\u5177\u9ad4\u5c40\u9762\u3002\n'+
 '\u932f\u8aa4\uff1a\u300c\u4f60\u5167\u5fc3\u6709\u4e00\u628a\u5c3a\uff0c\u800c\u90a3\u628a\u5c3a\u7684\u5239\u5ea6\u6bd4\u5927\u90e8\u5206\u4eba\u5bc6\u300d\n'+
 '\u6b63\u78ba\uff1a\u300c\u4f60\u5c0d\u7d30\u7bc0\u7684\u8981\u6c42\u6bd4\u5927\u591a\u6578\u4eba\u9ad8\uff0c\u5225\u4eba\u8aaa\u5920\u4e86\u4f60\u9084\u6c92\u505c\u300d\n'+
-'\u4e0d\u52a0\u4efb\u4f55\u62ec\u865f\u3002\u4e0d\u7528\u62bd\u8c61\u8a5e\u5f59\u4ee3\u66ff\u5177\u9ad4\u5c40\u9762\u3002\n\n'+
+'不加任何括號，包括「」、（）、()。不用『——』任何地方，用逗號或句號代替。每句話必須描述一件真實發生的事，不是給這個事情赴一個分類標籤。測試：能將這句話想像成一個具體場景嗎？如果不行，就是標籤，重寫。錯誤：「社會位置重新定錨」「身體代謝轉折」「財務端的壓力」——都是標籤。正確：「你手頭的錢開始不夠用」「你這幾年建起來的東西開始有人主動來找你」。\n'+
 
 '\u898f\u5247\u4e94\u2014\u2014\u6bcf\u53e5\u8a71\u90fd\u5fc5\u9808\u8d3a\u5230\u5b83\u7684\u4f4d\u7f6e\uff1a\n'+
 '\u6bcf\u53e5\u8a71\u5fc5\u9808\u544a\u8a34\u5c0d\u65b9\u4e00\u4ef6\u5b83\u7121\u6cd5\u5047\u8a2d\u7684\u4e8b\u3002\u5beb\u5b8c\u4e00\u53e5\u8a71\u524d\u554f\uff1a\u5982\u679c\u5220\u6389\u9019\u53e5\uff0c\u5c0d\u65b9\u6703\u5c11\u4ec0\u9ebc\u5177\u9ad4\u7684\u8a8a\u606f\uff1f\u5982\u679c\u4ec0\u9ebc\u90fd\u6c92\u5c11\uff0c\u5c31\u5220\u3002\n'+
@@ -725,15 +722,9 @@ async function generate(){
 '\u932f\u8aa4\u6a19\u7c64\uff08\u5e74\u9f61\u5c0e\u5411\uff09\uff1a\u81ea\u6211\u6210\u5f62\u3001\u5b78\u696d\u63a2\u7d22\u3001\u8eab\u5fc3\u7a69\u5b9a\u671f\u3001\u5bb6\u5ead\u5e74\u3001\u53cd\u601d\u671f\u3002\n'+
 '\u932f\u8aa4\u6a19\u7c64\uff08\u5bae\u4f4d\u540d\u7a31\u6539\u88dd\uff09\uff1a\u8ca1\u5bcc\u5e74\u3001\u5065\u5eb7\u671f\u3001\u4e8b\u696d\u968e\u6bb5\u2014\u2014\u9019\u4e9b\u53ea\u662f\u5bae\u4f4d\u540d\u7a31\uff0c\u4e0d\u662f\u89e3\u8b80\u3002\n'+
 '\u6b63\u78ba\u6a19\u7c64\uff1a\u5f9e\u90a3\u500b\u5927\u9650\u5bae\u4f4d\u7684\u661f\u66dc\u5c0e\u51fa\u3002\u6a19\u51fa\u9019\u5f35\u547d\u76e4\u7684\u9ad8\u9ede\u5e74\u9f61\u6bb5\u3002\u6bcf\u884c\u7d50\u5c3e\u7d66\u4e00\u500b\u6307\u4ee4\u3002\n'+
-'\u683c\u5f0f\uff1a\u5e74\u9f61\uff08\u5e74\u4efd\uff09 | [\u6a19\u7c64] | [\u9019\u5341\u5e74\u7684\u610f\u7fa9\u3001\u5316\u5fcc\u5f71\u97ff\u3001\u6307\u4ee4]\uff08\u540c\u4e00\u884c\uff0c\u4e0d\u63db\u884c\uff09\u3002\u4e0d\u8aaa\u5bae\u4f4d\u540d\u3001\u661f\u540d\u3002\n'+
-'\u8f38\u51fa\u524d\u4e0d\u8981\u52a0---\u6216##\u6a19\u8a18\u3002]\n'+'3-12 ('+(+year+3)+'-'+(+year+12)+') | [\u6a19\u7c64] | [\u5167\u5bb9]\n'+
-'13-22 ('+(+year+13)+'-'+(+year+22)+') | [\u6a19\u7c64] | [\u5167\u5bb9]\n'+
-'23-32 ('+(+year+23)+'-'+(+year+32)+') | [\u6a19\u7c64] | [\u5167\u5bb9]\n'+
-'33-42 ('+(+year+33)+'-'+(+year+42)+') | [\u6a19\u7c64] | [\u5167\u5bb9]\n'+
-'43-52 ('+(+year+43)+'-'+(+year+52)+') | [\u6a19\u7c64] | [\u5167\u5bb9]\n'+
-'53-62 ('+(+year+53)+'-'+(+year+62)+') | [\u6a19\u7c64] | [\u5167\u5bb9]\n'+
-'63-72 ('+(+year+63)+'-'+(+year+72)+') | [\u6a19\u7c64] | [\u5167\u5bb9]\n'+
-'73-82 ('+(+year+73)+'-'+(+year+82)+') | [\u6a19\u7c64] | [\u5167\u5bb9]\n\n'+
+'每個大限段落不要用通用開頭語——禁止：「但這十年」、「這十年同樣」、「這十年也」開頭。直接進入這個大限的具體內容。\n'+
+'格式：年齡（年份） | [標籤] | [內容：說具體發生的事，不用抽象名詞(社會位置、代謝轉折、定錨、財務端)。不加括號。同一行，不換行）。不說宮位名、星名。\n'+
+cycleTemplate+
 
 '===SUMMARY===\n'+
 '[3-4句。規則一在這裡同樣適用——不說星名、宮位名、任何命理術語、不說年齡。這個段落不能重複已經在宮位中說過的內容——如果遷移宮已經說了「向外走會打開機會」，這裡就不要再說。它的工作是找到只有把宮位放在一起看才呼現的真相。問自己：兩個或三個領域之間有什麼張力或矛盾？這個人在事業、關係和內心三者合起來看呼現什麼單一角度說不到的？用這張命盤最重要的一件事結尾——必須是具體的、只屬於這張命盤的洞見，不要用通用的收尾句。]'+
@@ -833,7 +824,7 @@ function renderResults(text,name,year,month,day,hrTxt,gender,chart,readMode,user
     h+='<div class="mp-grid show" id="mp-grid">'+buildMingpan()+'</div>';
   }
 
-    var palacesRaw=sec(text,'PALACES');
+  var palacesRaw=sec(text,'PALACES');
     if(palacesRaw){
       palacesRaw=palacesRaw.replace(/^[-=]{2,}\s*$/gm,'').replace(/^#+\s*/gm,'').replace(/\*\*([^*]+)\*\*/g,'$1');
       h+='<div class="stitle">'+(LANG==='zh'?'\u5341\u4e8c\u5bae\u6982\u89bd':'12 Palace Overview')+'</div>';
@@ -872,10 +863,9 @@ function renderResults(text,name,year,month,day,hrTxt,gender,chart,readMode,user
   if(summaryRaw){
     h+='<div class="scard-full" style="margin-top:12px;border-left:3px solid var(--gold)">';
     h+='<div class="sh">'+(LANG==='zh'?'\u7d50\u8a9e':'Summary')+'</div>';
-    h+='<p style="font-size:14px;color:var(--cream2);line-height:1.9">'+summaryRaw+'</p>';
+    h+='<p style="font-size:14px;color:var(--cream2);line-height:1.9">'+escHtml(summaryRaw)+'</p>';
     h+='</div>';
   }
-
 
   var qRaw=sec(text,'QUESTION');
   if(!qRaw&&readMode==='question'){
@@ -902,7 +892,7 @@ function renderResults(text,name,year,month,day,hrTxt,gender,chart,readMode,user
       h+='<p style="font-size:13px;color:var(--cream3);line-height:1.6;margin-bottom:12px;font-style:italic;border-bottom:0.5px solid var(--border);padding-bottom:10px">'+(LANG==='zh'?'\u554f\uff1a':'Q: ')+escHtml(userQ)+'</p>';
     }
     if(qRaw){
-      h+='<p style="font-size:13px;color:var(--cream2);line-height:1.85">'+qRaw+'</p>';
+      h+='<p style="font-size:13px;color:var(--cream2);line-height:1.85">'+escHtml(qRaw)+'</p>';
     }
     h+='</div>';
   }
