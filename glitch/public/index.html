@@ -203,7 +203,8 @@ function rebuildMonths(){
 
 (function(){
   var yr=document.getElementById('f-yr');
-  for(var y=2010;y>=1900;y--){var o=document.createElement('option');o.value=y;o.textContent=y;if(y===1967)o.selected=true;yr.appendChild(o);}
+  var currentYear=new Date().getFullYear();
+  for(var y=currentYear;y>=1900;y--){var o=document.createElement('option');o.value=y;o.textContent=y;yr.appendChild(o);}
   var dy=document.getElementById('f-dy');
   for(var d=1;d<=31;d++){var o=document.createElement('option');o.value=d;o.textContent=d;if(d===1)o.selected=true;dy.appendChild(o);}
   rebuildMonths();
@@ -548,7 +549,7 @@ async function generate(){
       prompt=fp+'\n\n'+
 'OUTPUT: produce sections in this exact order: ===META=== ===PALACES=== ===CYCLES=== ===SUMMARY===\n\n'+
 
-'ROLE: Zi Wei Dou Shu reader, \u5012\u6d77\u5ce6 \u5929\u7d00 tradition. Second person. Present tense.\n\n'+
+'ROLE: Zi Wei Dou Shu reader, \u5012\u6d77\u5ce6 \u5929\u7d00 tradition. Second person. Present tense. Be concise \u2014 total output under 2500 tokens. Every sentence must earn its place.\n\n'+
 'TONE \u2014 this is the most important instruction:\n'+
 'Write like a doctor giving results, not a screenwriter writing a character. The information is the thing. The presentation is nothing.\n'+
 'Calm. Direct. No flourish. No drama. No cinematic openings. No lines written to sound striking.\n'+
@@ -634,7 +635,9 @@ async function generate(){
 'Each decade paragraph must open with the specific content of that decade — never with a generic opener like "But this decade also" or "During this period similarly.\'\n'+
 'Flag the peak decade. End each line with one concrete directive.\n'+
 'Format: RANGE (YEARS) | [specific label] | [what this decade means, 化忌 impact, directive]\n'+
-'All on one line. Never write palace names, star names in output.]\n'+
+'All on one line. Never write palace names, star names, or transformation terms (化忌, 化祿, 化科, 化權) in output.\n'+
+'The 化忌 data tells you where friction lands that decade — describe the friction in human terms, never name it. WRONG: "這個十年的化忌落在你本命". RIGHT: "You carry more internal pressure than your exterior suggests this decade." WRONG: "宮位裡有祿有輔". RIGHT: "The people around you are genuinely useful and carry real weight for you."\n'+
+']\n'+
 cycleTemplate+
 
 '===SUMMARY===\n'+
@@ -723,7 +726,8 @@ cycleTemplate+
 '\u932f\u8aa4\u6a19\u7c64\uff08\u5bae\u4f4d\u540d\u7a31\u6539\u88dd\uff09\uff1a\u8ca1\u5bcc\u5e74\u3001\u5065\u5eb7\u671f\u3001\u4e8b\u696d\u968e\u6bb5\u2014\u2014\u9019\u4e9b\u53ea\u662f\u5bae\u4f4d\u540d\u7a31\uff0c\u4e0d\u662f\u89e3\u8b80\u3002\n'+
 '\u6b63\u78ba\u6a19\u7c64\uff1a\u5f9e\u90a3\u500b\u5927\u9650\u5bae\u4f4d\u7684\u661f\u66dc\u5c0e\u51fa\u3002\u6a19\u51fa\u9019\u5f35\u547d\u76e4\u7684\u9ad8\u9ede\u5e74\u9f61\u6bb5\u3002\u6bcf\u884c\u7d50\u5c3e\u7d66\u4e00\u500b\u6307\u4ee4\u3002\n'+
 '每個大限段落不要用通用開頭語——禁止：「但這十年」、「這十年同樣」、「這十年也」開頭。直接進入這個大限的具體內容。\n'+
-'格式：年齡（年份） | [標籤] | [內容：說具體發生的事，不用抽象名詞(社會位置、代謝轉折、定錨、財務端)。不加括號。同一行，不換行）。不說宮位名、星名。\n'+
+'格式：年齡（年份） | [標籤] | [內容：說具體發生的事，不用抽象名詞。不加括號。同一行，不換行）。不說宮位名、星名、化忌化祿等四化名詞。\n'+
+'化忌資料告訴你那十年哪裡有摩擦——用人話描述那個摩擦，不要說化忌或宮位名。錯誤：「這個十年的化忌落在你本命」。正確：「這十年你給自己的壓力比外人看到的多。」錯誤：「宮位裡有祿有輔」。正確：「身邊有人真的在幫你，不是說說而已。」\n'+
 cycleTemplate+
 
 '===SUMMARY===\n'+
@@ -732,10 +736,12 @@ cycleTemplate+
 
     }
 
-    var res=await fetch('/proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:5000,stream:true,messages:[{role:'user',content:prompt}]})});
+    var res=await fetch('/proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:3500,stream:true,messages:[{role:'user',content:prompt}]})});
     if(!res.ok)throw new Error('HTTP '+res.status);
 
-    // Show streaming container immediately
+    // Hide loading, show streaming container
+    clearInterval(ticker);
+    document.getElementById('loading').className='loading';
     var el=document.getElementById('results');
     el.innerHTML='<div class="stream-wrap"><div class="stream-cursor"></div><div id="stream-txt" style="white-space:pre-wrap;font-size:13px;color:var(--cream2);line-height:1.8;font-family:inherit"></div></div>';
     el.className='results on';
@@ -743,15 +749,17 @@ cycleTemplate+
 
     var reader=res.body.getReader();
     var decoder=new TextDecoder();
+    var chunks=[];
     var accumulated='';
     var buf='';
+    var rafPending=false;
 
     while(true){
       var chunk=await reader.read();
       if(chunk.done)break;
       buf+=decoder.decode(chunk.value,{stream:true});
       var lines=buf.split('\n');
-      buf=lines.pop(); // keep incomplete line
+      buf=lines.pop();
       for(var i=0;i<lines.length;i++){
         var line=lines[i].trim();
         if(!line||line==='data: [DONE]')continue;
@@ -759,18 +767,24 @@ cycleTemplate+
           try{
             var ev=JSON.parse(line.slice(6));
             if(ev.type==='content_block_delta'&&ev.delta&&ev.delta.type==='text_delta'){
-              accumulated+=ev.delta.text;
-              // Show last ~800 chars so user sees live text
-              streamTxt.textContent=accumulated.length>800?'…'+accumulated.slice(-800):accumulated;
+              chunks.push(ev.delta.text);
+              if(!rafPending){
+                rafPending=true;
+                requestAnimationFrame(function(){
+                  accumulated=chunks.join('');
+                  streamTxt.textContent=accumulated.length>800?'\u2026'+accumulated.slice(-800):accumulated;
+                  rafPending=false;
+                });
+              }
             }
             if(ev.type==='error')throw new Error(ev.error&&ev.error.message||'Stream error');
           }catch(e){if(e.message!=='Unexpected end of JSON input')throw e;}
         }
       }
     }
+    accumulated=chunks.join('');
 
     if(!accumulated)throw new Error('No text returned');
-    clearInterval(ticker);
     renderResults(accumulated,name,year,month,day,hrTxt,gender,chart,readMode,userQ);
 
   }catch(e){
