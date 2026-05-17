@@ -352,7 +352,7 @@ async function generate(){
     // Siblings
     var sibJi=hasJi(sibPO);
     var sibHard=allStars(sibPO).some(function(s){return HARD.indexOf(s.name)>-1;});
-    var sibVerdict=sibJi?'化忌 present — financial friction from shared dealings is most likely pattern':sibHard?'Difficult stars present (擎羊/陀羅/火星/鈴星 type) — friction pattern; estrangement or financial conflict more likely than purely geographic separation':'No major friction — relationship is essentially stable';
+    var sibVerdict=sibJi?'化忌 present — financial friction from shared dealings is most likely pattern':sibHard?'Hard stars present — conflict or estrangement more likely than support':'No major friction — relationship essentially stable';
 
     // Parents verdict
     var parentsVerdict=(function(){
@@ -360,13 +360,13 @@ async function generate(){
       var moon=parentsPO.majorStars.find(function(s){return s.name==='太陰';});
       var sS=sun&&STRONG_B.indexOf(sun.brightness)>-1,mS=moon&&STRONG_B.indexOf(moon.brightness)>-1;
       var sW=sun&&WEAK_B.indexOf(sun.brightness)>-1,mW=moon&&WEAK_B.indexOf(moon.brightness)>-1;
-      if(sS&&!mS)return 'FATHER — 太陽('+sun.brightness+') strong';
-      if(mS&&!sS)return 'MOTHER — 太陰('+moon.brightness+') strong';
-      if(sS&&mS)return 'BOTH — both strong; do not pick one';
-      if(sW&&mW)return 'UNCERTAIN — both 太陽 and 太陰 weak; do not assign dominance to either parent';
-      if(sW&&!moon)return 'UNCERTAIN — 太陽 weak('+sun.brightness+'); do not assign as dominant';
-      if(mW&&!sun)return 'UNCERTAIN — 太陰 weak('+moon.brightness+'); do not assign as dominant';
-      return 'NO POLARITY — no 太陽 or 太陰; do not assign father or mother; describe relationship quality only';
+      if(sS&&!mS)return 'FATHER — father figure is the dominant influence; write from this';
+      if(mS&&!sS)return 'MOTHER — mother figure is the dominant influence; write from this';
+      if(sS&&mS)return 'BOTH — both parents strong; do not assign one as more defining';
+      if(sW&&mW)return 'UNCERTAIN — neither parent dominant; do not assign dominance';
+      if(sW&&!moon)return 'UNCERTAIN — father figure present but not dominant; do not assign';
+      if(mW&&!sun)return 'UNCERTAIN — mother figure present but not dominant; do not assign';
+      return 'NO POLARITY — neither parent emerges as dominant; describe what was received from both; do not assign dominance to either';
     })();
 
     // Per-palace tone verdicts
@@ -563,9 +563,12 @@ async function generate(){
 
 'RULE 1 \u2014 NO ASTROLOGICAL TERMS IN OUTPUT:\n'+
 'Never name stars, palaces, transformations, or astrological terms. This means ALL individual star names are banned from output — 紫微, 天機, 武曲, 破軍, 廉貞, 天府, 太陽, 太陰, 貪狼, 巨門, 天相, 天梁, 七殺, 擎羊, 陀羅, 火星, 鈴星, and all others. All palace names banned: 命宮, 夫妻宮, 官祿宮, 財帛宮, and all others. No Chinese characters in English output. No palace location references. No age references except inside ===CYCLES===.\n'+
+'The star names are in the analysis for YOU to read and reason from. They must never appear in the reading the person receives — not even to explain why you reached a conclusion.\n'+
 'WRONG: "武曲破軍在官祿讓你在推進和決策上有機會做到真正有份量的事"\n'+
-'RIGHT: "At work you have real capacity to drive decisions that carry weight — the kind where the outcome depends on your call."\n'+
-'The star names are in the analysis for YOU to read. They must never appear in the reading the person receives.\n\n'+
+'RIGHT: "At work you have real capacity to drive decisions that carry weight."\n'+
+'WRONG: "這個宮位沒有太陽或太陰，沒辦法說哪一位父母影響更大"\n'+
+'RIGHT: "Neither parent emerges as clearly more defining — describe what was received from both."\n'+
+'Pattern: take any insight from the stars → state the insight in plain terms → never name the star that produced it.\n\n'+
 
 'RULE 2 \u2014 NO INSTRUCTION VOCABULARY IN OUTPUT:\n'+
 'Analysis labels stay in the analysis \u2014 never in the reading. Banned: "double edge," "ceiling," "DOMINANT," "NEUTRAL-THIN," "inherited wealth," "earned wealth." Banned: ---, ## markdown between sections. Banned in Career: abstract management language. Replace everything with what actually happens.\n\n'+
@@ -630,7 +633,7 @@ async function generate(){
 '  \u7834\u8ecd/\u8ca2\u72fc \u2192 surgery risk, accidents, sudden onset\n'+
 '  \u592a\u9670/\u5929\u6882 \u2192 hormones, reproductive, fluid retention\n'+
 'CHILDREN (2 sentences): TONE drives this: POSITIVE means genuinely good, CHALLENGING means real difficulty. Is it close or distant? Does it cost or give? Say what the relationship actually is and what it does to this person\'s life. No subordinate/student alternative unless palace has no major stars.\n'+
-'PARENTS (2-3 sentences): Use the PARENTS verdict from the pre-computed analysis — it tells you whether father, mother, both, or neither is dominant based on major stars and brightness. Do not override it. Do not infer parent polarity from minor stars, hard stars, or lucky stars — only 太陽 and 太陰 at 廟/旺 determine this. If the verdict is NO POLARITY or UNCERTAIN, do not name either parent as more defining. Then: what was received emotionally and financially in early life; what pattern they set that this person still carries.\n'+
+'PARENTS (2-3 sentences): Use the PARENTS verdict from the pre-computed analysis — it tells you whether father, mother, both, or neither is dominant based on major stars and brightness. Do not override it. Do not infer parent polarity from minor stars, hard stars, or lucky stars — only 太陽 and 太陰 at 廟/旺 determine this. If the verdict is NO POLARITY or UNCERTAIN, do not name either parent as more defining — and do NOT explain why using star names. WRONG: "這個宮位沒有太陽或太陰，沒辦法說哪一位父母影響更大" — palace reference and star names in output. RIGHT: "Neither parent emerges as clearly dominant — describe what was received emotionally and financially from both." Then: what was received emotionally and financially in early life; what pattern they set that this person still carries.\n'+
 'SIBLINGS/PEERS (2-3 sentences): Covers blood siblings AND peers, close friends, business partners at the same level. Do they support, cost, or stay neutral? How present are they? NEUTRAL-THIN means the relationship exists but is not a major theme — do not write it as warm. NEUTRAL-LUCKY means quietly fine. Only mention financial dealings if 化忌 is present.\n'+
 'TRAVEL (2-3 sentences): Use pre-computed Travel verdict. DOMINANT means the departure is a structural fact of this life — do not soften it. MODERATE means external movement consistently opens things up — do not tell this person to stay local or that going abroad is unnecessary. Say what leaving has opened or would open. For 40+ with DOMINANT or MODERATE Travel, speak in past and present about what movement already produced and continues to enable.\n'+
 'NETWORK (2-3 sentences): TONE drives this: POSITIVE means genuine asset, CHALLENGING means they drain. Cross-reference Siblings for the complete social picture.\n'+
@@ -678,6 +681,13 @@ cycleTemplate+
 '\u5f8c\u8005\u66f4\u6709\u7528\uff0c\u56e0\u70ba\u5c0d\u65b9\u77e5\u9053\u8a72\u600e\u9ebc\u505a\u3002\n\n'+
 
 '\u898f\u5247\u4e00\u2014\u2014\u8f38\u51fa\u4e0d\u8aaa\u8853\u8a9e\uff1a\n'+
+'\u8f38\u51fa\u4e2d\u6240\u6709\u661f\u540d\u3001\u5bae\u4f4d\u540d\u3001\u56db\u5316\u540d\u8a5e\u4e00\u5f8b\u7981\u6b62\u3002\u661f\u540d\u5305\u62ec\uff1a\u7d2b\u5fae\u3001\u5929\u6a5f\u3001\u6b66\u66f2\u3001\u7834\u8ecd\u3001\u5ec9\u8c1e\u3001\u5929\u5e9c\u3001\u592a\u967d\u3001\u592a\u9670\u3001\u8ca2\u72fc\u3001\u5de8\u9580\u3001\u5929\u76f8\u3001\u5929\u6082\u3001\u4e03\u6bba\u53ca\u6240\u6709\u5f3a\u661f\u3002\u5bae\u4f4d\u540d\u5305\u62ec\uff1a\u547d\u5bae\u3001\u592b\u59bb\u5bae\u3001\u5b98\u797f\u5bae\u7b49\u3002\u7981\u6b62\u5bae\u4f4d\u4f4d\u7f6e\u5f15\u7528\u3002\u7981\u6b62\u5728===CYCLES===\u4e4b\u5916\u7684\u4efb\u4f55\u5730\u65b9\u4f7f\u7528\u5e74\u9f61\u3002\n'+
+'\u661f\u540d\u5b58\u5728\u65bc\u5206\u6790\u4e2d\u662f\u4f9b\u4f60\u300c\u8b80\u300d\u7684\u5de5\u5177\u3002\u8f38\u51fa\u4e2d\u4e00\u500b\u90fd\u4e0d\u80fd\u51fa\u73fe\u2014\u2014\u5305\u62ec\u7528\u4f86\u89e3\u91cb\u70ba\u4ec0\u9ebc\u5f97\u51fa\u67d0\u500b\u7d50\u8ad6\u3002\n'+
+'\u932f\u8aa4\uff1a\u300c\u6b66\u66f2\u7834\u8ecd\u5728\u5b98\u797f\u8b93\u4f60\u5728\u63a8\u9032\u548c\u6c7a\u7b56\u4e0a\u6709\u6a5f\u6703\u505a\u5230\u771f\u6b63\u6709\u4efd\u91cf\u7684\u4e8b\u300d\n'+
+'\u6b63\u78ba\uff1a\u300c\u5de5\u4f5c\u4e0a\u4f60\u6709\u771f\u5be6\u7684\u80fd\u529b\u63a8\u52d5\u6709\u91cd\u91cf\u7684\u6c7a\u7b56\u3002\u300d\n'+
+'\u932f\u8aa4\uff1a\u300c\u9019\u500b\u5bae\u4f4d\u6c92\u6709\u592a\u967d\u6216\u592a\u9670\uff0c\u6c92\u8fa6\u6cd5\u8aaa\u54ea\u4e00\u4f4d\u7236\u6bcd\u5f71\u97ff\u66f4\u5927\u300d\n'+
+'\u6b63\u78ba\uff1a\u300c\u5169\u4f4d\u7236\u6bcd\u6c92\u6709\u660e\u986f\u7684\u4e3b\u5c0e\uff0c\u8aaa\u5169\u8005\u5404\u81ea\u7d66\u4e86\u4ec0\u9ebc\u3002\u300d\n'+
+'\u539f\u5247\uff1a\u5f9e\u661f\u66dc\u5f97\u5230\u4efb\u4f55\u6d1e\u898b\uff0c\u7528\u5e73\u767d\u8a9e\u8a00\u8aaa\u51fa\u9019\u500b\u6d1e\u898b\uff0c\u6c38\u9060\u4e0d\u8981\u8aaa\u51fa\u7522\u751f\u5b83\u7684\u661f\u540d\u3002\n\n'+
 '不說星名、宮位名、四化名詞。具體禁止用詞：化忌、亮度、星曜、配置、主星、輔星、大限、小限——這些是分析工具，不是輸出。把每個命盤配置翻譯為這個人實際經歷的事。禁止宮位位置引用。禁止在輸出的任何地方使用年齡——包括宮位解讀、結語、回答問題——除了===CYCLES===之外，一律不說年齡。命盤顯示模式，不是時間表。\n\n'+
 
 '\u898f\u5247\u4e8c\u2014\u2014\u6307\u4ee4\u8a5e\u5f59\u4e0d\u9032\u8f38\u51fa\uff1a\n'+
