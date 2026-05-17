@@ -208,7 +208,7 @@ function rebuildMonths(){
   var dy=document.getElementById('f-dy');
   for(var d=1;d<=31;d++){var o=document.createElement('option');o.value=d;o.textContent=d;if(d===1)o.selected=true;dy.appendChild(o);}
   rebuildMonths();
-  document.getElementById('f-mo').value='7';
+  document.getElementById('f-mo').value=String(new Date().getMonth()+1);
   var sn=localStorage.getItem('zwds_name');if(sn)document.getElementById('f-name').value=sn;
   setLang(localStorage.getItem('zwds_lang')||'en');
   document.getElementById('f-hr').addEventListener('change',function(){
@@ -605,7 +605,7 @@ async function generate(){
 '===PALACES===\n'+
 '[12 paragraphs in this order: Life \u00b7 Spouse \u00b7 Career \u00b7 Wealth \u00b7 Inner Life \u00b7 Health \u00b7 Children \u00b7 Parents \u00b7 Siblings \u00b7 Travel \u00b7 Network \u00b7 Home\n'+
 'Format: [Name] \u2014 [text]. No ** bold markers. No markdown. Every sentence must add new information \u2014 do not explain or restate the previous one.\n'+
-'LIFE (3-5 sentences): Who this person is — use LIFE PALACE CHARACTER. Direct personality statements each followed by a concrete behavior. Their greatest asset and most reliable liability should emerge from the description, not be labelled. If Body Palace differs, one sentence on how they modify each other (never name the palace or location).\n'+
+'LIFE (3-5 sentences): Start with the single most defining quality of this person — stated plainly, not as a label. Then elaborate from that: how it shows up in behavior, what it enables, what it costs them. Use LIFE PALACE CHARACTER for the specific nature and brightness. Their greatest asset and most reliable liability should emerge from the description, not be named. If Body Palace differs, one sentence on how they modify each other (never name the palace or location).\n'+
 'SPOUSE (3 sentences): First sentence must describe the partner \u2014 their temperament, appearance, ability, wealth tendency. Second sentence: relationship quality and longevity from pre-computed Marriage verdict. Third sentence: does it improve or deteriorate? The person\u2019s inner state belongs in Inner Life, not here. Do not open Spouse with "your inner insecurity affects the relationship."\n'+
 'CAREER (3-4 sentences): Write from this palace\'s specific stars and brightness — two different charts with different stars must produce different answers here. What this person is actually like at work; what makes this configuration work and what makes it fail; the wrong path for this specific star combination. Cross-reference Wealth and Travel verdicts. No age references.\n'+
 'WEALTH (3 sentences): (1) Inherited vs earned — one flat sentence; (2) what conditions make it build, what conditions make it thin; (3) the specific leak. Cross-reference Career and Travel — when Travel is DOMINANT or MODERATE, name the specific mechanism that produces income for this chart, not generic "movement and networking." Cross-reference Siblings for financial friction channels. No age references.\n'+
@@ -632,9 +632,9 @@ async function generate(){
 'WRONG labels (age-based): Self-Formation, Study Period, Career Building, Family Years, Reflection Phase\n'+
 'WRONG labels (palace name as label): Wealth Decade, Travel Period, Health Phase — these are just the palace name, not a reading.\n'+
 'RIGHT labels: derived from the activated palace\'s stars for THIS chart. Example: if decade activates the Network palace with 天機廟, the label reflects strategic relationships and advisory influence — not "social period."\n'+
-'Each decade paragraph must open with the specific content of that decade — never with a generic opener like "But this decade also" or "During this period similarly.\'\n'+
+'Each decade paragraph must open directly with what happens that decade. Never start with: "This decade," "During this period," "In this phase," or the Chinese equivalent "\u9019\u5341\u5e74" in any form.\n'+
 'Flag the peak decade. End each line with one concrete directive.\n'+
-'Format: RANGE (YEARS) | [specific label] | [what this decade means, 化忌 impact, directive]\n'+
+'Format: RANGE (YEARS) | [specific label] | [2 sentences max: what this decade brings, one concrete directive]\n'+
 'All on one line. Never write palace names, star names, or transformation terms (化忌, 化祿, 化科, 化權) in output.\n'+
 'The 化忌 data tells you where friction lands that decade — describe the friction in human terms, never name it. WRONG: "這個十年的化忌落在你本命". RIGHT: "You carry more internal pressure than your exterior suggests this decade." WRONG: "宮位裡有祿有輔". RIGHT: "The people around you are genuinely useful and carry real weight for you."\n'+
 ']\n'+
@@ -699,7 +699,7 @@ cycleTemplate+
 '===PALACES===\n'+
 '[12\u6bb5\u9806\u5e8f\uff1a\u547d\u5bae\u00b7\u592b\u59bb\u00b7\u5b98\u797f\u00b7\u8ca1\u5e1b\u00b7\u798f\u5fb7\u00b7\u75be\u5384\u00b7\u5b50\u5973\u00b7\u7236\u6bcd\u00b7\u5144\u5f1f\u00b7\u9077\u79fb\u00b7\u50d5\u5f79\u00b7\u7530\u5b85\n'+
 '\u683c\u5f0f\uff1a[\u5bae\u4f4d\u540d] \u2014 [\u5167\u5bb9]\u3002\u4e0d\u8981\u7528**\u7c97\u9ad4\u6a19\u8a18\u3002\u4e0d\u8981\u7528markdown\u683c\u5f0f\u3002\u6bcf\u53e5\u8a71\u52a0\u5165\u65b0\u8cc7\u8a0a\uff0c\u4e0d\u89e3\u91cb\u4e5f\u4e0d\u91cd\u8ff0\u4e0a\u4e00\u53e5\u3002\n'+
-'命宮（3-5句）：這個人是誰。用LIFE PALACE CHARACTER。直接的性格述述，每條跟一個具體行為為證。最大優勢與最可靠的弱點應從描述中自然浮現，不要明認。若身宮與命宮不同，一句說明兩者如何互相修正（不要說宮位名稱或位置）。\n'+
+'命宮（3-5句）：先說這個人最核心的一個特質——直接說，不要用分類標籤。然後從那個特質展開：它具體怎麼在行為中出現，它讓這個人能做什麼，它讓這個人付出什麼代價。用LIFE PALACE CHARACTER的具體性質和亮度。最大優勢與最可靠的弱點應從描述中自然浮現，不要明認。若身宮與命宮不同，一句說明兩者如何互相修正（不要說宮位名稱或位置）。\n'+
 '\u592b\u59bb\uff083\u53e5\uff09\uff1a\u7b2c\u4e00\u53e5\u5fc5\u9808\u63cf\u8ff0\u914d\u5076\u2014\u2014\u5c0d\u65b9\u7684\u6c23\u8cea\u3001\u5916\u8c8c\u3001\u80fd\u529b\u3001\u8ca1\u5bcc\u5080\u5411\u3002\u7b2c\u4e8c\u53e5\uff1a\u95dc\u4fc2\u8cea\u5730\u8207\u9577\u4e45\u5ea6\uff08\u7528\u9810\u5148\u8a08\u7b97\u7684\u5a5a\u59fb\u7d50\u8ad6\uff09\u3002\u7b2c\u4e09\u53e5\uff1a\u5a5a\u59fb\u96a8\u6642\u9593\u662f\u6539\u5584\u9084\u662f\u60aa\u5316\u3002\u9019\u500b\u4eba\u7684\u5167\u5fc3\u72c0\u614b\u5c6c\u65bc\u798f\u5fb7\u5bae\uff0c\u4e0d\u8981\u7528\u300c\u5167\u5fc3\u4e0d\u5b89\u5f71\u97ff\u5a5a\u59fb\u300d\u958b\u5834\u3002\n'+
 '官祿（3-4句）：從這個宮位的具體星曜和亮度寫起——兩張不同命盤有不同星曜，答案必須不同。這個人在工作中實際是什麼樣子；這個配置什麼情況下會發揮、什麼情況下會失效；對這張命盤的這組星曜而言走錯的路是什麼。對照財帛和遷移結果。不要用年齡。\n'+
 '財帛（3句）：（1）先天還是後天財——一句話；（2）這張命盤的財富如何累積——什麼條件下會建立，什麼條件下會腐荷；（3）漏洞在哪裡。對照官祿和遷移結果——如果遷移強或中等，說清楚對這張命盤而言具體是什麼樣的外部參與能產生收入，不要用通用的「向外走、接觸不同環境」。對照兄弟結果——如果兄弟宮有化忌或難星，那是財務摩擦的一個可能渠道。不要用年齡。\n'+
@@ -723,9 +723,9 @@ cycleTemplate+
 '\u6a19\u7c64\u5fc5\u9808\u4f86\u81ea\uff1a\u90a3\u500b\u5bae\u4f4d\u5728\u9019\u5f35\u547d\u76e4\u88e1\u7ba1\u4ec0\u9ebc\uff0c\u52a0\u4e0a\u5177\u9ad4\u7684\u661f\u66dc\u3002\u4e0d\u662f\u5e74\u9f61\uff0c\u4e0d\u662f\u901a\u7528\u4eba\u751f\u968e\u6bb5\u3002\n'+
 '\u540c\u6642\u67e5\u770b DECADE \u5316\u5fcc\u2014\u2014\u986f\u793a\u90a3\u5341\u5e74\u54ea\u500b\u9818\u57df\u627f\u53d7\u6469\u64e6\u3002\n'+
 '\u932f\u8aa4\u6a19\u7c64\uff08\u5e74\u9f61\u5c0e\u5411\uff09\uff1a\u81ea\u6211\u6210\u5f62\u3001\u5b78\u696d\u63a2\u7d22\u3001\u8eab\u5fc3\u7a69\u5b9a\u671f\u3001\u5bb6\u5ead\u5e74\u3001\u53cd\u601d\u671f\u3002\n'+
-'\u932f\u8aa4\u6a19\u7c64\uff08\u5bae\u4f4d\u540d\u7a31\u6539\u88dd\uff09\uff1a\u8ca1\u5bcc\u5e74\u3001\u5065\u5eb7\u671f\u3001\u4e8b\u696d\u968e\u6bb5\u2014\u2014\u9019\u4e9b\u53ea\u662f\u5bae\u4f4d\u540d\u7a31\uff0c\u4e0d\u662f\u89e3\u8b80\u3002\n'+
+'格式：年齡（年份） | [標籤] | [最多2句：這個大限帶來什麼，一個具體指令。不加括號。同一行，不換行。不說宮位名、星名、四化名詞。]\n'+
 '\u6b63\u78ba\u6a19\u7c64\uff1a\u5f9e\u90a3\u500b\u5927\u9650\u5bae\u4f4d\u7684\u661f\u66dc\u5c0e\u51fa\u3002\u6a19\u51fa\u9019\u5f35\u547d\u76e4\u7684\u9ad8\u9ede\u5e74\u9f61\u6bb5\u3002\u6bcf\u884c\u7d50\u5c3e\u7d66\u4e00\u500b\u6307\u4ee4\u3002\n'+
-'每個大限段落不要用通用開頭語——禁止：「但這十年」、「這十年同樣」、「這十年也」開頭。直接進入這個大限的具體內容。\n'+
+'不要用「這十年」、「但這十年」、「這十年同樣」、「這十年也」開頭——直接說這個大限帶來什麼。\n'+
 '格式：年齡（年份） | [標籤] | [內容：說具體發生的事，不用抽象名詞。不加括號。同一行，不換行）。不說宮位名、星名、化忌化祿等四化名詞。\n'+
 '化忌資料告訴你那十年哪裡有摩擦——用人話描述那個摩擦，不要說化忌或宮位名。錯誤：「這個十年的化忌落在你本命」。正確：「這十年你給自己的壓力比外人看到的多。」錯誤：「宮位裡有祿有輔」。正確：「身邊有人真的在幫你，不是說說而已。」\n'+
 cycleTemplate+
@@ -789,7 +789,7 @@ cycleTemplate+
 
   }catch(e){
     clearInterval(ticker);
-    document.getElementById('err-box').innerHTML='<b>Error:</b> '+e.message;
+    document.getElementById('err-box').innerHTML='<b>Error:</b> '+escHtml(e.message);
     document.getElementById('err-box').className='err-box on';
   }
   document.getElementById('loading').className='loading';
