@@ -121,6 +121,7 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
             <option value="8">15:00–16:59</option><option value="9">17:00–18:59</option>
             <option value="10">19:00–20:59</option><option value="11">21:00–22:59</option>
           </select>
+          <div style="font-size:11px;color:var(--cream3);margin-top:5px;line-height:1.5">紫微斗數以「時辰」為單位，每個時辰為兩小時。同一時辰內出生，命盤相同。</div>
         </div>
       </div>
     </div>
@@ -204,11 +205,12 @@ function rebuildMonths(){
 (function(){
   var yr=document.getElementById('f-yr');
   var currentYear=new Date().getFullYear();
-  for(var y=currentYear;y>=1900;y--){var o=document.createElement('option');o.value=y;o.textContent=y;yr.appendChild(o);}
+  for(var y=currentYear;y>=1900;y--){var o=document.createElement('option');o.value=y;o.textContent=y;if(y===1967)o.selected=true;yr.appendChild(o);}
   var dy=document.getElementById('f-dy');
   for(var d=1;d<=31;d++){var o=document.createElement('option');o.value=d;o.textContent=d;if(d===1)o.selected=true;dy.appendChild(o);}
   rebuildMonths();
-  document.getElementById('f-mo').value=String(new Date().getMonth()+1);
+  document.getElementById('f-mo').value='7';
+  document.getElementById('f-hr').value='5';
   var sn=localStorage.getItem('zwds_name');if(sn)document.getElementById('f-name').value=sn;
   setLang(localStorage.getItem('zwds_lang')||'en');
   document.getElementById('f-hr').addEventListener('change',function(){
@@ -608,6 +610,7 @@ async function generate(){
 'LIFE (3-5 sentences): Start with the single most defining quality of this person — stated plainly, not as a label. Then elaborate from that: how it shows up in behavior, what it enables, what it costs them. Use LIFE PALACE CHARACTER for the specific nature and brightness. Their greatest asset and most reliable liability should emerge from the description, not be named. If Body Palace differs, one sentence on how they modify each other (never name the palace or location).\n'+
 'SPOUSE (3 sentences): First sentence must describe the partner \u2014 their temperament, appearance, ability, wealth tendency. Second sentence: relationship quality and longevity from pre-computed Marriage verdict. Third sentence: does it improve or deteriorate? The person\u2019s inner state belongs in Inner Life, not here. Do not open Spouse with "your inner insecurity affects the relationship."\n'+
 'CAREER (3-4 sentences): Write from this palace\'s specific stars and brightness — two different charts with different stars must produce different answers here. What this person is actually like at work; what makes this configuration work and what makes it fail; the wrong path for this specific star combination. Cross-reference Wealth and Travel verdicts. No age references.\n'+
+'BANNED career phrases — do not use unless the chart has multiple strong converging signals specifically supporting them: "works best alone," "prefers independence," "not suitable for structured environments," "can\'t handle boring or fixed jobs," "doesn\'t work well under authority," "needs freedom and autonomy." These apply to most people, not most charts. One star having restless or assertive energy is not enough — say what this specific star combination actually produces at work instead.\n'+
 'WEALTH (3 sentences): (1) Inherited vs earned — one flat sentence; (2) what conditions make it build, what conditions make it thin; (3) the specific leak. Cross-reference Career and Travel — when Travel is DOMINANT or MODERATE, name the specific mechanism that produces income for this chart, not generic "movement and networking." Cross-reference Siblings for financial friction channels. No age references.\n'+
 'INNER LIFE (3 sentences): Read THIS palace\'s TONE first — POSITIVE/MOSTLY-POSITIVE = genuine inner ease, say so directly. CHALLENGING = persistent friction regardless of external circumstances. Never let Career, Spouse, or Health difficulty color this palace. (1) Inner quality from this TONE. (2) What triggers or relieves it — from this palace\'s stars only, not generic conditions. (3) Cross-reference Health only if this palace is also MIXED or worse.\n'+
 'HEALTH (3 sentences): (1) Overall constitution from TONE — POSITIVE means genuinely strong, say so directly; do not soften MIXED to “moderately weak.” (2) Body systems — ONLY flag if relevant star is weak (陷/落) or has 化忌; strong (廟/旺) star = robust system. If Inner Life is CHALLENGING/MIXED-DIFFICULT, note the nervous system cost. (3) Recurring pattern. Never write stress.\n'+
@@ -634,9 +637,12 @@ async function generate(){
 'RIGHT labels: derived from the activated palace\'s stars for THIS chart. Example: if decade activates the Network palace with 天機廟, the label reflects strategic relationships and advisory influence — not "social period."\n'+
 'Each decade paragraph must open directly with what happens that decade. Never start with: "This decade," "During this period," "In this phase," or the Chinese equivalent "\u9019\u5341\u5e74" in any form.\n'+
 'Flag the peak decade. End each line with one concrete directive.\n'+
-'Format: RANGE (YEARS) | [specific label] | [2 sentences max: what this decade brings, one concrete directive]\n'+
+'Format: RANGE (YEARS) | [specific label] | [2 sentences max]\n'+
+'Content rule: Start with the single most defining shift of that decade — stated as something that actually happens, not a category name for it. Then one concrete directive that follows from that shift.\n'+
+'WRONG content: "A decade of financial transformation and realignment begins." RIGHT: "The money stops tracking your effort cleanly — what you put in and what comes back become less predictable."\n'+
+'WRONG content: "Relationships become central this period." RIGHT: "The people around you carry real weight for you — more than any previous decade — and one or two of them will matter more than you expect."\n'+
 'All on one line. Never write palace names, star names, or transformation terms (化忌, 化祿, 化科, 化權) in output.\n'+
-'The 化忌 data tells you where friction lands that decade — describe the friction in human terms, never name it. WRONG: "這個十年的化忌落在你本命". RIGHT: "You carry more internal pressure than your exterior suggests this decade." WRONG: "宮位裡有祿有輔". RIGHT: "The people around you are genuinely useful and carry real weight for you."\n'+
+'The 化忌 data tells you where friction lands — describe the friction as what happens, never name it. WRONG: "化忌落在你本命". RIGHT: "You carry more internal pressure than your exterior suggests."\n'+
 ']\n'+
 cycleTemplate+
 
@@ -702,6 +708,7 @@ cycleTemplate+
 '命宮（3-5句）：先說這個人最核心的一個特質——直接說，不要用分類標籤。然後從那個特質展開：它具體怎麼在行為中出現，它讓這個人能做什麼，它讓這個人付出什麼代價。用LIFE PALACE CHARACTER的具體性質和亮度。最大優勢與最可靠的弱點應從描述中自然浮現，不要明認。若身宮與命宮不同，一句說明兩者如何互相修正（不要說宮位名稱或位置）。\n'+
 '\u592b\u59bb\uff083\u53e5\uff09\uff1a\u7b2c\u4e00\u53e5\u5fc5\u9808\u63cf\u8ff0\u914d\u5076\u2014\u2014\u5c0d\u65b9\u7684\u6c23\u8cea\u3001\u5916\u8c8c\u3001\u80fd\u529b\u3001\u8ca1\u5bcc\u5080\u5411\u3002\u7b2c\u4e8c\u53e5\uff1a\u95dc\u4fc2\u8cea\u5730\u8207\u9577\u4e45\u5ea6\uff08\u7528\u9810\u5148\u8a08\u7b97\u7684\u5a5a\u59fb\u7d50\u8ad6\uff09\u3002\u7b2c\u4e09\u53e5\uff1a\u5a5a\u59fb\u96a8\u6642\u9593\u662f\u6539\u5584\u9084\u662f\u60aa\u5316\u3002\u9019\u500b\u4eba\u7684\u5167\u5fc3\u72c0\u614b\u5c6c\u65bc\u798f\u5fb7\u5bae\uff0c\u4e0d\u8981\u7528\u300c\u5167\u5fc3\u4e0d\u5b89\u5f71\u97ff\u5a5a\u59fb\u300d\u958b\u5834\u3002\n'+
 '官祿（3-4句）：從這個宮位的具體星曜和亮度寫起——兩張不同命盤有不同星曜，答案必須不同。這個人在工作中實際是什麼樣子；這個配置什麼情況下會發揮、什麼情況下會失效；對這張命盤的這組星曜而言走錯的路是什麼。對照財帛和遷移結果。不要用年齡。\n'+
+'禁用詞彙——除非命盤有多個強烈信號同時指向，不然不要用：「適合自己工作」、「不適合團隊環境」、「不適合死指活」、「需要自由和自主性」、「不適合被管」。這些適用於大多數人，不是大多數命盤。一個星曜有為沖動或玄強的氣質不夠——說這個具體的星曜組合在工作中實際產生什麼。\n'+
 '財帛（3句）：（1）先天還是後天財——一句話；（2）這張命盤的財富如何累積——什麼條件下會建立，什麼條件下會腐荷；（3）漏洞在哪裡。對照官祿和遷移結果——如果遷移強或中等，說清楚對這張命盤而言具體是什麼樣的外部參與能產生收入，不要用通用的「向外走、接觸不同環境」。對照兄弟結果——如果兄弟宮有化忌或難星，那是財務摩擦的一個可能渠道。不要用年齡。\n'+
 '福德（3句）：先看這個宮位的TONE——POSITIVE/MOSTLY-POSITIVE = 內心有真實的基線穩定感，直接說。CHALLENGING = 不管外在多好都有持續的內在摩擦。不要把官祿、夫妻、疾厄的困難溲進這個宮位。（1）內心質地來自這個宮位的TONE。（2）具體觸發或纓解的是什麼——從這個宮位的星曜推導。（3）只有這個宮位本身也是MIXED或更難時，才對照疾厄調性。\n'+
 '疾厄（3句）：（1）整體體質——POSITIVE是真正強健，直接說；MIXED大體沒問題但有具體系統要注意。（2）具體系統——只有對應星曜度弱（陷/落）或有化忌時才標為需要注意；度強星曜表示那個系統健康。若福德是CHALLENGING/MIXED-DIFFICULT，說明內心載荷是身體代價。（3）反覆模式。禁寫壓力。\n'+
@@ -723,7 +730,10 @@ cycleTemplate+
 '\u6a19\u7c64\u5fc5\u9808\u4f86\u81ea\uff1a\u90a3\u500b\u5bae\u4f4d\u5728\u9019\u5f35\u547d\u76e4\u88e1\u7ba1\u4ec0\u9ebc\uff0c\u52a0\u4e0a\u5177\u9ad4\u7684\u661f\u66dc\u3002\u4e0d\u662f\u5e74\u9f61\uff0c\u4e0d\u662f\u901a\u7528\u4eba\u751f\u968e\u6bb5\u3002\n'+
 '\u540c\u6642\u67e5\u770b DECADE \u5316\u5fcc\u2014\u2014\u986f\u793a\u90a3\u5341\u5e74\u54ea\u500b\u9818\u57df\u627f\u53d7\u6469\u64e6\u3002\n'+
 '\u932f\u8aa4\u6a19\u7c64\uff08\u5e74\u9f61\u5c0e\u5411\uff09\uff1a\u81ea\u6211\u6210\u5f62\u3001\u5b78\u696d\u63a2\u7d22\u3001\u8eab\u5fc3\u7a69\u5b9a\u671f\u3001\u5bb6\u5ead\u5e74\u3001\u53cd\u601d\u671f\u3002\n'+
-'格式：年齡（年份） | [標籤] | [最多2句：這個大限帶來什麼，一個具體指令。不加括號。同一行，不換行。不說宮位名、星名、四化名詞。]\n'+
+'格式：年齡（年份） | [標籤] | [最多2句：先說最核心的一個轉變（具體發生的事），然後一個具體指令。同一行。不說宮位名、星名、四化名詞。]\n'+
+'錯誤：「一個財務轉化和重整的階段。」正確：「錢開始不跟努力走——你投入的和回來的變得不對稱。」\n'+
+'錯誤：「關係在這個階段變得核心。」正確：「身邊少數人確實在這十年才讓你感覺到它們的重量，其中一兩個會讓你驚訝。」\n'+
+'化忌資料告訴你那十年哪裡有摩擦——說具體發生的事，不要說化忌或宮位名。錯誤：「化忌落在你本命。」正確：「你給自己的壓力比外人看到的多。」\n'+
 '\u6b63\u78ba\u6a19\u7c64\uff1a\u5f9e\u90a3\u500b\u5927\u9650\u5bae\u4f4d\u7684\u661f\u66dc\u5c0e\u51fa\u3002\u6a19\u51fa\u9019\u5f35\u547d\u76e4\u7684\u9ad8\u9ede\u5e74\u9f61\u6bb5\u3002\u6bcf\u884c\u7d50\u5c3e\u7d66\u4e00\u500b\u6307\u4ee4\u3002\n'+
 '不要用「這十年」、「但這十年」、「這十年同樣」、「這十年也」開頭——直接說這個大限帶來什麼。\n'+
 '格式：年齡（年份） | [標籤] | [內容：說具體發生的事，不用抽象名詞。不加括號。同一行，不換行）。不說宮位名、星名、化忌化祿等四化名詞。\n'+
