@@ -121,7 +121,7 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
             <option value="8">15:00–16:59</option><option value="9">17:00–18:59</option>
             <option value="10">19:00–20:59</option><option value="11">21:00–22:59</option>
           </select>
-          <div style="font-size:11px;color:var(--cream3);margin-top:5px;line-height:1.5">紫微斗數以「時辰」為單位，每個時辰為兩小時。同一時辰內出生，命盤相同。</div>
+          <div id="t-hr-note" style="font-size:11px;color:var(--cream3);margin-top:5px;line-height:1.5">紫微斗數以「時辰」為單位，每個時辰為兩小時。同一時辰內出生，命盤相同。</div>
         </div>
       </div>
     </div>
@@ -158,8 +158,8 @@ var MO={
   zh:['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月']
 };
 var TX={
-  en:{birth:'Birth Information',name:'Name (optional)',ph:'Enter name…',gender:'Gender',male:'Male',female:'Female',yr:'Year',mo:'Month',dy:'Day',hr:'Birth Hour',btn:'Generate',zi:'Born after midnight?',zino:'No (23:00–23:59)',ziyes:'Yes (00:00–00:59)',modelbl:'Reading type',modefull:'Full reading',modeq:'Question only',modeboth:'Both',qlbl:'Your question',qph:'e.g. Should I change jobs this year? Why do I keep having the same argument with my partner?'},
-  zh:{birth:'出生資料',name:'姓名（選填）',ph:'輸入姓名…',gender:'性別',male:'男',female:'女',yr:'年',mo:'月',dy:'日',hr:'出生時辰',btn:'送出',zi:'午夜後出生？',zino:'否 (23:00–23:59)',ziyes:'是 (00:00–00:59)',modelbl:'解讀類型',modefull:'完整解讀',modeq:'僅回答問題',modeboth:'兩者都要',qlbl:'你的問題',qph:'例如：今年適合換工作嗎？為什麼我和另一半總是在吉話不合？'}
+  en:{birth:'Birth Information',name:'Name (optional)',ph:'Enter name…',gender:'Gender',male:'Male',female:'Female',yr:'Year',mo:'Month',dy:'Day',hr:'Birth Hour',hrnote:'ZWDS uses 2-hour time blocks. Birth time within the same block gives the same chart.',btn:'Generate',zi:'Born after midnight?',zino:'No (23:00–23:59)',ziyes:'Yes (00:00–00:59)',modelbl:'Reading type',modefull:'Full reading',modeq:'Question only',modeboth:'Both',qlbl:'Your question',qph:'e.g. Should I change jobs this year? Why do I keep having the same argument with my partner?'},
+  zh:{birth:'出生資料',name:'姓名（選填）',ph:'輸入姓名…',gender:'性別',male:'男',female:'女',yr:'年',mo:'月',dy:'日',hr:'出生時辰',hrnote:'紫微斗數以「時辰」為單位，每個時辰為兩小時。同一時辰內出生，命盤相同。',btn:'送出',zi:'午夜後出生？',zino:'否 (23:00–23:59)',ziyes:'是 (00:00–00:59)',modelbl:'解讀類型',modefull:'完整解讀',modeq:'僅回答問題',modeboth:'兩者都要',qlbl:'你的問題',qph:'例如：今年適合換工作嗎？為什麼我和另一半總是在吉話不合？'}
 };
 
 function setLang(l){
@@ -183,6 +183,7 @@ function setLang(l){
   document.getElementById('t-mo').textContent=t.mo;
   document.getElementById('t-dy').textContent=t.dy;
   document.getElementById('t-hr').textContent=t.hr;
+  document.getElementById('t-hr-note').textContent=t.hrnote;
   document.getElementById('btn-gen').textContent=t.btn;
   document.getElementById('t-zi').textContent=t.zi;
   document.getElementById('t-zi-no').textContent=t.zino;
@@ -605,12 +606,16 @@ async function generate(){
 'Life Master: '+chart.lifeMaster+' | Body: '+chart.bodyMaster+'\n\n'+
 
 '===PALACES===\n'+
-'[12 paragraphs in this order: Life \u00b7 Spouse \u00b7 Career \u00b7 Wealth \u00b7 Inner Life \u00b7 Health \u00b7 Children \u00b7 Parents \u00b7 Siblings \u00b7 Travel \u00b7 Network \u00b7 Home\n'+
+'[12 paragraphs in this order: Life \u00b7 Spouse/Relationship \u00b7 Career \u00b7 Wealth \u00b7 Inner Life \u00b7 Health \u00b7 Children \u00b7 Parents \u00b7 Siblings/Peers \u00b7 Travel \u00b7 Network \u00b7 Home\n'+
 'Format: [Name] \u2014 [text]. No ** bold markers. No markdown. Every sentence must add new information \u2014 do not explain or restate the previous one.\n'+
 'LIFE (3-5 sentences): Start with the single most defining quality of this person — stated plainly, not as a label. Then elaborate from that: how it shows up in behavior, what it enables, what it costs them. Use LIFE PALACE CHARACTER for the specific nature and brightness. Their greatest asset and most reliable liability should emerge from the description, not be named. If Body Palace differs, one sentence on how they modify each other (never name the palace or location).\n'+
-'SPOUSE (3 sentences): First sentence must describe the partner \u2014 their temperament, appearance, ability, wealth tendency. Second sentence: relationship quality and longevity from pre-computed Marriage verdict. Third sentence: does it improve or deteriorate? The person\u2019s inner state belongs in Inner Life, not here. Do not open Spouse with "your inner insecurity affects the relationship."\n'+
-'CAREER (3-4 sentences): Write from this palace\'s specific stars and brightness — two different charts with different stars must produce different answers here. What this person is actually like at work; what makes this configuration work and what makes it fail; the wrong path for this specific star combination. Cross-reference Wealth and Travel verdicts. No age references.\n'+
-'BANNED career phrases — do not use unless the chart has multiple strong converging signals specifically supporting them: "works best alone," "prefers independence," "not suitable for structured environments," "can\'t handle boring or fixed jobs," "doesn\'t work well under authority," "needs freedom and autonomy." These apply to most people, not most charts. One star having restless or assertive energy is not enough — say what this specific star combination actually produces at work instead.\n'+
+'SPOUSE/RELATIONSHIP (3 sentences): First sentence must describe the partner \u2014 their temperament, appearance, ability, wealth tendency. Second sentence: relationship quality and longevity from pre-computed Marriage verdict. Third sentence: does it improve or deteriorate? The person\u2019s inner state belongs in Inner Life, not here. Do not open Spouse with "your inner insecurity affects the relationship."\n'+
+'CAREER (3 sentences max): Write from this palace\'s specific stars and brightness — two different charts must produce different answers. What this person is actually like at work; what makes it work and what makes it fail; the wrong path for this specific combination. Cross-reference Wealth and Travel. No age references.\n'+
+'BANNED — phrases that explain instead of describe:\n'+
+'• "These two directions are a real tension, not complementary" — just say what each direction does\n'+
+'• "It\'s not that you don\'t cooperate, it\'s that your judgment diverges from others\'" — do not explain or excuse friction, state what happens\n'+
+'• "no outlet for your strongest part," "命盤," ceiling — banned\n'+
+'State the thing directly. Do not narrate the shape of the thing.\n'+
 'WEALTH (3 sentences): (1) Inherited vs earned — one flat sentence; (2) what conditions make it build, what conditions make it thin; (3) the specific leak. Cross-reference Career and Travel — when Travel is DOMINANT or MODERATE, name the specific mechanism that produces income for this chart, not generic "movement and networking." Cross-reference Siblings for financial friction channels. No age references.\n'+
 'INNER LIFE (3 sentences): Read THIS palace\'s TONE first — POSITIVE/MOSTLY-POSITIVE = genuine inner ease, say so directly. CHALLENGING = persistent friction regardless of external circumstances. Never let Career, Spouse, or Health difficulty color this palace. (1) Inner quality from this TONE. (2) What triggers or relieves it — from this palace\'s stars only, not generic conditions. (3) Cross-reference Health only if this palace is also MIXED or worse.\n'+
 'HEALTH (3 sentences): (1) Overall constitution from TONE — POSITIVE means genuinely strong, say so directly; do not soften MIXED to “moderately weak.” (2) Body systems — ONLY flag if relevant star is weak (陷/落) or has 化忌; strong (廟/旺) star = robust system. If Inner Life is CHALLENGING/MIXED-DIFFICULT, note the nervous system cost. (3) Recurring pattern. Never write stress.\n'+
@@ -621,12 +626,12 @@ async function generate(){
 '  \u7d2b\u5fae/\u5929\u5e9c \u2192 cardiovascular, energy levels, vitality\n'+
 '  \u7834\u8ecd/\u8ca2\u72fc \u2192 surgery risk, accidents, sudden onset\n'+
 '  \u592a\u9670/\u5929\u6882 \u2192 hormones, reproductive, fluid retention\n'+
-'CHILDREN (2 sentences): TONE drives this: POSITIVE means genuine quality, CHALLENGING means real difficulty. Relationship quality and life impact. No subordinate/student alternative unless palace has no major stars.\n'+
-'PARENTS (2-3 sentences): Use the PARENTS verdict from the pre-computed analysis — it tells you whether father, mother, both, or neither is dominant based on major stars and brightness. Do not override it. Do not infer parent polarity from minor stars, hard stars, or lucky stars — only 太陽 and 太陰 at 廟/旺 determine this. If the verdict is NO POLARITY or UNCERTAIN, do not name either parent as more defining. Then: relationship quality and what was received emotionally and financially in early life; how parents shaped this person\'s trajectory.\n'+
-'SIBLINGS (2-3 sentences): Covers blood siblings AND peers, close friends, business partners at same level. Cover: relationship quality and closeness; how they affect this person\'s life. NEUTRAL-THIN means the relationship exists but is not a major theme \u2014 do not write it as warm and supportive. NEUTRAL-LUCKY means quietly fine, not prominently helpful. Only mention financial dealings if \u5316\u5fcc is present.\n'+
-'TRAVEL (2-3 sentences): Use pre-computed Travel verdict. DOMINANT means the departure is a structural fact of this life \u2014 do not soften it. MODERATE means external movement consistently opens things up \u2014 do not tell this person to stay local or that going abroad is unnecessary. Say what leaving has opened or would open. For 40+ with DOMINANT or MODERATE Travel, speak in past and present about what movement already produced and continues to enable.\n'+
+'CHILDREN (2 sentences): TONE drives this: POSITIVE means genuinely good, CHALLENGING means real difficulty. Is it close or distant? Does it cost or give? Say what the relationship actually is and what it does to this person\'s life. No subordinate/student alternative unless palace has no major stars.\n'+
+'PARENTS (2-3 sentences): Use the PARENTS verdict from the pre-computed analysis — it tells you whether father, mother, both, or neither is dominant based on major stars and brightness. Do not override it. Do not infer parent polarity from minor stars, hard stars, or lucky stars — only 太陽 and 太陰 at 廟/旺 determine this. If the verdict is NO POLARITY or UNCERTAIN, do not name either parent as more defining. Then: what was received emotionally and financially in early life; what pattern they set that this person still carries.\n'+
+'SIBLINGS/PEERS (2-3 sentences): Covers blood siblings AND peers, close friends, business partners at the same level. Do they support, cost, or stay neutral? How present are they? NEUTRAL-THIN means the relationship exists but is not a major theme — do not write it as warm. NEUTRAL-LUCKY means quietly fine. Only mention financial dealings if 化忌 is present.\n'+
+'TRAVEL (2-3 sentences): Use pre-computed Travel verdict. DOMINANT means the departure is a structural fact of this life — do not soften it. MODERATE means external movement consistently opens things up — do not tell this person to stay local or that going abroad is unnecessary. Say what leaving has opened or would open. For 40+ with DOMINANT or MODERATE Travel, speak in past and present about what movement already produced and continues to enable.\n'+
 'NETWORK (2-3 sentences): TONE drives this: POSITIVE means genuine asset, CHALLENGING means they drain. Cross-reference Siblings for the complete social picture.\n'+
-'HOME (2 sentences): Property accumulation and relationship to home base. Cross-reference Parents palace and Travel verdict.]\n\n'+
+'HOME (2 sentences): Does property accumulate, and under what conditions? Does this person root or keep moving — and what does that cost or produce? Cross-reference Parents and Travel verdict.]\n\n'+
 
 '===CYCLES===\n'+
 '[Use DECADE PALACES from the pre-computed analysis above — the activated palace and its stars are already identified for each decade. Do not guess from age.\n'+
@@ -647,7 +652,14 @@ async function generate(){
 cycleTemplate+
 
 '===SUMMARY===\n'+
-'[3-4 sentences. RULE 1 applies here too — no star names, no palace names, no astrological terms, no age references. This section must NOT repeat what individual palaces already said — if Travel already said movement opens things up, do not say it again here. Its job is to find what only emerges when palaces are read TOGETHER — the thread connecting domains that no single palace reveals on its own. Ask: what is the tension or contradiction between two or more domains? What does the combination of how this person operates in work AND relationships AND inner life reveal that neither alone does? What is the single most important thing this person should know that is specific to this chart and cannot be inferred from any one palace reading? End on that insight — concrete, chart-specific, not a generic closing line.]'+
+'[3-4 sentences. RULE 1 applies — no star names, palace names, astrological terms, no age references. Must NOT repeat what individual palaces already said.\n'+
+'Find what only emerges when palaces are read together. Ask: what tension or contradiction between two or more domains defines this chart?\n'+
+'BANNED — phrases that sound profound but say nothing:\n'+
+'\u2022 "X and Y are two sides of the same trait" — just say what X and Y do\n'+
+'\u2022 "this tension," "this pattern always holds for you" — meta-language about the reading, not the reading itself\n'+
+'\u2022 "It is not because you did something wrong, it is just how this chart is structured" — consolation that applies to everyone\n'+
+'\u2022 ceiling, "no outlet," "your body knows before your mind" — metaphors banned by RULE 4\n'+
+'End on the single most specific, actionable insight — something the person can do something with. Not philosophy. Not reassurance.]\'\n'+
 (userQ?'\n\n===QUESTION===\nIMPORTANT: marker is exactly ===QUESTION===\nQuestion: '+userQ+'\n[No star names. No astrological terms. Write what actually happens. 3-5 sentences. No Chinese.]':'');
 
     } else {
@@ -719,11 +731,11 @@ cycleTemplate+
 '  \u7d2b\u5fae/\u5929\u5e9c \u2192 \u5fc3\u8840\u7ba1\u3001\u9ad4\u529b\u3001\u6d3b\u529b\n'+
 '  \u7834\u8ecd/\u8ca2\u72fc \u2192 \u624b\u8853\u98a8\u96aa\u3001\u610f\u5916\u3001\u7a81\u767c\n'+
 '  \u592a\u9670/\u5929\u6882 \u2192 \u8377\u723e\u8499\u3001\u751f\u6b96\u3001\u6c34\u5206\n'+
-'子女（2句）：調性主導：POSITIVE表示關係真正好；CHALLENGING表示真實困難。關係質地和對人生的影響。除非宮位完全沒有主星，不用部屬或學生這個替代選項。\n'+
+'子女（2句）：調性主導：POSITIVE表示真正好；CHALLENGING表示真實困難。關係是親近還是疏遠？它給還是耗？直接說這個關係是什麼樣子，對這個人的生活具體在做什麼。除非宮位完全沒有主星，不用部屬或學生這個替代選項。\n'+
 '\u7236\u6bcd\uff082-3\u53e5\uff09\uff1a\u4f7f\u7528\u9810\u5148\u8a08\u7b97\u5206\u6790\u4e2d\u7684PARENTS\u7d50\u8ad6\u2014\u2014\u5b83\u5df2\u7d93\u6839\u64da\u4e3b\u661f\u548c\u4eae\u5ea6\u78ba\u5b9a\u54ea\u4e00\u65b9\u7236\u6bcd\u5f71\u97ff\u66f4\u5927\u3002\u4e0d\u8981\u8986\u84cb\u9019\u500b\u7d50\u8ad6\u3002\u4e0d\u8981\u5f9e\u8f14\u661f\u3001\u5c07\u661f\u3001\u5409\u661f\u63a8\u65b7\u7236\u6bcd\u6027\u5225\u2014\u2014\u53ea\u6709\u592a\u967d\u548c\u592a\u9670\u5728\u5edf/\u65fa\u624d\u6709\u8cc7\u683c\u6307\u5b9a\u4e3b\u5c0e\u7236\u6bcd\u3002\u5982\u679c\u7d50\u8ad6\u662fNO POLARITY\u6216UNCERTAIN\uff0c\u4e0d\u8aaa\u54ea\u4e00\u4f4d\u7236\u6bcd\u5f71\u97ff\u66f4\u5927\u3002\u7136\u5f8c\u8aaa\uff1a\u95dc\u4fc2\u8cea\u5730\u8207\u5e7c\u5e74\u6240\u53d7\u5230\u7684\u8ca1\u52d9\u548c\u60c5\u611f\u652f\u6301\uff1b\u7236\u6bcd\u5982\u4f55\u5851\u9020\u9019\u500b\u4eba\u7684\u8ecc\u8de1\u3002\n'+
 '\u5144\u5f1f\uff082-3\u53e5\uff09\uff1a\u8840\u89aa\u5144\u5f1f\u4e5f\u4ee3\u8868\u540c\u7d1a\u7684\u540c\u5b78\u3001\u4eb2\u5bc6\u670b\u53cb\u3001\u5546\u696d\u5408\u4f5c\u4eba\u3002\u8acb\u8aaa\uff1a\u95dc\u4fc2\u8cea\u5730\u8207\u89aa\u5bc6\u7a0b\u5ea6\uff1b\u9019\u4e9b\u4eba\u5c0d\u9019\u500b\u4eba\u7684\u751f\u6d3b\u5f71\u97ff\u3002NEUTRAL-THIN\u8868\u793a\u95dc\u4fc2\u5b58\u5728\u4f46\u4e0d\u662f\u4e3b\u8981\u4e3b\u984c\u3002\u5982\u679c\u5144\u5f1f\u5bae\u6709\u5316\u5fcc\u624d\u63d0\u9322\u9322\u7cbe\u845b\u554f\u984c\u3002\n'+
 '\u9077\u79fb\uff082-3\u53e5\uff09\uff1a\u7528\u9810\u5148\u8a08\u7b97\u7684\u9077\u79fb\u5f37\u5ea6\u7d50\u679c\u3002DOMINANT\u8868\u793a\u79bb\u958b\u662f\u9019\u500b\u751f\u547d\u7684\u7d50\u69cb\u6027\u4e8b\u5be6\uff0c\u4e0d\u8981\u8edf\u5316\u3002MODERATE\u8868\u793a\u5411\u5916\u79fb\u52d5\u6301\u7e8c\u70ba\u9019\u500b\u4eba\u6253\u958b\u5c40\u9762\uff0c\u4e0d\u8981\u544a\u8a34\u5c0d\u65b9\u505c\u5728\u672c\u5730\u5c31\u597d\u6216\u4e0d\u9700\u8981\u51fa\u570b\u3002\u8aaa\u6e05\u695a\u79fb\u52d5\u6253\u958b\u4e86\u4ec0\u9ebc\u3002\u5982\u679c40\u6b72\u4ee5\u4e0a\u4e14\u9077\u79fb\u5f37\uff08DOMINANT\u6216MODERATE\uff09\uff0c\u7528\u904e\u53bb\u5f0f\u548c\u73fe\u5728\u5f0f\u8aaa\u5df2\u7d93\u7522\u751f\u7684\u7d50\u679c\u3002\n'+
-'僕役（2-3句）：調性主導：POSITIVE表示這些人是真實資產；CHALLENGING表示占耗或令人失望。對照兄弟宮——兩者合看再示這個人完整的社交世界。\n'+
+'兄弟（2-3句）：包括血親兄弟也包括同級的選手、諸友、商業合作人。他們對這個人是支持、占耗還是保持中立？存在感多高？NEUTRAL-THIN表示關係存在但不是主要主題——不要寫得温暨。只有兄弟宮有化忌時才提錢錢摩擦。\n'+
 '\u7530\u5b85\uff082\u53e5\uff09\uff1a\u4e0d\u52d5\u7522\u7d2f\u7a4d\u5080\u5411\u8207\u5c0d\u5bb6\u9109\u7684\u7d81\u7e1b\u611f\u3002\u5c0d\u7167\u7236\u6bcd\u5bae\uff08\u539f\u751f\u5bb6\u5ead\u8cc7\u6e90\uff09\u8207\u9077\u79fb\u7d50\u679c\u3002]\n\n'+
 '===CYCLES===\n'+
 '[\u7528\u4e0a\u65b9\u9810\u5148\u8a08\u7b97\u5206\u6790\u4e2d\u7684DECADE PALACES\u2014\u2014\u6bcf\u500b\u5e74\u9f61\u6bb5\u7684\u5927\u9650\u5bae\u4f4d\u548c\u661f\u66dc\u5df2\u7d93\u6a19\u660e\u3002\u4e0d\u8981\u5f9e\u5e74\u9f61\u731c\u6e2c\u3002\n'+
@@ -741,7 +753,14 @@ cycleTemplate+
 cycleTemplate+
 
 '===SUMMARY===\n'+
-'[3-4句。規則一在這裡同樣適用——不說星名、宮位名、任何命理術語、不說年齡。這個段落不能重複已經在宮位中說過的內容——如果遷移宮已經說了「向外走會打開機會」，這裡就不要再說。它的工作是找到只有把宮位放在一起看才呼現的真相。問自己：兩個或三個領域之間有什麼張力或矛盾？這個人在事業、關係和內心三者合起來看呼現什麼單一角度說不到的？用這張命盤最重要的一件事結尾——必須是具體的、只屬於這張命盤的洞見，不要用通用的收尾句。]'+
+'[3-4\u53e5\u3002\u898f\u5247\u4e00\u5728\u9019\u88e1\u540c\u6a23\u9069\u7528\u2014\u2014\u4e0d\u8aaa\u661f\u540d\u3001\u5bae\u4f4d\u540d\u3001\u4efb\u4f55\u547d\u7406\u8853\u8a9e\u3001\u4e0d\u8aaa\u5e74\u9f61\u3002\u9019\u500b\u6bb5\u843d\u4e0d\u80fd\u91cd\u8907\u5df2\u7d93\u5728\u5bae\u4f4d\u4e2d\u8aaa\u904e\u7684\u5167\u5bb9\u3002\n'+
+'\u5b83\u7684\u5de5\u4f5c\u662f\u627e\u5230\u53ea\u6709\u628a\u5bae\u4f4d\u653e\u5728\u4e00\u8d77\u770b\u624d\u547c\u73fe\u7684\u771f\u76f8\u3002\u554f\u81ea\u5df1\uff1a\u5169\u500b\u6216\u4e09\u500b\u9818\u57df\u4e4b\u9593\u6700\u6838\u5fc3\u7684\u5f35\u529b\u6216\u77db\u76fe\u662f\u4ec0\u9ebc\uff1f\n'+
+'\u7981\u7528\u8a5e\u5f59\u2014\u2014\u8074\u8d77\u4f86\u6df1\u523b\u4f46\u4ec0\u9ebc\u90fd\u6c92\u8aaa\u7684\u8aac\u6cd5\uff1a\n'+
+'\u2022 \u300cX\u548cY\u662f\u540c\u4e00\u500b\u7279\u8cea\u7684\u5169\u9762\u300d\u2014\u2014\u76f4\u63a5\u8aaa\u5169\u8005\u5177\u9ad4\u5728\u505a\u4ec0\u9ebc\u3002\n'+
+'\u2022 \u300c\u9019\u500b\u5f35\u529b\u300d\u3001\u300c\u9019\u500b\u8ecc\u8de1\u300d\u3001\u300c\u9019\u689d\u7dda\u5c0d\u4f60\u4e00\u76f4\u662f\u6210\u7acb\u7684\u300d\u2014\u2014\u95dc\u65bc\u89e3\u8b80\u7684\u5143\u8a00\uff0c\u4e0d\u662f\u89e3\u8b80\u672c\u8eab\u3002\n'+
+'\u2022 \u300c\u4e0d\u662f\u56e0\u70ba\u4f60\u505a\u932f\u4e86\u4ec0\u9ebc\uff0c\u800c\u662f\u9019\u5f35\u547d\u76e4\u7684\u7d50\u69cb\u5c31\u662f\u9019\u6a23\u8a2d\u7684\u300d\u2014\u2014\u9019\u53e5\u8a71\u9019\u5f35\u547d\u76e4\u6bcf\u500b\u4eba\u90fd\u53ef\u4ee5\u7528\u3002\n'+
+'\u2022 \u5929\u82b1\u677f\u3001\u6c92\u6709\u51fa\u53e3\u3001\u8eab\u9ad4\u6bd4\u982d\u8166\u5148\u77e5\u9053\u2014\u2014\u6bd4\u55bb\u548c\u6307\u4ee4\u8a5e\u5f59\u3002\n'+
+'\u7528\u9019\u5f35\u547d\u76e4\u6700\u5177\u9ad4\u3001\u6700\u53ef\u884c\u52d5\u7684\u6d1e\u898b\u7d50\u5c3e\u2014\u2014\u662f\u9019\u500b\u4eba\u53ef\u4ee5\u62ff\u4f86\u505a\u4e9b\u4e8b\u7684\uff0c\u4e0d\u662f\u54f2\u5b78\uff0c\u4e0d\u662f\u5b89\u6170\u3002]\'\n'+
 (userQ?'\n\n===QUESTION===\n\u91cd\u8981\uff1a\u6a19\u8a18\u5c31\u662f===QUESTION===\u3002\u554f\uff1a'+userQ+'\n[\u4e0d\u8aaa\u661f\u540d\u3002\u4e0d\u8aaa\u5bae\u4f4d\u3002\u5beb\u5177\u9ad4\u767c\u751f\u7684\u4e8b\u30023-5\u53e5\u3002]':'');
 
     }
@@ -853,7 +872,7 @@ function renderResults(text,name,year,month,day,hrTxt,gender,chart,readMode,user
       palacesRaw=palacesRaw.replace(/^[-=]{2,}\s*$/gm,'').replace(/^#+\s*/gm,'').replace(/\*\*([^*]+)\*\*/g,'$1');
       h+='<div class="stitle">'+(LANG==='zh'?'\u5341\u4e8c\u5bae\u6982\u89bd':'12 Palace Overview')+'</div>';
       h+='<div class="pal-paras">';
-      var EN_PAL=/^(Life|Spouse|Career|Wealth|Inner Life|Health|Children|Parents|Siblings|Travel|Network|Home)\s*\u2014?\s*/;
+      var EN_PAL=/^(Life|Spouse\/Relationship|Spouse|Career|Wealth|Inner Life|Health|Children|Parents|Siblings\/Peers|Siblings|Travel|Network|Home)\s*\u2014?\s*/;
       var ZH_PAL=/^(\u547d\u5bae|\u592b\u59bb|\u5b98\u797f|\u8ca1\u5e1b|\u798f\u5fb7|\u75be\u5384|\u5b50\u5973|\u7236\u6bcd|\u5144\u5f1f|\u9077\u79fb|\u50d5\u5f79|\u7530\u5b85)\s*\u2014?\s*/;
       var groups=[],cur='';
       palacesRaw.split('\n').forEach(function(line){
