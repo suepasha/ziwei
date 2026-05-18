@@ -568,8 +568,6 @@ async function generate(){
 'The star names are in the analysis for YOU to read and reason from. They must never appear in the reading the person receives — not even to explain why you reached a conclusion.\n'+
 'WRONG: "武曲破軍在官祿讓你在推進和決策上有機會做到真正有份量的事"\n'+
 'RIGHT: "At work you have real capacity to drive decisions that carry weight."\n'+
-'WRONG: "這個宮位沒有太陽或太陰，沒辦法說哪一位父母影響更大"\n'+
-'RIGHT: "Neither parent emerges as clearly more defining — describe what was received from both."\n'+
 'Pattern: take any insight from the stars → state the insight in plain terms → never name the star that produced it.\n\n'+
 
 'RULE 2 \u2014 NO INSTRUCTION VOCABULARY IN OUTPUT:\n'+
@@ -597,9 +595,6 @@ async function generate(){
 '\u2022 Inner Life (\u798f\u5fb7): governs fundamental ease or friction \u2014 whether they trust good things to last, whether intimacy can hold.\n'+
 '\u2022 \u5316\u5fcc: translate to real-life outcome only \u2014 never the mechanism.\n\n'+
 
-'ANTI-SIMILARITY: before writing any sentence, ask \u2014 could this apply to half the charts I read? If yes, rewrite:\n'+
-'\u2717 "Suffocates in bureaucracy" \u2014 only if multiple palaces confirm. Degree matters.\n'+
-'\u2717 "You are driven / decisive / independent" \u2014 too generic. Show the specific way this chart expresses it.\n\n'+
 'Birth: '+(name||'this person')+' | '+gender+' | '+year+'/'+month+'/'+day+' | '+hrTxt+'\n'+
 'Five Elements: '+chart.fiveElements+'\n'+
 'Chart:\n'+palaceSummary+'\n'+
@@ -622,8 +617,6 @@ async function generate(){
 'BANNED — phrases that describe work style instead of career outcomes:\n'+
 '• "You work best when pushing forward" — this is a preference, not an outcome. Say what the career produces.\n'+
 '• "These two directions are a real tension" — say what each direction does, not that tension exists\n'+
-'• "no outlet for your strongest part," "命盤," ceiling — banned\n'+
-'State the factual outcome first. Work style is secondary.\n'+
 'WEALTH (3 sentences): (1) 先天財 or 後天財 — one flat sentence. 先天財 means wealth comes through structural or relational means (spouse, status, inheritance, opportunity) — not necessarily parental inheritance, but not built purely from personal effort. 後天財 means it must be built from nothing through sustained action. (2) What conditions make it build, what conditions make it thin. (3) The specific leak. Cross-reference Career and Travel. Cross-reference Siblings for financial friction. No age references.\n'+
 'INNER LIFE (2 sentences): Read THIS palace\'s TONE — POSITIVE/MOSTLY-POSITIVE means genuine baseline ease, say what it feels like and what sustains it. CHALLENGING means persistent internal friction regardless of external circumstances, say what triggers it. Never let Career, Spouse, or Health color this palace.\n'+
 'HEALTH (2 sentences): Overall constitution from TONE. Only flag a body system if the relevant star is weak (\u9677/\u843d) or has \u5316\u5fcc AND that star is physically inside this palace — never use stars from other palaces (Career, Life, Travel etc.) to identify health issues even if those stars are hard or weak elsewhere. Strong star in this palace = robust system, do not flag. If Inner Life is CHALLENGING, note the body carries that cost. Never write stress.\n'+
@@ -636,7 +629,7 @@ async function generate(){
 '  \u7834\u8ecd/\u8ca2\u72fc \u2192 surgery risk, accidents, sudden onset\n'+
 '  \u592a\u9670/\u5929\u6882 \u2192 hormones, reproductive, fluid retention\n'+
 'CHILDREN (2 sentences): TONE drives this: POSITIVE means genuinely good, CHALLENGING means real difficulty. Is it close or distant? Does it cost or give? Say what the relationship actually is and what it does to this person\'s life. No subordinate/student alternative unless palace has no major stars.\n'+
-'PARENTS (2-3 sentences): Use the PARENTS verdict. Do not override it. Do not infer polarity from any stars. If NO POLARITY or UNCERTAIN: skip the polarity statement, describe what was received materially and functionally in early life — do not assign emotional qualities (warmth, distance, coldness) without a specific verdict supporting it. Then: what pattern they set that this person still carries.\n'+
+'PARENTS (2-3 sentences): Use the PARENTS verdict. Do not override it. Do not infer polarity from any stars. Also cross-reference this palace\'s TONE from PALACE TONES — if MIXED-DIFFICULT or CHALLENGING, there was disruption, conflict, or instability in the parental relationship that must be noted (a hard star at weak brightness in this palace produces this). If NO POLARITY or UNCERTAIN: do NOT write any version of "neither parent was more defining" or "neither parent dominated" — these phrases are banned even when paraphrased differently. Skip the polarity entirely and describe: what was received materially and functionally in early life based on the palace TONE and stars — do not assign emotional qualities (warmth, distance, coldness) without a specific verdict supporting it. Then: what pattern they set that this person still carries.\n'+
 'SIBLINGS/PEERS (2-3 sentences): Covers blood siblings AND peers, close friends, business partners at the same level. Do they support, cost, or stay neutral? How present are they? NEUTRAL-THIN means the relationship exists but is not a major theme — do not write it as warm. NEUTRAL-LUCKY means quietly fine. Only mention financial dealings if 化忌 is present.\n'+
 'TRAVEL (2-3 sentences): Use pre-computed Travel verdict. DOMINANT means the departure is a structural fact of this life — do not soften it. MODERATE means external movement consistently opens things up — do not tell this person to stay local or that going abroad is unnecessary. Say what leaving has opened or would open. For 40+ with DOMINANT or MODERATE Travel, speak in past and present about what movement already produced and continues to enable.\n'+
 'NETWORK (2-3 sentences): TONE drives this: POSITIVE means genuine asset, CHALLENGING means they drain. Cross-reference Siblings for the complete social picture.\n'+
@@ -650,8 +643,6 @@ async function generate(){
 'RIGHT: "The work you put in this decade starts to carry real weight — decisions and outcomes that matter."\n'+
 'WRONG: "陀羅在這裡，意思是你在工作上遇到的阻力是慢的那種" — star name + explanation.\n'+
 'RIGHT: "Progress is slower than the effort you put in — expect friction to wear rather than block."\n'+
-'WRONG: "地空在這裡意味著有一部分的付出是散出去沒有收回來的" — star name explaining mechanism.\n'+
-'RIGHT: "Some of what you invest in people this decade does not come back."\n'+
 '化忌 data: describe friction as what happens. WRONG: "化忌落在你本命". RIGHT: "You carry more internal pressure than your exterior suggests." If the decade \u5316\u5fcc falls in the same palace as the activated decade palace, name specifically what goes under pressure in that domain that decade.\n'+
 'Do not open with "This decade," "During this period," or 這十年 in any form.\n'+
 'Format: RANGE (YEARS) | [specific label] | [1-2 sentences]\n'+
@@ -717,10 +708,6 @@ cycleTemplate+
 '\u2022 \u798f\u5fb7\u5bae\uff1a\u63ed\u793a\u9019\u500b\u4eba\u5c0d\u751f\u6d3b\u6709\u6c92\u6709\u57fa\u672c\u7684\u8f15\u9b06\u611f\u3001\u80fd\u4e0d\u80fd\u76f8\u4fe1\u597d\u4e8b\u6703\u6301\u7e8c\u3001\u4eb2\u5bc6\u95dc\u4fc2\u80fd\u4e0d\u80fd\u649e\u884c\u3002\n'+
 '\u2022 \u5316\u5fcc\uff1a\u8aaa\u5be6\u969b\u7d50\u679c\uff0c\u4e0d\u8aaa\u6a5f\u5236\u3002\n\n'+
 
-'\u5f9e\u773e\u591a\u54e1\u6aa2\u67e5\uff1a\u5beb\u4efb\u4f55\u4e00\u53e5\u4e4b\u524d\uff0c\u554f\u2014\u2014\u9019\u53e5\u8a71\u80fd\u7528\u5230\u534a\u6578\u4ee5\u4e0a\u7684\u547d\u76e4\u55ce\uff1f\u5982\u679c\u53ef\u4ee5\uff0c\u91cd\u5beb\uff1a\n'+
-'\u2717 \u300c\u5728\u5b98\u50da\u9ad4\u5236\u5167\u7a92\u606f\u300d\u2014\u2014\u50c5\u7576\u591a\u500b\u5bae\u4f4d\u540c\u6642\u78ba\u8a8d\u3002\n'+
-'\u2717 \u300c\u4f60\u6709\u9a45\u52d5\u529b\u300d\u2014\u2014\u592a\u6cdb\uff0c\u8aaa\u9019\u5f35\u547d\u76e4\u5177\u9ad4\u600e\u9ebc\u8868\u73fe\u3002\n\n'+
-
 '\u51fa\u751f\uff1a'+(name||'\u6b64\u4eba')+' | '+gender+' | '+year+'\u5e74'+month+'\u6708'+day+'\u65e5 | '+hrTxt+'\n'+
 '\u8fb2\u66c6\uff1a'+chart.lunarDate+' | \u5e72\u652f\uff1a'+chart.chinesePillars+' | \u4e94\u884c\uff1a'+chart.fiveElements+'\n'+
 '\u547d\u4e3b\uff1a'+chart.lifeMaster+' | \u8eab\u4e3b\uff1a'+chart.bodyMaster+'\n'+
@@ -751,7 +738,7 @@ cycleTemplate+
 '  \u7834\u8ecd/\u8ca2\u72fc \u2192 \u624b\u8853\u98a8\u96aa\u3001\u610f\u5916\u3001\u7a81\u767c\n'+
 '  \u592a\u9670/\u5929\u6882 \u2192 \u8377\u723e\u8499\u3001\u751f\u6b96\u3001\u6c34\u5206\n'+
 '子女（2句）：調性主導：POSITIVE表示真正好；CHALLENGING表示真實困難。關係是親近還是疏遠？它給還是耗？直接說這個關係是什麼樣子，對這個人的生活具體在做什麼。除非宮位完全沒有主星，不用部屬或學生這個替代選項。\n'+
-'\u7236\u6bcd\uff082-3\u53e5\uff09\uff1a\u4f7f\u7528PARENTS\u7d50\u8ad6\u3002\u4e0d\u8986\u84cb\u7d50\u8ad6\u3002\u4e0d\u5f9e\u4efb\u4f55\u661f\u66dc\u63a8\u65b7\u7236\u6bcd\u6027\u5225\u3002\u5982\u679c\u662fNO POLARITY\u6216UNCERTAIN\uff1a\u8df3\u904e\u4e3b\u5c0e\u6027\u9023\u8a5e\uff0c\u8aaa\u5e7c\u5e74\u5be6\u969b\u6536\u5230\u7684\u7269\u8cea\u548c\u529f\u80fd\u6027\u652f\u6301\u2014\u2014\u5728\u6c92\u6709\u660e\u78ba\u7d50\u8ad6\u652f\u6301\u7684\u60c5\u6cc1\u4e0b\uff0c\u4e0d\u8981\u81ea\u884c\u5206\u914d\u60c5\u611f\u6e6b\u6726\u6216\u51b7\u6f20\u3002\u7136\u5f8c\u8aaa\u7236\u6bcd\u5b9a\u4e0b\u7684\u6a21\u5f0f\u3002\n'+
+'\u7236\u6bcd\uff082-3\u53e5\uff09\uff1a\u4f7f\u7528PARENTS\u7d50\u8ad6\u3002\u4e0d\u8986\u84cb\u7d50\u8ad6\u3002\u4e0d\u5f9e\u4efb\u4f55\u661f\u66dc\u63a8\u65b7\u7236\u6bcd\u6027\u5225\u3002\u540c\u6642\u5c0d\u7167PALACE TONES\u4e2d\u9019\u500b\u5bae\u4f4d\u7684\u8abf\u6027\u2014\u2014\u5982\u679c\u662fMIXED-DIFFICULT\u6216CHALLENGING\uff0c\u7236\u6bcd\u95dc\u4fc2\u4e2d\u6709\u771f\u5be6\u7684\u885d\u7a81\u6216\u4e0d\u7a69\u5b9a\uff0c\u5fc5\u9808\u8aaa\u6e05\u695a\u3002\u5982\u679c\u662fNO POLARITY\u6216UNCERTAIN\uff1a\u7d55\u5c0d\u4e0d\u8981\u5beb\u300c\u5169\u4f4d\u7236\u6bcd\u6c92\u6709\u54ea\u4e00\u4f4d\u7279\u5225\u4e3b\u5c0e\u300d\u6216\u300c\u5169\u4f4d\u7236\u6bcd\u6c92\u6709\u54ea\u4e00\u4f4d\u66f4\u5177\u51b3\u5b9a\u6027\u300d\u2014\u2014\u9019\u4e9b\u8aac\u6cd5\u5373\u4f7f\u63db\u8a9e\u4e5f\u7981\u7528\u3002\u5b8c\u5168\u8df3\u904e\u4e3b\u5c0e\u6027\uff0c\u76f4\u63a5\u6839\u64da\u5bae\u4f4d\u8abf\u6027\u548c\u661f\u66dc\u8aaa\uff1a\u5e7c\u5e74\u5be6\u969b\u6536\u5230\u7684\u7269\u8cea\u548c\u529f\u80fd\u6027\u652f\u6301\u2014\u2014\u5728\u6c92\u6709\u660e\u78ba\u7d50\u8ad6\u652f\u6301\u7684\u60c5\u6cc1\u4e0b\uff0c\u4e0d\u8981\u81ea\u884c\u5206\u914d\u60c5\u611f\u6e6b\u6226\u6216\u51b7\u6f20\u3002\u7136\u5f8c\u8aaa\u7236\u6bcd\u5b9a\u4e0b\u7684\u6a21\u5f0f\u3002\n'+
 '\u9077\u79fb\uff082-3\u53e5\uff09\uff1a\u7528\u9810\u5148\u8a08\u7b97\u7684\u9077\u79fb\u5f37\u5ea6\u7d50\u679c\u3002DOMINANT\u8868\u793a\u79bb\u958b\u662f\u9019\u500b\u751f\u547d\u7684\u7d50\u69cb\u6027\u4e8b\u5be6\uff0c\u4e0d\u8981\u8edf\u5316\u3002MODERATE\u8868\u793a\u5411\u5916\u79fb\u52d5\u6301\u7e8c\u70ba\u9019\u500b\u4eba\u6253\u958b\u5c40\u9762\uff0c\u4e0d\u8981\u544a\u8a34\u5c0d\u65b9\u505c\u5728\u672c\u5730\u5c31\u597d\u6216\u4e0d\u9700\u8981\u51fa\u570b\u3002\u8aaa\u6e05\u695a\u79fb\u52d5\u6253\u958b\u4e86\u4ec0\u9ebc\u3002\u5982\u679c40\u6b72\u4ee5\u4e0a\u4e14\u9077\u79fb\u5f37\uff08DOMINANT\u6216MODERATE\uff09\uff0c\u7528\u904e\u53bb\u5f0f\u548c\u73fe\u5728\u5f0f\u8aaa\u5df2\u7d93\u7522\u751f\u7684\u7d50\u679c\u3002\n'+
 '兄弟（2-3句）：包括血親兄弟也包括同級的選手、諸友、商業合作人。他們對這個人是支持、占耗還是保持中立？存在感多高？NEUTRAL-THIN表示關係存在但不是主要主題——不要寫得溫馨。只有兄弟宮有化忌時才提錢財摩擦。\n'+
 '僕役（2-3句）：調性主導：POSITIVE表示這些人是真實資產；CHALLENGING表示占耗或令人失望。對照兄弟宮——兩者合看呈現這個人完整的社交世界。\n'+
