@@ -892,7 +892,7 @@ function renderResults(text,name,year,month,day,hrTxt,gender,chart,readMode,user
       h+='<div class="stitle">'+(LANG==='zh'?'\u5341\u4e8c\u5bae\u6982\u89bd':'12 Palace Overview')+'</div>';
       h+='<div class="pal-paras">';
       var EN_PAL=/^(Life|Spouse\/Relationship|Spouse|Career|Wealth|Inner Life|Health|Children|Parents|Siblings\/Peers|Siblings|Travel|Network|Home)\s*\u2014?\s*/;
-      var ZH_PAL=/^(\u547d\u5bae|\u592b\u59bb|\u5b98\u797f|\u8ca1\u5e1b|\u798f\u5fb7|\u75be\u5384|\u5b50\u5973|\u7236\u6bcd|\u5144\u5f1f|\u9077\u79fb|\u50d5\u5f79|\u7530\u5b85)\s*\u2014?\s*\uff1a?\s*/;
+      var ZH_PAL=/^(\u547d\u5bae|\u592b\u59bb|\u5b98\u797f|\u8ca1\u5e1b|\u798f\u5fb7|\u75be\u5384|\u5b50\u5973|\u7236\u6bcd|\u5144\u5f1f|\u9077\u79fb|\u50d5\u5f79|\u7530\u5b85)\s*\u2014?\s*[\uff1a\uff0c]?\s*/;
       var groups=[],cur='';
       palacesRaw.split('\n').forEach(function(line){
         var t=line.trim();
