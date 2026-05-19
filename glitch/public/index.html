@@ -219,6 +219,57 @@ var WEAK_B=['陷','落'];
 
 var _lastChart=null;
 
+var STAR_CHAR={
+  '\u7d2b\u5fae':'commanding and dignified — needs to be THE authority, status-conscious, natural ruler; runs calm but immovable; others instinctively defer; doesn\'t raise voice but the room changes when displeased',
+  '\u5929\u6a5f':'analytical and restless — strategic thinker, advisor type; mind always moving to the next idea; can seem scattered or nervous; quick but not hot',
+  '\u592a\u967d':'giving and outward-facing — generous, warm, public presence; emotionally open and expressive; can over-extend; rarely holds grudges',
+  '\u6b66\u66f2':'decisive and practical — money-minded, direct, action-oriented; terse under pressure; can seem cold but is reliable; doesn\'t waste words',
+  '\u5929\u540c':'gentle and harmony-seeking — pleasure-oriented, adaptable; avoids confrontation; runs cool; absorbs difficulty rather than fighting it',
+  '\u5ec9\u8c1e':'principled, proud, and deeply feeling \u2014 loyalty runs deep; cares more than they show; when they decide someone matters, that doesn\'t change easily; complex emotionally: the outside is composed but the inside is strongly attached; pride turns to stubbornness when crossed; dignity is non-negotiable',
+  '\u5929\u5e9c':'stable and accumulating — conservative, responsible, treasury energy; patient, steady, hard to destabilize; doesn\'t rush; builds quietly',
+  '\u592a\u9670':'sensitive and inward — emotionally deep, aesthetic, needs privacy; absorbs the mood of the room; can be wounded quietly; runs cool on the surface, deep underneath',
+  '\u8ca2\u72fc':'charming and multi-talented — desire-driven, relationship energy; magnetic, wants everything; can scatter; enthusiasm is genuine but short-lived on any single thing',
+  '\u5de8\u9580':'communicative but friction-prone — analytical, skeptical, words can cut; tends to argue even when not angry; others experience as blunt or suspicious',
+  '\u5929\u76f8':'supportive and structure-seeking — diplomatic, mediating, needs a system to work within; doesn\'t lead naturally but executes well within order',
+  '\u5929\u6882':'wise and protective — elder energy, principled, carries others; patient and long-view; can be self-righteous; dignity through endurance',
+  '\u4e03\u6bba':'direct, strong-charactered, and clear \u2014 says what they think without dressing it up; can be funny because they say what others won\'t; emotionally straightforward; meets things head on; runs hot when standards aren\'t met but doesn\'t hold grudges; the sharpness is honest, not malicious; independent to the point of isolation when pushed',
+  '\u7834\u8ecd':'disruptive rebuilder — pioneer who loses interest once stable; restless energy, chafes under routine; not hot-tempered but destabilizing; the room after they\'re done rearranging it'
+};
+
+var STAR_BRIGHT={
+  '\u7d2b\u5fae':{strong:'authority is stable and genuinely earned; others follow willingly',weak:'authority-need becomes controlling or brittle; status anxiety rises; hard to delegate'},
+  '\u5929\u6a5f':{strong:'strategic mind is sharp and reliably available; plans actually execute',weak:'same analytical tendency but scattered; overthinks; hard to settle on a direction'},
+  '\u592a\u967d':{strong:'generosity is genuine and sustainable; the warmth is a real and consistent asset',weak:'gives beyond capacity; warmth fluctuates; the public presence can feel forced or exhausting'},
+  '\u6b66\u66f2':{strong:'decisiveness is measured and reliable; money instincts are sound',weak:'decisions become hasty; financial impulsiveness; terseness tips into harshness'},
+  '\u5929\u540c':{strong:'harmony-seeking is effective; adaptability is genuine ease that works for them',weak:'avoidance becomes passivity; pleasure-seeking crowds out substance; difficulty when pushed'},
+  '\u5ec9\u8c1e':{strong:'principles and pride operate together cleanly; dignity commands real respect',weak:'pride becomes self-destructive rigidity; dignity tips into unapproachability; principles harden into inflexibility'},
+  '\u5929\u5e9c':{strong:'stability is genuine and lasting; accumulation is steady and reliable',weak:'conservatism becomes stagnation; caution becomes inability to move or adapt'},
+  '\u592a\u9670':{strong:'sensitivity is a perceptive gift; emotional depth is accessible and a real strength',weak:'sensitivity tips into instability; easily wounded; mood fluctuates with environment'},
+  '\u8ca2\u72fc':{strong:'charm is real and deployable; multi-talented energy finds productive direction',weak:'desires scatter without landing; restlessness becomes inability to commit; charm without follow-through'},
+  '\u5de8\u9580':{strong:'analytical skepticism finds genuine truth; communication lands with impact',weak:'suspicion becomes reflexive; arguments are not in service of truth; others feel attacked not engaged'},
+  '\u5929\u76f8':{strong:'supportive nature is reliable and genuinely useful to others',weak:'structure-dependence rises; hard to act without external scaffolding or approval'},
+  '\u5929\u6882':{strong:'protective wisdom is stable; elder energy is genuinely reassuring to those around them',weak:'self-righteousness rises; carrying others tips into martyrdom or resentment'},
+  '\u4e03\u6bba':{strong:'directness is controlled and constructive; the sharpness builds rather than burns',weak:'force is harder to direct; can overreach, cut ties too quickly, turn the harshness inward'},
+  '\u7834\u8ecd':{strong:'disruption creates real progress; the rebuilding is genuine and lasting',weak:'disruption without direction; restlessness destroys what it cannot yet replace'}
+};
+
+function isPos(p){
+  var ms=p.majorStars||[];
+  var all=allStars(p);
+  var ji=hasJi(p);
+  var hard=all.filter(function(s){return HARD_SET.has(s.name);}).length;
+  var lucky=all.filter(function(s){return LUCKY_SET.has(s.name);}).length;
+  if(!ms.length){return !ji&&hard===0;}
+  var top=ms[0];
+  var topHasLu=top.mutagen==='祿'||top.mutagen==='科';
+  if(WEAK_B.indexOf(top.brightness)>-1||ji)return false;
+  if(topHasLu)return true;
+  if(STRONG_B.indexOf(top.brightness)>-1&&lucky>0&&hard<=1)return true;
+  return STRONG_B.indexOf(top.brightness)>-1&&hard===0;
+}
+function hasJi(p){return (p.majorStars||[]).some(function(s){return s.mutagen==='忌';});}
+function allStars(p){return (p.majorStars||[]).concat(p.minorStars||[]);}
+
 async function generate(){
   var name=document.getElementById('f-name').value.trim();
   if(name)localStorage.setItem('zwds_name',name);
@@ -261,23 +312,8 @@ async function generate(){
     // ── PRE-COMPUTED ASTROLOGICAL ANALYSIS ─────────────────────────────────
 
     function gp(key){return chart.palaces.find(function(p){return p.name.indexOf(key)>-1;})||{majorStars:[],minorStars:[],decadeMutagen:[],name:''};}
-    function hasJi(p){return (p.majorStars||[]).some(function(s){return s.mutagen==='忌';});}
-    function allStars(p){return (p.majorStars||[]).concat(p.minorStars||[]);}
     var toneCache=new Map();
-    function isPos(p){
-      var ms=p.majorStars||[];
-      var all=allStars(p);
-      var ji=hasJi(p);
-      var hard=all.filter(function(s){return HARD_SET.has(s.name);}).length;
-      var lucky=all.filter(function(s){return LUCKY_SET.has(s.name);}).length;
-      if(!ms.length){return !ji&&hard===0;}
-      var top=ms[0];
-      var topHasLu=top.mutagen==='祿'||top.mutagen==='科';
-      if(WEAK_B.indexOf(top.brightness)>-1||ji)return false;
-      if(topHasLu)return true;
-      if(STRONG_B.indexOf(top.brightness)>-1&&lucky>0&&hard<=1)return true;
-      return STRONG_B.indexOf(top.brightness)>-1&&hard===0;
-    }
+
     function tone(p){
       var k=p.name||'';
       if(toneCache.has(k))return toneCache.get(k);
@@ -365,39 +401,7 @@ async function generate(){
     }).join('\n');
 
     // ── LIFE PALACE CHARACTER INTERPRETATION ────────────────────────────────
-    var STAR_CHAR={
-      '\u7d2b\u5fae':'commanding and dignified — needs to be THE authority, status-conscious, natural ruler; runs calm but immovable; others instinctively defer; doesn\'t raise voice but the room changes when displeased',
-      '\u5929\u6a5f':'analytical and restless — strategic thinker, advisor type; mind always moving to the next idea; can seem scattered or nervous; quick but not hot',
-      '\u592a\u967d':'giving and outward-facing — generous, warm, public presence; emotionally open and expressive; can over-extend; rarely holds grudges',
-      '\u6b66\u66f2':'decisive and practical — money-minded, direct, action-oriented; terse under pressure; can seem cold but is reliable; doesn\'t waste words',
-      '\u5929\u540c':'gentle and harmony-seeking — pleasure-oriented, adaptable; avoids confrontation; runs cool; absorbs difficulty rather than fighting it',
-      '\u5ec9\u8c1e':'principled, proud, and deeply feeling \u2014 loyalty runs deep; cares more than they show; when they decide someone matters, that doesn\'t change easily; complex emotionally: the outside is composed but the inside is strongly attached; pride turns to stubbornness when crossed; dignity is non-negotiable',
-      '\u5929\u5e9c':'stable and accumulating — conservative, responsible, treasury energy; patient, steady, hard to destabilize; doesn\'t rush; builds quietly',
-      '\u592a\u9670':'sensitive and inward — emotionally deep, aesthetic, needs privacy; absorbs the mood of the room; can be wounded quietly; runs cool on the surface, deep underneath',
-      '\u8ca2\u72fc':'charming and multi-talented — desire-driven, relationship energy; magnetic, wants everything; can scatter; enthusiasm is genuine but short-lived on any single thing',
-      '\u5de8\u9580':'communicative but friction-prone — analytical, skeptical, words can cut; tends to argue even when not angry; others experience as blunt or suspicious',
-      '\u5929\u76f8':'supportive and structure-seeking — diplomatic, mediating, needs a system to work within; doesn\'t lead naturally but executes well within order',
-      '\u5929\u6882':'wise and protective — elder energy, principled, carries others; patient and long-view; can be self-righteous; dignity through endurance',
-      '\u4e03\u6bba':'direct, strong-charactered, and clear \u2014 says what they think without dressing it up; can be funny because they say what others won\'t; emotionally straightforward; meets things head on; runs hot when standards aren\'t met but doesn\'t hold grudges; the sharpness is honest, not malicious; independent to the point of isolation when pushed',
-      '\u7834\u8ecd':'disruptive rebuilder — pioneer who loses interest once stable; restless energy, chafes under routine; not hot-tempered but destabilizing; the room after they\'re done rearranging it'
-    };
     // Brightness qualifiers: how reliably the star's nature expresses at each strength
-    var STAR_BRIGHT={
-      '\u7d2b\u5fae':{strong:'authority is stable and genuinely earned; others follow willingly',weak:'authority-need becomes controlling or brittle; status anxiety rises; hard to delegate'},
-      '\u5929\u6a5f':{strong:'strategic mind is sharp and reliably available; plans actually execute',weak:'same analytical tendency but scattered; overthinks; hard to settle on a direction'},
-      '\u592a\u967d':{strong:'generosity is genuine and sustainable; the warmth is a real and consistent asset',weak:'gives beyond capacity; warmth fluctuates; the public presence can feel forced or exhausting'},
-      '\u6b66\u66f2':{strong:'decisiveness is measured and reliable; money instincts are sound',weak:'decisions become hasty; financial impulsiveness; terseness tips into harshness'},
-      '\u5929\u540c':{strong:'harmony-seeking is effective; adaptability is genuine ease that works for them',weak:'avoidance becomes passivity; pleasure-seeking crowds out substance; difficulty when pushed'},
-      '\u5ec9\u8c1e':{strong:'principles and pride operate together cleanly; dignity commands real respect',weak:'pride becomes self-destructive rigidity; dignity tips into unapproachability; principles harden into inflexibility'},
-      '\u5929\u5e9c':{strong:'stability is genuine and lasting; accumulation is steady and reliable',weak:'conservatism becomes stagnation; caution becomes inability to move or adapt'},
-      '\u592a\u9670':{strong:'sensitivity is a perceptive gift; emotional depth is accessible and a real strength',weak:'sensitivity tips into instability; easily wounded; mood fluctuates with environment'},
-      '\u8ca2\u72fc':{strong:'charm is real and deployable; multi-talented energy finds productive direction',weak:'desires scatter without landing; restlessness becomes inability to commit; charm without follow-through'},
-      '\u5de8\u9580':{strong:'analytical skepticism finds genuine truth; communication lands with impact',weak:'suspicion becomes reflexive; arguments are not in service of truth; others feel attacked not engaged'},
-      '\u5929\u76f8':{strong:'supportive nature is reliable and genuinely useful to others',weak:'structure-dependence rises; hard to act without external scaffolding or approval'},
-      '\u5929\u6882':{strong:'protective wisdom is stable; elder energy is genuinely reassuring to those around them',weak:'self-righteousness rises; carrying others tips into martyrdom or resentment'},
-      '\u4e03\u6bba':{strong:'directness is controlled and constructive; the sharpness builds rather than burns',weak:'force is harder to direct; can overreach, cut ties too quickly, turn the harshness inward'},
-      '\u7834\u8ecd':{strong:'disruption creates real progress; the rebuilding is genuine and lasting',weak:'disruption without direction; restlessness destroys what it cannot yet replace'}
-    };
     var lifeCharParts=(lifePO.majorStars||[]).map(function(s){
       var m=STAR_CHAR[s.name];
       if(!m)return'';
@@ -586,19 +590,16 @@ async function generate(){
 '• "These two directions are a real tension" — say what each direction does, not that tension exists\n'+
 'WEALTH (3 sentences): (1) 先天財 or 後天財 — one flat sentence. 先天財 means wealth comes through structural or relational means (spouse, status, inheritance, opportunity) — not necessarily parental inheritance, but not built purely from personal effort. 後天財 means it must be built from nothing through sustained action. (2) What conditions make it build, what conditions make it thin. (3) The specific leak. Cross-reference Career and Travel. Cross-reference Siblings for financial friction. No age references.\n'+
 'INNER LIFE (2 sentences): Read THIS palace\'s TONE — POSITIVE/MOSTLY-POSITIVE means genuine baseline ease, say what it feels like and what sustains it. CHALLENGING means persistent internal friction regardless of external circumstances, say what triggers it. Never let Career, Spouse, or Health color this palace.\n'+
-'HEALTH (2 sentences): Overall constitution from TONE. Only flag a body system if the relevant star is weak (\u9677/\u843d) or has \u5316\u5fcc AND that star is physically inside this palace — never use stars from other palaces (Career, Life, Travel etc.) to identify health issues even if those stars are hard or weak elsewhere. Strong star in this palace = robust system, do not flag. If Inner Life is CHALLENGING, note the body carries that cost. Never write stress.\n'+
-'  Use these as internal reference only \u2014 identify the body system, never output the star name:\n'+
-'  \u5929\u6a5f/\u5929\u540c \u2192 nervous system, sleep, chronic overthinking\n'+
-'  \u592a\u967d/\u5de8\u9580 \u2192 digestive, stomach, throat\n'+
-'  \u5ec9\u8c1e/\u706b\u661f/\u9234\u661f \u2192 blood, inflammation, skin, infection\n'+
-'  \u6b66\u66f2/\u64ce\u7f8a/\u9640\u7f85 \u2192 bones, joints, teeth, respiratory\n'+
-'  \u7d2b\u5fae/\u5929\u5e9c \u2192 cardiovascular, energy levels, vitality\n'+
-'  \u7834\u8ecd/\u8ca2\u72fc \u2192 surgery risk, accidents, sudden onset\n'+
-'  \u592a\u9670/\u5929\u6882 \u2192 hormones, reproductive, fluid retention\n'+
+'HEALTH (2 sentences): WORKFLOW — first look at the PALACE TONES entry for Health only. List the stars there. Now ask: are any of those specific stars weak (\u9677/\u843d) or carrying \u5316\u5fcc?\n'+
+'If NO: write one sentence — constitution is strong — and stop. Do not look anywhere else.\n'+
+'If YES: derive the affected body system from that star\'s own nature (same way you derive personality from Life palace stars). A weak star governs the body system naturally associated with its domain.\n'+
+'WRONG: flag joints/bones/respiratory from stars in Career or Life.\n'+
+'RIGHT: only flag what the weak star in the Health palace itself naturally governs.\n'+
+'If Inner Life is CHALLENGING/MIXED-DIFFICULT, note the body carries that cost. Never write stress.\n'+
 'CHILDREN (2 sentences): TONE drives this: POSITIVE means genuinely good, CHALLENGING means real difficulty. Is it close or distant? Does it cost or give? Say what the relationship actually is and what it does to this person\'s life. No subordinate/student alternative unless palace has no major stars.\n'+
 'PARENTS (2-3 sentences): Use the PARENTS verdict. Do not override it. Do not infer polarity from any stars. Also cross-reference this palace\'s TONE from PALACE TONES — if MIXED-DIFFICULT or CHALLENGING, there was disruption, conflict, or instability in the parental relationship that must be noted (a hard star at weak brightness in this palace produces this). If NO POLARITY or UNCERTAIN: do NOT write any version of "neither parent was more defining" or "neither parent dominated" — these phrases are banned even when paraphrased differently. Skip the polarity entirely and describe: what was received materially and functionally in early life based on the palace TONE and stars — do not assign emotional qualities (warmth, distance, coldness) without a specific verdict supporting it. Then: what pattern they set that this person still carries.\n'+
 'SIBLINGS/PEERS (2-3 sentences): Covers blood siblings AND peers, close friends, business partners at the same level. Do they support, cost, or stay neutral? How present are they? NEUTRAL-THIN means the relationship exists but is not a major theme — do not write it as warm. NEUTRAL-LUCKY means quietly fine. Only mention financial dealings if 化忌 is present.\n'+
-'TRAVEL (2-3 sentences): Use pre-computed Travel verdict. DOMINANT means the departure is a structural fact of this life — do not soften it. MODERATE means external movement consistently opens things up — do not tell this person to stay local or that going abroad is unnecessary. Say what leaving has opened or would open. For 40+ with DOMINANT or MODERATE Travel, speak in past and present about what movement already produced and continues to enable.\n'+
+'TRAVEL (2-3 sentences): Use pre-computed Travel verdict. DOMINANT means the departure is a structural fact of this life — do not soften it. MODERATE means external movement consistently opens things up — do not tell this person to stay local or that going abroad is unnecessary. WEAK means the rooted path genuinely works better — do not reverse this to say movement is beneficial. MILD means slight outward preference but not defining. Say what leaving has opened or would open. For 40+ with DOMINANT or MODERATE Travel, speak in past and present about what movement already produced and continues to enable.\n'+
 'NETWORK (2-3 sentences): TONE drives this: POSITIVE means genuine asset, CHALLENGING means they drain. Cross-reference Siblings for the complete social picture.\n'+
 'HOME (2 sentences): Does property accumulate, and under what conditions? Does this person root or keep moving — and what does that cost or produce? Cross-reference Parents and Travel verdict.]\n\n'+
 
@@ -699,7 +700,15 @@ cycleTemplate+
 '\u76f4\u63a5\u8aaa\u9019\u4ef6\u4e8b\u3002\u4e0d\u8981\u8ff4\u8ff0\u9019\u4ef6\u4e8b\u7684\u5f62\u72c0\u3002\n'+
 '財帛（3句）：（1）先天還是後天財——一句話。先天財指財富通過關係或結構性因素而來（配偶、地位、機會），不一定是父母遺產，但不是純靠個人持續努力建起來的。後天財指必須從頭靠行動建立；（2）這張命盤的財富如何累積——什麼條件下會建立，什麼條件下會縮水；（3）漏洞在哪裡。對照官祿和遷移結果——如果遷移強或中等，說清楚對這張命盤而言具體是什麼樣的外部參與能產生收入，不要用通用的「向外走、接觸不同環境」。對照兄弟結果——如果兄弟宮有化忌或難星，那是財務摩擦的一個可能渠道。不要用年齡。\n'+
 '福德（2句）：先看這個宮位的TONE——POSITIVE/MOSTLY-POSITIVE表示內心有真實的基線穩定感，說清楚那個穩定感是什麼樣子、什麼在支撑它。CHALLENGING表示不管外在多好都有持續的內在摩擦，說具體什麼觸發它。不要把官祿、夫妻、疾厄的困難滲進這個宮位。\n'+
-'疾厄（2句）：整體體質來自調性——POSITIVE是真正強健，直接說；MIXED整體沒問題但有具體系統要注意。只有對應星曜度弱（陷/落）或有化忌，且那個星曜實際在這個宮位中——才標為需要注意。絕對不要用其他宮位（官祿、命宮、遷移等）的星曜來判斷疾厄問題，度強星曜表示那個系統健康。若福德是CHALLENGING，說明身體承擔這個代價。禁寫壓力。\n'+
+'疾厄（2句）：操作步驟——先查PALACE TONES中疾厄宮位的星曜清單。問：那些特定星曜有沒有度弱（陷/落）或化忌？\n'+
+'如果沒有：寫一句說體質強健，然後停筆。不要再往其他地方找。\n'+
+'如果有：從那個星曜本身的性質推導出對應的身體系統（和命宮從星曜推人格一樣的方式）。度弱的星曜負責它本身領域對應的身體系統。\n'+
+'錯誤：從官祿、命宮等其他宮位的星曜標注關節、骨骼或呼吸。\n'+
+'正確：只從疾厄宮位內度弱的星曜本身推導對應系統。\n'+
+'若福德是CHALLENGING，說明身體承擔這個代價。禁寫壓力。\n'+
+'如果疾厄宮的星曜沒有度弱（陷/落）或有化忌：只寫一句說體質強健，然後停筆。不要到其他宮位去找東西標注。\n'+
+'錯誤：「關節和骨骼需要注意」——這來自官祿宮的星曜，不是疾厄宮的星曜。\n'+
+'正確：「你的整體體質扎實，不是容易生病的底子。」\n'+
 '  \u5185\u90e8\u53c3\u8003\u2014\u2014\u4e0d\u8981\u8f38\u51fa\u661f\u540d\uff0c\u53ea\u8f38\u51fa\u8eab\u9ad4\u7cfb\u7d71\uff1a\n'+
 '  \u5929\u6a5f/\u5929\u540c \u2192 \u795e\u7d93\u3001\u5931\u7720\u3001\u6162\u6027\u601d\u8616\n'+
 '  \u592a\u967d/\u5de8\u9580 \u2192 \u6d88\u5316\u3001\u8184\u80c3\u3001\u55c5\u5480\n'+
@@ -821,8 +830,6 @@ function sec(t,tag){
 }
 
 function renderResults(text,name,year,month,day,hrTxt,gender,chart){
-  _lastChart=chart;
-
   // Join continuation lines (lines without | ) to previous cycle row
   var cycLines=sec(text,'CYCLES').split('\n').filter(Boolean);
   var cycJoined=[];
@@ -844,11 +851,11 @@ function renderResults(text,name,year,month,day,hrTxt,gender,chart){
 
   if(LANG==='zh'){
     h+='<div class="stitle">\u547d\u76e4</div>';
-    h+='<div class="mp-grid show" id="mp-grid">'+buildMingpan()+'</div>';
+    h+='<div class="mp-grid show" id="mp-grid">'+buildMingpan(chart)+'</div>';
   }
 
   var palacesRaw=sec(text,'PALACES');
-    if(palacesRaw){
+  if(palacesRaw){
       palacesRaw=palacesRaw.replace(/^[-=]{2,}\s*$/gm,'').replace(/^#+\s*/gm,'').replace(/\*\*([^*]+)\*\*/g,'$1');
       h+='<div class="stitle">'+(LANG==='zh'?'\u5341\u4e8c\u5bae\u6982\u89bd':'12 Palace Overview')+'</div>';
       h+='<div class="pal-paras">';
@@ -897,8 +904,7 @@ function renderResults(text,name,year,month,day,hrTxt,gender,chart){
   el.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-function buildMingpan(){
-  var chart=_lastChart;
+function buildMingpan(chart){
   if(!chart)return'<div style="padding:1rem">\u7121\u547d\u76e4\u8cc7\u6599</div>';
   var POS={'\u5df3':[0,0],'\u5348':[0,1],'\u672a':[0,2],'\u7533':[0,3],'\u8fb0':[1,0],'\u9149':[1,3],'\u536f':[2,0],'\u620c':[2,3],'\u5bc5':[3,0],'\u4e11':[3,1],'\u5b50':[3,2],'\u4ea5':[3,3]};
   var NEG=['\u64ce\u7f8a','\u9640\u7f85','\u706b\u661f','\u9234\u661f','\u5730\u7a7a','\u5730\u52ab'];
