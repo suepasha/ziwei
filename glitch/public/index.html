@@ -454,17 +454,29 @@ async function generate(){
           if(!p.decadeRange||!p.decadeMutagen||!p.decadeMutagen[3])return null;
           var jiStar=p.decadeMutagen[3];
           var jiPal=findStarPal(jiStar);
-          return '  大限'+p.decadeRange+': 化忌['+jiStar+'] → '+(jiPal?jiPal.name:'unknown');
+          // Send destination palace only — no star name
+          return '  大限'+p.decadeRange+': \u5316\u5fcc \u2192 '+(jiPal?jiPal.name:'unknown');
         }).filter(Boolean).join('\n');
         var pals=sortedDecades;
         var palRows=pals.map(function(p){
-          var ms=(p.majorStars||[]).map(function(s){return s.name+(s.mutagen||'')+'('+s.brightness+')';}).join('·');
-          var lk=allStars(p).filter(function(s){return LUCKY_SET.has(s.name);}).map(function(s){return s.name;}).join(' ');
-          var hd=allStars(p).filter(function(s){return HARD_SET.has(s.name);}).map(function(s){return s.name;}).join(' ');
-          return '  '+p.decadeRange+' → '+p.name+(ms?' | '+ms:'')+(lk?' lucky:'+lk:'')+(hd?' hard:'+hd:'')+' | TONE:'+tone(p);
+          // Send tone and brightness counts — no star names
+          var ms=p.majorStars||[];
+          var all=allStars(p);
+          var strongCount=ms.filter(function(s){return STRONG_B.indexOf(s.brightness)>-1;}).length;
+          var weakCount=ms.filter(function(s){return WEAK_B.indexOf(s.brightness)>-1;}).length;
+          var hasLu=ms.some(function(s){return s.mutagen==='\u7984'||s.mutagen==='\u79d1';});
+          var hasJiDec=ms.some(function(s){return s.mutagen==='\u5fcc';});
+          var lkCount=all.filter(function(s){return LUCKY_SET.has(s.name);}).length;
+          var hdCount=all.filter(function(s){return HARD_SET.has(s.name);}).length;
+          var msDesc=ms.length===0?'no major stars':ms.length+' major star'+(ms.length>1?'s':'')+
+            (strongCount?' ('+strongCount+' strong)':'')+
+            (weakCount?' ('+weakCount+' weak)':'')+
+            (hasLu?' [positive transformation]':'')+
+            (hasJiDec?' [化忌 on lead star]':'');
+          return '  '+p.decadeRange+' \u2192 '+p.name+' | '+msDesc+(lkCount?' lucky:'+lkCount:'')+(hdCount?' hard:'+hdCount:'')+' | TONE:'+tone(p);
         }).join('\n');
-        return 'DECADE 化忌 (where friction lands each decade):\n'+jiRows+'\n\n'+
-               'DECADE PALACES (use these to write cycle labels and readings):\n'+palRows+'\n';
+        return 'DECADE \u5316\u5fcc (which palace carries friction each decade):\n'+jiRows+'\n\n'+
+               'DECADE PALACES (use these to write cycle labels and readings — derive content from PALACE TONES, not from star names):\n'+palRows+'\n';
       })()+'\n'+
 
       // Chart context — gender-aware, orientation-inclusive
