@@ -211,6 +211,8 @@ var SFMAP={'子':['辰','申','午'],'丑':['巳','酉','未'],'寅':['午','戌
 // Pre-computed constants
 var LUCKY=['祿存','天魁','天鉞','左輔','右弼','龍池','鳳閣','天官','天福','天壽'];
 var HARD=['擎羊','陀羅','火星','鈴星','地空','地劫','天空','截路','空亡'];
+var LUCKY_SET=new Set(LUCKY);
+var HARD_SET=new Set(HARD);
 var WEALTH_S=['紫微','天府','武曲','太陰','貪狼'];
 var STRONG_B=['廟','旺'];
 var WEAK_B=['陷','落'];
@@ -261,41 +263,47 @@ async function generate(){
     function gp(key){return chart.palaces.find(function(p){return p.name.indexOf(key)>-1;})||{majorStars:[],minorStars:[],decadeMutagen:[],name:''};}
     function hasJi(p){return (p.majorStars||[]).some(function(s){return s.mutagen==='忌';});}
     function allStars(p){return (p.majorStars||[]).concat(p.minorStars||[]);}
+    var toneCache=new Map();
     function isPos(p){
       var ms=p.majorStars||[];
       var all=allStars(p);
       var ji=hasJi(p);
-      var hard=all.filter(function(s){return HARD.indexOf(s.name)>-1;}).length;
-      var lucky=all.filter(function(s){return LUCKY.indexOf(s.name)>-1;}).length;
+      var hard=all.filter(function(s){return HARD_SET.has(s.name);}).length;
+      var lucky=all.filter(function(s){return LUCKY_SET.has(s.name);}).length;
       if(!ms.length){return !ji&&hard===0;}
       var top=ms[0];
       var topHasLu=top.mutagen==='祿'||top.mutagen==='科';
       if(WEAK_B.indexOf(top.brightness)>-1||ji)return false;
-      if(topHasLu)return true; // 化祿/化科 on dominant star = positive
-      if(STRONG_B.indexOf(top.brightness)>-1&&lucky>0&&hard<=1)return true; // lucky compensates 1 hard
+      if(topHasLu)return true;
+      if(STRONG_B.indexOf(top.brightness)>-1&&lucky>0&&hard<=1)return true;
       return STRONG_B.indexOf(top.brightness)>-1&&hard===0;
     }
     function tone(p){
+      var k=p.name||'';
+      if(toneCache.has(k))return toneCache.get(k);
       var ms=p.majorStars||[];
       var all=allStars(p);
       var ji=hasJi(p);
-      var hard=all.filter(function(s){return HARD.indexOf(s.name)>-1;}).length;
-      var lucky=all.filter(function(s){return LUCKY.indexOf(s.name)>-1;}).length;
+      var hard=all.filter(function(s){return HARD_SET.has(s.name);}).length;
+      var lucky=all.filter(function(s){return LUCKY_SET.has(s.name);}).length;
+      var result;
       if(!ms.length){
-        if(ji||hard>0)return 'MIXED-DIFFICULT';
-        if(lucky>0)return 'NEUTRAL-LUCKY';
-        return 'NEUTRAL-THIN';
+        if(ji||hard>0)result='MIXED-DIFFICULT';
+        else if(lucky>0)result='NEUTRAL-LUCKY';
+        else result='NEUTRAL-THIN';
+      } else {
+        var top=ms[0];
+        var topHasLu=top.mutagen==='祿'||top.mutagen==='科';
+        if(WEAK_B.indexOf(top.brightness)>-1&&ji)result='CHALLENGING';
+        else if(WEAK_B.indexOf(top.brightness)>-1||ji)result='MIXED-DIFFICULT';
+        else if(topHasLu)result=hard===0?'POSITIVE':'MOSTLY-POSITIVE';
+        else if(STRONG_B.indexOf(top.brightness)>-1&&lucky>0&&hard===0)result='POSITIVE';
+        else if(STRONG_B.indexOf(top.brightness)>-1&&lucky>0&&hard<=1)result='MOSTLY-POSITIVE';
+        else if(STRONG_B.indexOf(top.brightness)>-1&&hard===0)result='MOSTLY-POSITIVE';
+        else result='MIXED';
       }
-      var top=ms[0];
-      var topHasLu=top.mutagen==='祿'||top.mutagen==='科'; // 化祿/化科 on dominant star = strong positive
-      if(WEAK_B.indexOf(top.brightness)>-1&&ji)return 'CHALLENGING';
-      if(WEAK_B.indexOf(top.brightness)>-1||ji)return 'MIXED-DIFFICULT';
-      // Strong dominant star
-      if(topHasLu)return hard===0?'POSITIVE':'MOSTLY-POSITIVE'; // 化祿/化科 overrides hard stars
-      if(STRONG_B.indexOf(top.brightness)>-1&&lucky>0&&hard===0)return 'POSITIVE';
-      if(STRONG_B.indexOf(top.brightness)>-1&&lucky>0&&hard<=1)return 'MOSTLY-POSITIVE'; // lucky compensates 1 hard star
-      if(STRONG_B.indexOf(top.brightness)>-1&&hard===0)return 'MOSTLY-POSITIVE';
-      return 'MIXED';
+      toneCache.set(k,result);
+      return result;
     }
 
     var lifePO=gp('命');
@@ -325,7 +333,7 @@ async function generate(){
 
     // Siblings
     var sibJi=hasJi(sibPO);
-    var sibHard=allStars(sibPO).some(function(s){return HARD.indexOf(s.name)>-1;});
+    var sibHard=allStars(sibPO).some(function(s){return HARD_SET.has(s.name);});
     var sibVerdict=sibJi?'化忌 present — financial friction from shared dealings is most likely pattern':sibHard?'Hard stars present — conflict or estrangement more likely than support':'No major friction — relationship essentially stable';
 
     // Parents verdict
@@ -351,8 +359,8 @@ async function generate(){
     ].map(function(pair){
       var nm=pair[0],po=pair[1];
       var ms=(po.majorStars||[]).map(function(s){return s.name+(s.mutagen||'')+'('+s.brightness+')';}).join(' ');
-      var lk=allStars(po).filter(function(s){return LUCKY.indexOf(s.name)>-1;}).map(function(s){return s.name;}).join(' ');
-      var hd=allStars(po).filter(function(s){return HARD.indexOf(s.name)>-1;}).map(function(s){return s.name;}).join(' ');
+      var lk=allStars(po).filter(function(s){return LUCKY_SET.has(s.name);}).map(function(s){return s.name;}).join(' ');
+      var hd=allStars(po).filter(function(s){return HARD_SET.has(s.name);}).map(function(s){return s.name;}).join(' ');
       return nm+' | stars:'+ms+(lk?' lucky:'+lk:'')+(hd?' hard:'+hd:'')+' | TONE:'+tone(po);
     }).join('\n');
 
@@ -427,8 +435,8 @@ async function generate(){
         var bpo=chart.palaces.find(function(p){return p.isBodyPalace;})||{majorStars:[],minorStars:[],name:'',branch:''};
         var bSame=bpo.name===lifePO.name;
         var bStars=(bpo.majorStars||[]).map(function(s){return s.name+(s.mutagen||'')+'('+s.brightness+')';}).join(' ');
-        var bLucky=allStars(bpo).filter(function(s){return LUCKY.indexOf(s.name)>-1;}).map(function(s){return s.name;}).join(' ');
-        var bHard=allStars(bpo).filter(function(s){return HARD.indexOf(s.name)>-1;}).map(function(s){return s.name;}).join(' ');
+        var bLucky=allStars(bpo).filter(function(s){return LUCKY_SET.has(s.name);}).map(function(s){return s.name;}).join(' ');
+        var bHard=allStars(bpo).filter(function(s){return HARD_SET.has(s.name);}).map(function(s){return s.name;}).join(' ');
         var bTone=tone(bpo);
         if(bSame)return 'BODY PALACE: same as Life Palace — driving force unified, no internal contradiction.\n';
         return 'BODY PALACE (use this to understand underlying drives — NEVER name this palace or state where it falls in output) | stars:'+bStars+(bLucky?' lucky:'+bLucky:'')+(bHard?' hard:'+bHard:'')+' | TONE:'+bTone+'\n'+
@@ -447,8 +455,8 @@ async function generate(){
         var pals=sortedDecades;
         var palRows=pals.map(function(p){
           var ms=(p.majorStars||[]).map(function(s){return s.name+(s.mutagen||'')+'('+s.brightness+')';}).join('·');
-          var lk=allStars(p).filter(function(s){return LUCKY.indexOf(s.name)>-1;}).map(function(s){return s.name;}).join(' ');
-          var hd=allStars(p).filter(function(s){return HARD.indexOf(s.name)>-1;}).map(function(s){return s.name;}).join(' ');
+          var lk=allStars(p).filter(function(s){return LUCKY_SET.has(s.name);}).map(function(s){return s.name;}).join(' ');
+          var hd=allStars(p).filter(function(s){return HARD_SET.has(s.name);}).map(function(s){return s.name;}).join(' ');
           return '  '+p.decadeRange+' → '+p.name+(ms?' | '+ms:'')+(lk?' lucky:'+lk:'')+(hd?' hard:'+hd:'')+' | TONE:'+tone(p);
         }).join('\n');
         return 'DECADE 化忌 (where friction lands each decade):\n'+jiRows+'\n\n'+
