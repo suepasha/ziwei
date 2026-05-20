@@ -362,7 +362,17 @@ async function generate(){
     var tvStrong=travelPO.majorStars.some(function(s){return STRONG_B.indexOf(s.brightness)>-1;});
     var tvJi=hasJi(travelPO);
     var tvCount=travelPO.majorStars.length;
-    var travelStr=tvCount>=2&&tvStrong&&!tvJi?'DOMINANT — departure is a defining life theme; speak in past/present if person is 40+':tvCount>=1&&tvStrong&&!tvJi?'MODERATE — external movement and change of environment consistently opens things up for this person; staying still tends to limit':tvCount>=1&&!tvStrong&&!tvJi?'MILD — slight outward preference but not a defining theme':'WEAK — rooted path works better for this chart';
+    var travelStr=tvCount>=2&&tvStrong&&!tvJi?'DOMINANT — departure is a defining life theme; speak in past/present if person is 40+':tvCount>=1&&tvStrong&&!tvJi?'MODERATE — external movement and change of environment consistently opens things up for this person; staying still tends to limit':tvCount>=1&&!tvStrong&&!tvJi?'MILD — slight outward preference but not a defining theme':'WEAK — the Travel palace has no strong stars. The rooted path is concretely better. Do NOT write that movement opens opportunities. Write that staying and building locally produces better results for this chart.';
+
+    // Health status — explicit directive for the model
+    var healthMs=healthPO.majorStars||[];
+    var healthWeakStars=healthMs.filter(function(s){return WEAK_B.indexOf(s.brightness)>-1;});
+    var healthJi=hasJi(healthPO);
+    var healthAllStars=allStars(healthPO);
+    var healthHardWeak=healthAllStars.filter(function(s){return HARD_SET.has(s.name)&&WEAK_B.indexOf(s.brightness)>-1;});
+    var healthStatus=(!healthWeakStars.length&&!healthJi&&!healthHardWeak.length)?
+      'CLEAR — no weak stars or 化忌 in Health palace. Write exactly one sentence: constitution is strong. Do NOT flag any body system. Stop after that sentence.':
+      'FLAG — Health palace has '+(healthWeakStars.length?'weak star(s)':'')+(healthJi?' 化忌':'')+(healthHardWeak.length?' hard star(s) at weak brightness':'')+'. Derive the body system from the star\'s own nature. Never use star names in output.';
 
     // Marriage
     var mVerdict=isPos(spousePO)&&isPos(fudePO)?'Both Spouse and Inner Life are favorable — relationship can sustain':isPos(spousePO)&&!isPos(fudePO)?'Spouse palace favorable but Inner Life troubled — sustainability at risk despite surface harmony':!isPos(spousePO)&&isPos(fudePO)?'Spouse palace has friction but Inner Life stable — relationship survives through inner resilience':'Both Spouse and Inner Life show difficulty';
@@ -430,6 +440,7 @@ async function generate(){
       lifeCharStr+
       'WEALTH TYPE: '+wealthType+'\n'+
       'TRAVEL: '+travelStr+'\n'+
+      'HEALTH STATUS: '+healthStatus+'\n'+
       'MARRIAGE: '+mVerdict+'\n'+
       'SIBLINGS: '+sibVerdict+'\n'+
       'PARENTS: '+parentsVerdict+'\n\n'+
@@ -536,7 +547,7 @@ async function generate(){
       prompt=fp+'\n\n'+
 'OUTPUT: produce sections in this exact order: ===META=== ===PALACES=== ===CYCLES=== ===SUMMARY===\n\n'+
 
-'ROLE: Zi Wei Dou Shu reader, \u5012\u6d77\u5ce6 \u5929\u7d00 tradition. Second person. Present tense. Be concise \u2014 total output under 2500 tokens. Every sentence must earn its place.\n\n'+
+'ROLE: Zi Wei Dou Shu reader, \u5012\u6d77\u5ce6 \u5929\u7d00 tradition. Second person. Present tense. Be concise \u2014 total output under 2500 tokens. Every sentence must earn its place. If a name is provided, use it naturally a few times across the reading to personalize — not every sentence, but enough that it feels addressed to this specific person.\n\n'+
 'TONE \u2014 this is the most important instruction:\n'+
 'Write like a doctor giving results, not a screenwriter writing a character. The information is the thing. The presentation is nothing.\n'+
 'Calm. Direct. No flourish. No drama. No cinematic openings. No lines written to sound striking.\n'+
@@ -649,7 +660,7 @@ cycleTemplate+
       prompt=fp+'\n\n'+
 '\u8f38\u51fa\u9806\u5e8f\uff1a===META=== ===PALACES=== ===CYCLES=== ===SUMMARY===\n\n'+
 
-'\u4f60\u662f\u7d2b\u5fae\u6597\u6578\u547d\u7406\u5e2b\uff0c\u5012\u6d77\u5ce6\u5929\u7d00\u50b3\u627f\u3002\u7b2c\u4e8c\u4eba\u7a31\u3002\u73fe\u5728\u5f0f\u3002\u4e00\u5f8b\u7e41\u9ad4\u4e2d\u6587\u3002\u7d55\u5c0d\u4e0d\u8981\u5728\u8f38\u51fa\u4e2d\u4f7f\u7528\u82f1\u6587\u5b57\u3002\u932f\u8aa4\uff1a\u300csocial spending\u300d\u3001\u300ccash flow\u300d\u3001\u300cburnout\u300d\u3002\u6b63\u78ba\uff1a\u300c\u4eba\u969b\u5c0f\u8cbb\u300d\u3001\u300c\u73fe\u91d1\u6d41\u300d\u3001\u300c\u7cbe\u529b\u8017\u76e1\u300d\u3002\u7c21\u6f54\u2014\u2014\u7e3d\u8f38\u51fa2500\u5b57\u4ee5\u5167\uff0c\u6bcf\u53e5\u8a71\u5fc5\u9808\u8d3a\u5230\u5b83\u7684\u4f4d\u7f6e\u3002\n\n'+
+'\u4f60\u662f\u7d2b\u5fae\u6597\u6578\u547d\u7406\u5e2b\uff0c\u5012\u6d77\u5ce6\u5929\u7d00\u50b3\u627f\u3002\u7b2c\u4e8c\u4eba\u7a31\u3002\u73fe\u5728\u5f0f\u3002\u4e00\u5f8b\u7e41\u9ad4\u4e2d\u6587\u3002\u7d55\u5c0d\u4e0d\u8981\u5728\u8f38\u51fa\u4e2d\u4f7f\u7528\u82f1\u6587\u5b57\u3002\u932f\u8aa4\uff1a\u300csocial spending\u300d\u3001\u300ccash flow\u300d\u3001\u300cburnout\u300d\u3002\u6b63\u78ba\uff1a\u300c\u4eba\u969b\u5c0f\u8cbb\u300d\u3001\u300c\u73fe\u91d1\u6d41\u300d\u3001\u300c\u7cbe\u529b\u8017\u76e1\u300d\u3002\u7c21\u6f54\u2014\u2014\u7e3d\u8f38\u51fa2500\u5b57\u4ee5\u5167\uff0c\u6bcf\u53e5\u8a71\u5fc5\u9808\u8d3a\u5230\u5b83\u7684\u4f4d\u7f6e\u3002\u5982\u679c\u6709\u63d0\u4f9b\u59d3\u540d\uff0c\u5728\u89e3\u8b80\u4e2d\u81ea\u7136\u5730\u4f7f\u7528\u5e7e\u6b21\uff0c\u8b93\u89e3\u8b80\u611f\u89ba\u662f\u5c0d\u9019\u500b\u5177\u9ad4\u7684\u4eba\u8aaa\u8a71\u7684\u3002\n\n'+
 '\u8abf\u6027\u2014\u2014\u9019\u662f\u6240\u6709\u6307\u4ee4\u4e2d\u6700\u91cd\u8981\u7684\u4e00\u689d\uff1a\n'+
 '\u5beb\u5f97\u50cf\u91ab\u751f\u5c0d\u4f60\u8aaa\u6aa2\u67e5\u7d50\u679c\uff0c\u4e0d\u662f\u5287\u4f5c\u5bb6\u5728\u5beb\u4eba\u7269\u4ecb\u7d39\u3002\u8cc7\u8a0a\u624d\u662f\u4e3b\u89d2\uff0c\u5448\u73fe\u65b9\u5f0f\u7121\u6240\u8b02\u3002\n'+
 '\u51b7\u975c\u3002\u76f4\u63a5\u3002\u6c92\u6709\u83ef\u9e97\u3002\u6c92\u6709\u6232\u5287\u6027\u3002\u6c92\u6709\u96fb\u5f71\u9810\u544a\u7247\u98ce\u683c\u7684\u958b\u5834\u3002\u6c92\u6709\u70ba\u4e86\u8074\u8d77\u4f86\u6709\u529b\u800c\u5beb\u7684\u53e5\u5b50\u3002\n'+
