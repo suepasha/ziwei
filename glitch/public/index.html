@@ -371,7 +371,7 @@ async function generate(){
     var healthAllStars=allStars(healthPO);
     var healthHardWeak=healthAllStars.filter(function(s){return HARD_SET.has(s.name)&&WEAK_B.indexOf(s.brightness)>-1;});
     var healthStatus=(!healthWeakStars.length&&!healthJi&&!healthHardWeak.length)?
-      'CLEAR — no weak stars or 化忌 in Health palace. Write exactly one sentence: constitution is strong. Do NOT flag any body system. Stop after that sentence.':
+      'CLEAR — Health palace has no weak stars or \u5316\u5fcc. Write EXACTLY 2 sentences about health: (1) the constitution is strong; (2) what this body specifically handles well — derived from the stars physically present in the Health palace in PALACE TONES above. Do NOT write only one sentence. Do NOT flag any concern.':
       'FLAG — Health palace has '+(healthWeakStars.length?'weak star(s)':'')+(healthJi?' 化忌':'')+(healthHardWeak.length?' hard star(s) at weak brightness':'')+'. Derive the body system from the star\'s own nature. Never use star names in output.';
 
     // Marriage
@@ -614,7 +614,7 @@ async function generate(){
 'WEALTH (3 sentences): (1) Describe in plain terms how wealth reaches this person — through position, relationships, and structural opportunity (not from grinding effort alone), or through direct sustained personal effort from scratch. Do NOT output the terms 先天財 or 後天財 as labels — translate the concept into what it actually means for this person. (2) What conditions make it build, what conditions make it thin. (3) The specific leak. Cross-reference Career and Travel. Cross-reference Siblings for financial friction. No age references.\n'+
 'INNER LIFE (2 sentences): Read THIS palace\'s TONE — POSITIVE/MOSTLY-POSITIVE means genuine baseline ease, say what it feels like and what sustains it. CHALLENGING means persistent internal friction regardless of external circumstances, say what triggers it. Never let Career, Spouse, or Health color this palace.\n'+
 'HEALTH (2 sentences): WORKFLOW — first look at the PALACE TONES entry for Health only. List the stars there. Now ask: are any of those specific stars weak (\u9677/\u843d) or carrying \u5316\u5fcc?\n'+
-'If NO: write one sentence — constitution is strong — and stop. Do not look anywhere else.\n'+
+'If NO (CLEAR): Write exactly 2 sentences. Sentence 1: constitution is strong. Sentence 2: what this body specifically handles well or is particularly resilient in — derived from the stars in the Health palace (from PALACE TONES). Do not write only one sentence. Do not flag any concern.\n'+
 'If YES: derive the affected body system from that star\'s own nature (same way you derive personality from Life palace stars). A weak star governs the body system naturally associated with its domain.\n'+
 'WRONG: flag joints/bones/respiratory from stars in Career or Life.\n'+
 'RIGHT: only flag what the weak star in the Health palace itself naturally governs.\n'+
@@ -724,7 +724,7 @@ cycleTemplate+
 '財帛（3句）：（1）用白話描述財富怎麼進來——通過地位、關係和結構性機會（不靠純粹的個人持續勞動），還是必須靠自己從頭一件件建立。不要輸出「先天財」或「後天財」這兩個標籤——把概念翻譯成對這個人而言實際的意思。（2）什麼條件下財會建立，什麼條件下會縮水；（3）漏洞在哪裡。對照官祿和遷移結果。對照兄弟結果——如果兄弟宮有化忌或難星，那是財務摩擦的渠道。不要用年齡。\n'+
 '福德（2句）：先看這個宮位的TONE——POSITIVE/MOSTLY-POSITIVE表示內心有真實的基線穩定感，說清楚那個穩定感是什麼樣子、什麼在支撑它。CHALLENGING表示不管外在多好都有持續的內在摩擦，說具體什麼觸發它。不要把官祿、夫妻、疾厄的困難滲進這個宮位。\n'+
 '疾厄（2句）：操作步驟——先查PALACE TONES中疾厄宮位的星曜清單。問：那些特定星曜有沒有度弱（陷/落）或化忌？\n'+
-'如果沒有：寫一句說體質強健，然後停筆。不要再往其他地方找。\n'+
+'如果沒有（CLEAR）：寫剛好2句話。第1句：整體體質扎實。第2句：這個身體在什麼方面特別有韌性或恢復力——從PALACE TONES中疾厄宮位實際有的星曜性質推導出來。不要只寫一句就停，不要標注任何問題。\n'+
 '如果有：從那個星曜本身的性質推導出對應的身體系統（和命宮從星曜推人格一樣的方式）。度弱的星曜負責它本身領域對應的身體系統。\n'+
 '錯誤：從官祿、命宮等其他宮位的星曜標注關節、骨骼或呼吸。\n'+
 '正確：只從疾厄宮位內度弱的星曜本身推導對應系統。\n'+
