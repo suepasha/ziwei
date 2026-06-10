@@ -50,12 +50,6 @@ body::before{content:'';display:block;height:3px;background:linear-gradient(90de
 .pal-paras{display:flex;flex-direction:column;gap:10px;margin-bottom:1.5rem}
 .pal-para{background:var(--ink2);border:1px solid var(--border);border-radius:8px;padding:.875rem 1rem;font-size:13px;color:var(--cream2);line-height:1.8;border-left:3px solid var(--border2)}
 .pal-name{font-weight:600;color:var(--gold);margin-right:4px}
-.scard-full{background:var(--ink2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.125rem;margin-bottom:10px}
-.sh{font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
-.cycles{display:flex;flex-direction:column;gap:7px}
-.cyc{padding:10px 14px;background:var(--ink3);border-radius:6px;border-left:2px solid var(--border2)}
-.cy-lbl{font-size:12px;font-weight:500;color:var(--cream);margin-bottom:3px}
-.cy-txt{font-size:13px;color:var(--cream3);line-height:1.7}
 .btn-new{width:100%;padding:12px;background:none;border:1px solid var(--border2);border-radius:8px;color:var(--cream2);font-family:'Jost',sans-serif;font-size:14px;cursor:pointer;margin-top:1.5rem;transition:.2s}
 .btn-new:hover{border-color:var(--gold);color:var(--gold)}
 .mp-grid{grid-template-columns:repeat(4,1fr);gap:2px;margin-bottom:1.5rem;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;display:none}
@@ -434,7 +428,6 @@ async function generate(){
       'WARNING: other palaces may contain different major stars. Do NOT apply their energy to the Life Palace paragraph.\n':
       '';
 
-    var sortedDecades=chart.palaces.filter(function(p){return p.decadeRange;}).slice().sort(function(a,b){return parseInt(a.decadeRange,10)-parseInt(b.decadeRange,10);});
     var analysisBlock=
       '=== PRE-COMPUTED CHART ANALYSIS — READ THIS BEFORE WRITING ANYTHING ===\n'+
       lifeCharStr+
@@ -458,38 +451,6 @@ async function generate(){
           'Body Palace shows what drives this person beneath the surface. Describe the quality, not the location.\n';
       })()+'\n'+
 
-      // Decade 化忌 + Decade palace lookup (pre-computed)
-      (function(){
-        function findStarPal(sn){return chart.palaces.find(function(p){return (p.majorStars||[]).some(function(s){return s.name===sn;});});}
-        var jiRows=chart.palaces.map(function(p){
-          if(!p.decadeRange||!p.decadeMutagen||!p.decadeMutagen[3])return null;
-          var jiStar=p.decadeMutagen[3];
-          var jiPal=findStarPal(jiStar);
-          // Send destination palace only — no star name
-          return '  大限'+p.decadeRange+': \u5316\u5fcc \u2192 '+(jiPal?jiPal.name:'unknown');
-        }).filter(Boolean).join('\n');
-        var pals=sortedDecades;
-        var palRows=pals.map(function(p){
-          // Send tone and brightness counts — no star names
-          var ms=p.majorStars||[];
-          var all=allStars(p);
-          var strongCount=ms.filter(function(s){return STRONG_B.indexOf(s.brightness)>-1;}).length;
-          var weakCount=ms.filter(function(s){return WEAK_B.indexOf(s.brightness)>-1;}).length;
-          var hasLu=ms.some(function(s){return s.mutagen==='\u7984'||s.mutagen==='\u79d1';});
-          var hasJiDec=ms.some(function(s){return s.mutagen==='\u5fcc';});
-          var lkCount=all.filter(function(s){return LUCKY_SET.has(s.name);}).length;
-          var hdCount=all.filter(function(s){return HARD_SET.has(s.name);}).length;
-          var msDesc=ms.length===0?'no major stars':ms.length+' major star'+(ms.length>1?'s':'')+
-            (strongCount?' ('+strongCount+' strong)':'')+
-            (weakCount?' ('+weakCount+' weak)':'')+
-            (hasLu?' [positive transformation]':'')+
-            (hasJiDec?' [化忌 on lead star]':'');
-          return '  '+p.decadeRange+' \u2192 '+p.name+' | '+msDesc+(lkCount?' lucky:'+lkCount:'')+(hdCount?' hard:'+hdCount:'')+' | TONE:'+tone(p);
-        }).join('\n');
-        return 'DECADE \u5316\u5fcc (which palace carries friction each decade):\n'+jiRows+'\n\n'+
-               'DECADE PALACES (use these to write cycle labels and readings — derive content from PALACE TONES, not from star names):\n'+palRows+'\n';
-      })()+'\n'+
-
       // Chart context — gender-aware, orientation-inclusive
       'CHART CONTEXT:\n'+
       '• Birth gender registered as '+gender+'. This affects the astrological calculation only.\n'+
@@ -504,12 +465,6 @@ async function generate(){
       'Follow the TONE above for each palace. Two-star palaces: describe both natures, each calibrated by its brightness. NEUTRAL-THIN = not defining, do not write warmly. NEUTRAL-LUCKY = quietly supportive. Read each palace from its own data only.\n'+
       '=== END PRE-COMPUTED ANALYSIS ===';
 
-    // Dynamic cycle template from actual decade ranges (水二局 starts at 2, 木三局 at 3, etc.)
-    var cycleTemplate=sortedDecades.slice(0,8).map(function(p){
-      var r=p.decadeRange,s=parseInt(r,10),e=parseInt(r.split('-')[1],10);
-      return r+' ('+(+year+s)+'-'+(+year+e)+') | [label] | [content]';
-    }).join('\n')+'\n';
-
     var sfBranches=SFMAP[lifePal.branch]||[];
     var sfPalaces=chart.palaces.filter(function(p){return sfBranches.indexOf(p.branch)>-1;}).map(function(p){return p.name+'['+p.majorStars.map(function(s){return s.name+'('+s.brightness+')';}).join('\u00b7')+']';}).join(' | ');
     var patternsStr=chart.patterns&&chart.patterns.length?chart.patterns.join('\u00b7'):'\u7121\u7279\u6b8a\u683c\u5c40';
@@ -520,15 +475,6 @@ async function generate(){
     var bodyPalaceStr=bodyPal?bodyPal.branch:'';
 
     var cy=new Date().getFullYear();
-    var yearlyStr='';
-    if(chart.yearlyData){
-      var palNameMap={'\u547d\u5bae':'Life','\u5144\u5f1f':'Siblings','\u592b\u59bb':'Spouse/Partner','\u5b50\u5973':'Children','\u8ca1\u5e1b':'Wealth','\u75be\u5384':'Health','\u9077\u79fb':'Life Beyond Home','\u50d5\u5f79':'Friends & Network','\u5b98\u797f':'Career','\u7530\u5b85':'Home & Property','\u798f\u5fb7':'Inner Life','\u7236\u6bcd':'Parents'};
-      [cy-1,cy,cy+1].forEach(function(yr){
-        var yd=chart.yearlyData[yr];
-        if(yd){var pe=palNameMap[yd.xiaoXianPalace]||yd.xiaoXianPalace;yearlyStr+=yr+' (Age '+yd.age+') | '+yd.xiaoXianPalace+'('+pe+') | \u5c0f\u9650\u5fcc:'+yd.xiaoXianMutagen[3]+' \u6d41\u5e74\u5fcc:'+yd.yearlyMutagen[3]+'\n';}
-      });
-    }
-
     var fp='CHART DATA:\nCurrent year: '+cy+' | Western age\n'+
       'Patterns: '+patternsStr+'\n'+
       'Life Palace: '+lifePalaceStars+'\n'+
@@ -537,8 +483,7 @@ async function generate(){
       (ymStr?'Life transforms: '+ymStr+'\n':'')+
       (flyJiStr?'Friction chains: '+flyJiStr+'\n':'')+
       'Life Master: '+chart.lifeMaster+' Body: '+chart.bodyMaster+' Five Elements: '+chart.fiveElements+'\n'+
-      analysisBlock+
-      (yearlyStr?'\nRecent yearly context:\n'+yearlyStr:'');
+      analysisBlock;
 
     var prompt;
         if(LANG==='en'){
@@ -642,7 +587,7 @@ async function generate(){
 '\u5f8c\u8005\u66f4\u6709\u7528\uff0c\u56e0\u70ba\u5c0d\u65b9\u77e5\u9053\u8a72\u600e\u9ebc\u505a\u3002\n\n'+
 
 '\u898f\u5247\u4e00\u2014\u2014\u8f38\u51fa\u4e0d\u8aaa\u8853\u8a9e\uff1a\u4e0d\u8981\u7528\u59d3\u540d\u7576\u6bb5\u843d\u6a19\u984c\uff0c\u5b98\u797f\u3001\u547d\u5bae\u7b49\u6a19\u6e96\u5bae\u4f4d\u540d\u7a31\u624d\u662f\u6b63\u78ba\u7684\u6bb5\u843d\u6a19\u984c\u3002\n'+
-'\u8f38\u51fa\u4e2d\u6240\u6709\u661f\u540d\u3001\u5bae\u4f4d\u540d\u3001\u56db\u5316\u540d\u8a5e\u4e00\u5f8b\u7981\u6b62\u3002\u661f\u540d\u5305\u62ec\uff1a\u7d2b\u5fae\u3001\u5929\u6a5f\u3001\u6b66\u66f2\u3001\u7834\u8ecd\u3001\u5ec9\u8c1e\u3001\u5929\u5e9c\u3001\u592a\u967d\u3001\u592a\u9670\u3001\u8ca2\u72fc\u3001\u5de8\u9580\u3001\u5929\u76f8\u3001\u5929\u6082\u3001\u4e03\u6bba\u53ca\u6240\u6709\u5f3a\u661f\u3002\u5bae\u4f4d\u540d\u5305\u62ec\uff1a\u547d\u5bae\u3001\u592b\u59bb\u5bae\u3001\u5b98\u797f\u5bae\u7b49\u3002\u7981\u6b62\u5bae\u4f4d\u4f4d\u7f6e\u5f15\u7528\u3002\u7981\u6b62\u5728===CYCLES===\u4e4b\u5916\u7684\u4efb\u4f55\u5730\u65b9\u4f7f\u7528\u5e74\u9f61\u3002\n'+
+'\u8f38\u51fa\u4e2d\u6240\u6709\u661f\u540d\u3001\u5bae\u4f4d\u540d\u3001\u56db\u5316\u540d\u8a5e\u4e00\u5f8b\u7981\u6b62\u3002\u661f\u540d\u5305\u62ec\uff1a\u7d2b\u5fae\u3001\u5929\u6a5f\u3001\u6b66\u66f2\u3001\u7834\u8ecd\u3001\u5ec9\u8c1e\u3001\u5929\u5e9c\u3001\u592a\u967d\u3001\u592a\u9670\u3001\u8ca2\u72fc\u3001\u5de8\u9580\u3001\u5929\u76f8\u3001\u5929\u6082\u3001\u4e03\u6bba\u53ca\u6240\u6709\u5f3a\u661f\u3002\u5bae\u4f4d\u540d\u5305\u62ec\uff1a\u547d\u5bae\u3001\u592b\u59bb\u5bae\u3001\u5b98\u797f\u5bae\u7b49\u3002\u7981\u6b62\u5bae\u4f4d\u4f4d\u7f6e\u5f15\u7528\u3002\u7981\u6b62\u5728\u8f38\u51fa\u4e2d\u4f7f\u7528\u5e74\u9f61\u3002\n'+
 '\u661f\u540d\u5b58\u5728\u65bc\u5206\u6790\u4e2d\u662f\u4f9b\u4f60\u300c\u8b80\u300d\u7684\u5de5\u5177\u3002\u8f38\u51fa\u4e2d\u4e00\u500b\u90fd\u4e0d\u80fd\u51fa\u73fe\u2014\u2014\u5305\u62ec\u7528\u4f86\u89e3\u91cb\u70ba\u4ec0\u9ebc\u5f97\u51fa\u67d0\u500b\u7d50\u8ad6\u3002\n'+
 '\u932f\u8aa4\uff1a\u300c\u6b66\u66f2\u7834\u8ecd\u5728\u5b98\u797f\u8b93\u4f60\u5728\u63a8\u9032\u548c\u6c7a\u7b56\u4e0a\u6709\u6a5f\u6703\u505a\u5230\u771f\u6b63\u6709\u4efd\u91cf\u7684\u4e8b\u300d\n'+
 '\u6b63\u78ba\uff1a\u300c\u5de5\u4f5c\u4e0a\u4f60\u6709\u771f\u5be6\u7684\u80fd\u529b\u63a8\u52d5\u6709\u91cd\u91cf\u7684\u6c7a\u7b56\u3002\u300d\n'+
