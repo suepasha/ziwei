@@ -463,6 +463,62 @@ async function generate(){
       '=== END PRE-COMPUTED ANALYSIS ===';
 
     var sfBranches=SFMAP[lifePal.branch]||[];
+
+    // ── TIMING: current decade + small limit ──────────────────────────────
+    var timingStr=(function(){
+      var age=cy-(parseInt(year,10));
+      // birthday not yet passed this year → still previous age
+      var todayMonth=new Date().getMonth()+1;
+      var todayDay=new Date().getDate();
+      if(todayMonth<parseInt(month,10)||(todayMonth===parseInt(month,10)&&todayDay<parseInt(day,10)))age--;
+
+      // Find current decade palace
+      var decadePal=null;
+      chart.palaces.forEach(function(p){
+        if(!p.decadeRange)return;
+        var parts=p.decadeRange.split('-');
+        var s=parseInt(parts[0],10),e=parseInt(parts[1],10);
+        if(age>=s&&age<=e)decadePal=p;
+      });
+
+      // Find current small limit palace (ages array on each palace)
+      var xiaoxianPal=null;
+      chart.palaces.forEach(function(p){
+        if(p.ages&&p.ages.indexOf(age)>-1)xiaoxianPal=p;
+      });
+
+      // Map palace names to reading domain labels
+      var PAL_TO_DOMAIN={
+        '\u547d\u5bae':'WHO YOU ARE','\u5144\u5f1f':'WHO YOU ARE',
+        '\u592b\u59bb':'SPOUSE/PARTNER','\u50d5\u5f79':'SPOUSE/PARTNER',
+        '\u7236\u6bcd':'PARENTS',
+        '\u5b50\u5973':'KIDS',
+        '\u8ca1\u5e1b':'WEALTH','\u7530\u5b85':'WEALTH',
+        '\u5b98\u797f':'CAREER','\u9077\u79fb':'CAREER',
+        '\u798f\u5fb7':'INNER PEACE','\u75be\u5384':'INNER PEACE'
+      };
+
+      var lines=[];
+      lines.push('CURRENT AGE: '+age);
+
+      if(decadePal){
+        var dd=PAL_TO_DOMAIN[decadePal.name]||decadePal.name;
+        var dTone=tone(decadePal);
+        var dJi=hasJi(decadePal);
+        lines.push('DECADE ACTIVE (大限 age '+decadePal.decadeRange+'): '+decadePal.name+' → domain: '+dd+' | TONE:'+dTone+(dJi?' | 化忌 present':''));
+      }
+
+      if(xiaoxianPal){
+        var xd=PAL_TO_DOMAIN[xiaoxianPal.name]||xiaoxianPal.name;
+        var xTone=tone(xiaoxianPal);
+        var xJi=hasJi(xiaoxianPal);
+        var xSame=decadePal&&xiaoxianPal.name===decadePal.name;
+        lines.push('SMALL LIMIT THIS YEAR (小限 age '+age+'): '+xiaoxianPal.name+' → domain: '+xd+' | TONE:'+xTone+(xJi?' | 化忌 present':'')+(xSame?' [same as decade — doubled activation]':''));
+      }
+
+      return lines.join('\n');
+    })();
+
     var sfPalaces=chart.palaces.filter(function(p){return sfBranches.indexOf(p.branch)>-1;}).map(function(p){return p.name+'['+p.majorStars.map(function(s){return s.name+'('+s.brightness+')';}).join('\u00b7')+']';}).join(' | ');
     var patternsStr=chart.patterns&&chart.patterns.length?chart.patterns.join('\u00b7'):'\u7121\u7279\u6b8a\u683c\u5c40';
     var flyJiStr=chart.flyingJi&&chart.flyingJi.length?chart.flyingJi.join(' | '):'';
@@ -480,6 +536,7 @@ async function generate(){
       (ymStr?'Life transforms: '+ymStr+'\n':'')+
       (flyJiStr?'Friction chains: '+flyJiStr+'\n':'')+
       'Life Master: '+chart.lifeMaster+' Body: '+chart.bodyMaster+' Five Elements: '+chart.fiveElements+'\n'+
+      timingStr+'\n'+
       analysisBlock;
 
     var prompt;
@@ -546,6 +603,7 @@ async function generate(){
 '===PALACES===\n'+
 '[7 sections in this exact order: Who You Are \u00b7 Spouse/Partner \u00b7 Parents \u00b7 Kids \u00b7 Wealth \u00b7 Career \u00b7 Inner Peace\n'+
 'Format: [Section Name] \u2014 [text]. No ** bold markers. No markdown. Every sentence must add new information \u2014 do not explain or restate the previous one. Section lengths vary — write as much as the chart warrants, no more.\n\n'+
+'TIMING RULE: Check DECADE ACTIVE and SMALL LIMIT THIS YEAR from the pre-computed data. If a domain is currently activated by either — add one plain sentence at the end of that section stating where the person is in time on that specific thing. Only write a timing sentence when the domain is genuinely activated. If neither the decade nor the small limit touches a domain, write no timing sentence for it. Never use astrological terms in the timing sentence — say what is happening, not which palace is active. If the same domain is activated by both decade and small limit, note that this period is particularly concentrated for that area.\n\n'+
 
 'WHO YOU ARE (3-5 sentences): The LIFE PALACE CHARACTER above tells you exactly what this person is. Start with the single most defining quality — stated plainly, not as a label. This MUST come from LIFE PALACE CHARACTER data, not general ZWDS knowledge. Then: how it shows up in behavior, what it enables, what it costs. Greatest asset and most reliable liability should emerge from the description, not be named. If Body Palace differs, one sentence on how they modify each other (never name the palace or location). Then: how peers, close friends, and siblings fit into this person\'s life — are they a genuine asset or source of friction? TONE from Siblings palace drives this. POSITIVE/MOSTLY-POSITIVE: genuine support, say so. MIXED-DIFFICULT/CHALLENGING: unreliable or draining. NEUTRAL-THIN: present but not warm. Only mention money friction between peers if 化忌 is present in Siblings palace.\n\n'+
 
@@ -624,6 +682,7 @@ async function generate(){
 '===PALACES===\n'+
 '[7\u6bb5\u9806\u5e8f\uff1a\u547d\u5bae/\u81ea\u5df1\u00b7\u592b\u59bb/\u4f34\u4fa3\u00b7\u7236\u6bcd\u00b7\u5b50\u5973\u00b7\u8ca1\u5bcc\u00b7\u4e8b\u696d\u00b7\u5fc3\u9748\n'+
 '\u683c\u5f0f\uff1a[\u6bb5\u843d\u540d] \u2014 [\u5167\u5bb9]\u3002\u4e0d\u7528**\u7c97\u9ad4\u6a19\u8a18\u3002\u4e0d\u7528markdown\u683c\u5f0f\u3002\u6bcf\u53e5\u52a0\u5165\u65b0\u8cc7\u8a0a\uff0c\u4e0d\u89e3\u91cb\u4e5f\u4e0d\u91cd\u8ff0\u4e0a\u4e00\u53e5\u3002\u6bb5\u843d\u9577\u5ea6\u4f9d\u547d\u76e4\u800c\u5b9a\uff0c\u4e0d\u5f37\u8981\u5747\u7b49\u3002]\n\n'+
+'\u6642\u9593\u898f\u5247\uff1a\u67e5\u770b\u9810\u5148\u8a08\u7b97\u8cc7\u6599\u4e2d\u7684DECADE ACTIVE\u548cSMALL LIMIT THIS YEAR\u3002\u5982\u679c\u67d0\u500b\u9818\u57df\u76ee\u524d\u88ab\u5176\u4e2d\u4e00\u500b\u6fc0\u6d3b\uff0c\u5728\u90a3\u500b\u6bb5\u843d\u7d50\u5c3e\u52a0\u4e00\u53e5\u767d\u8a71\uff0c\u8aaa\u6e05\u695a\u9019\u500b\u4eba\u5728\u9019\u500b\u9818\u57df\u76ee\u524d\u5728\u6642\u9593\u4e0a\u8655\u65bc\u4ec0\u9ebc\u4f4d\u7f6e\u3002\u53ea\u6709\u5728\u5c0d\u61c9\u9818\u57df\u771f\u6b63\u88ab\u6fc0\u6d3b\u6642\u624d\u5beb\u6642\u9593\u53e5\u3002\u5982\u679c\u5927\u9650\u548c\u5c0f\u9650\u540c\u6642\u6307\u5411\u540c\u4e00\u9818\u57df\uff0c\u8aaa\u660e\u9019\u500b\u6642\u671f\u5c0d\u90a3\u500b\u9818\u57df\u7279\u5225\u96c6\u4e2d\u3002\u7d55\u5c0d\u4e0d\u7528\u547d\u7406\u8853\u8a9e\u2014\u2014\u76f4\u63a5\u8aaa\u767c\u751f\u7684\u4e8b\uff0c\u4e0d\u8aaa\u54ea\u500b\u5bae\u4f4d\u6fc0\u6d3b\u3002\n\n'+
 '命宮/自己（3-5句）：先說這個人最核心的一個特質——直接說，不用分類標籤。這必須直接來自LIFE PALACE CHARACTER資料。然後從那個特質展開：它在行為中怎麼出現，讓這個人能做什麼，付出什麼代價。最大優勢與弱點應從描述中自然浮現。若身宮與命宮不同，一句說兩者怎麼互相修正（不說宮位名稱）。然後：兄弟和同儕對這個人是支持、占耗還是保持中立？用兄弟宮TONE主導。POSITIVE/MOSTLY-POSITIVE：真實資產，直接說。MIXED-DIFFICULT/CHALLENGING：不可靠或占耗。NEUTRAL-THIN：存在但不溫暖。只有兄弟宮有化忌才提財務摩擦。\n\n'+
 '夫妻/伴侶（3-4句）：（1）外貌與氣質。（2）性格與類型——這張命盤持續吸引什麼樣的人，對方的氣質、行事方式、帶來什麼。（3）關係質地——用mVerdict，隨時間是撐住、改善還是惡化。（4）若僕役宮TONE是POSITIVE：這個人周圍的社交圈積極支持他們建立的關係和生活。若CHALLENGING：更廣的社交圈製造漏進親密關係的摩擦。不推斷對方收入方式。\n'+
 '  外貌參考（內部使用，不輸出星名）：天相/天府/紫微 → 儀態端正、氣質穩重。天機/天梁 → 清瘦、書卷氣、靈活。太陽 → 高挑、開朗、氣場外向。太陰 → 溫柔、白淨、安靜的氣質。武曲/七殺 → 結實、直接、行事爽快。貪狼 → 有魅力、吸引人、有存在感。廉貞/破軍 → 外形出挑、有鋒芒感。巨門 → 表情深沉、思慮感重。\n\n'+
