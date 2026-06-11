@@ -195,7 +195,6 @@ function rebuildMonths(){
     document.getElementById('zi-toggle').style.display=this.value==='0'?'block':'none';
     if(this.value!=='0')document.querySelector('input[name=nightzi][value=false]').checked=true;
   });
-  fetch('/chart?year=2000&month=1&day=1&hour=5&gender=female').catch(function(){});
 
 })();
 </script>
@@ -210,8 +209,6 @@ var HARD_SET=new Set(HARD);
 var WEALTH_S=['紫微','天府','武曲','太陰','貪狼'];
 var STRONG_B=['廟','旺'];
 var WEAK_B=['陷','落'];
-
-var _lastChart=null;
 
 var STAR_CHAR={
   '\u7d2b\u5fae':'commanding and dignified — needs to be THE authority, status-conscious, natural ruler; runs calm but immovable; others instinctively defer; doesn\'t raise voice but the room changes when displeased',
@@ -524,7 +521,7 @@ async function generate(){
 
 'RULE 5 \u2014 EARN EVERY SENTENCE:\n'+
 'Every sentence must tell the person something they could not have assumed. Before keeping a sentence, ask: if I removed this, would the person miss something specific to their chart? If no, cut it.\n'+
-'No section may repeat another: palaces cannot repeat each other, Summary cannot repeat what palaces said, Cycles cannot restate palace content.\n'+
+'No section may repeat another — each domain must add new information not covered elsewhere.\n'+
 'Generic observations like "you work hard" or "relationships matter to you" could apply to anyone \u2014 rewrite them into what is specific to this chart.\n\n'+
 
 'READING METHOD (\u5012\u6d77\u5ce6 \u5929\u7d00):\n'+
@@ -567,10 +564,7 @@ async function generate(){
 '• "These two directions are a real tension" — say what each does, not that tension exists\n\n'+
 
 'INNER PEACE (2-4 sentences): Read the 福德 palace TONE first — POSITIVE/MOSTLY-POSITIVE means genuine baseline ease, say what it feels like and what sustains it. CHALLENGING means persistent internal friction regardless of external circumstances, say what triggers it. Never let Career, Spouse, or external events color this — this is internal baseline only. Then: health as carried by this body. Check Health palace TONE — if stars are strong (廟/旺) and no 化忌: constitution is solid, say what this body handles well. If weak stars (陷/落) or 化忌 present: derive the affected body system from the weak star\'s own domain (not from Life or Career palace stars). If 福德 is CHALLENGING, note the body carries that cost. Never write the word "stress."\n'+
-'  Health star domain reference (internal — never output star name): 天梁 = chronic/structural depletion. 天同 = rest/recovery, digestion, chronic fatigue. 天機 = nervous system. 太陰 = hormones/fluids. 廉貞/火星/鈴星 = blood/inflammation. 武曲/擎羊/陀羅 = bones/joints. 巨門/太陽 = digestive.]\n\n'+
-'\u2022 ceiling, "no outlet," "your body knows before your mind" — metaphors banned by RULE 4\n'+
-'End on the single most specific, actionable insight — something the person can do something with. Not philosophy. Not reassurance.]\n'+
-'';
+'  Health star domain reference (internal — never output star name): 天梁 = chronic/structural depletion. 天同 = rest/recovery, digestion, chronic fatigue. 天機 = nervous system. 太陰 = hormones/fluids. 廉貞/火星/鈴星 = blood/inflammation. 武曲/擎羊/陀羅 = bones/joints. 巨門/太陽 = digestive.]\n\n';
 
     } else {
 
@@ -627,8 +621,9 @@ async function generate(){
 
 '===META===\n\u8fb2\u66c6\uff1a'+chart.lunarDate+'\n\u5e72\u652f\uff1a'+chart.chinesePillars+'\n\u547d\u5bae\uff1a'+lifePal.branch+'\n\u8eab\u5bae\uff1a'+(bodyPal?bodyPal.branch:'')+'\n\u4e94\u884c\u5c40\uff1a'+chart.fiveElements+'\n\u547d\u4e3b\uff1a'+chart.lifeMaster+'\n\u8eab\u4e3b\uff1a'+chart.bodyMaster+'\n\n'+
 
-
-
+'===PALACES===\n'+
+'[7\u6bb5\u9806\u5e8f\uff1a\u547d\u5bae/\u81ea\u5df1\u00b7\u592b\u59bb/\u4f34\u4fa3\u00b7\u7236\u6bcd\u00b7\u5b50\u5973\u00b7\u8ca1\u5bcc\u00b7\u4e8b\u696d\u00b7\u5fc3\u9748\n'+
+'\u683c\u5f0f\uff1a[\u6bb5\u843d\u540d] \u2014 [\u5167\u5bb9]\u3002\u4e0d\u7528**\u7c97\u9ad4\u6a19\u8a18\u3002\u4e0d\u7528markdown\u683c\u5f0f\u3002\u6bcf\u53e5\u52a0\u5165\u65b0\u8cc7\u8a0a\uff0c\u4e0d\u89e3\u91cb\u4e5f\u4e0d\u91cd\u8ff0\u4e0a\u4e00\u53e5\u3002\u6bb5\u843d\u9577\u5ea6\u4f9d\u547d\u76e4\u800c\u5b9a\uff0c\u4e0d\u5f37\u8981\u5747\u7b49\u3002]\n\n'+
 '命宮/自己（3-5句）：先說這個人最核心的一個特質——直接說，不用分類標籤。這必須直接來自LIFE PALACE CHARACTER資料。然後從那個特質展開：它在行為中怎麼出現，讓這個人能做什麼，付出什麼代價。最大優勢與弱點應從描述中自然浮現。若身宮與命宮不同，一句說兩者怎麼互相修正（不說宮位名稱）。然後：兄弟和同儕對這個人是支持、占耗還是保持中立？用兄弟宮TONE主導。POSITIVE/MOSTLY-POSITIVE：真實資產，直接說。MIXED-DIFFICULT/CHALLENGING：不可靠或占耗。NEUTRAL-THIN：存在但不溫暖。只有兄弟宮有化忌才提財務摩擦。\n\n'+
 '夫妻/伴侶（3-4句）：（1）外貌與氣質。（2）性格與類型——這張命盤持續吸引什麼樣的人，對方的氣質、行事方式、帶來什麼。（3）關係質地——用mVerdict，隨時間是撐住、改善還是惡化。（4）若僕役宮TONE是POSITIVE：這個人周圍的社交圈積極支持他們建立的關係和生活。若CHALLENGING：更廣的社交圈製造漏進親密關係的摩擦。不推斷對方收入方式。\n'+
 '  外貌參考（內部使用，不輸出星名）：天相/天府/紫微 → 儀態端正、氣質穩重。天機/天梁 → 清瘦、書卷氣、靈活。太陽 → 高挑、開朗、氣場外向。太陰 → 溫柔、白淨、安靜的氣質。武曲/七殺 → 結實、直接、行事爽快。貪狼 → 有魅力、吸引人、有存在感。廉貞/破軍 → 外形出挑、有鋒芒感。巨門 → 表情深沉、思慮感重。\n\n'+
