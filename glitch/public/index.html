@@ -505,7 +505,7 @@ async function generate(){
         var dd=PAL_TO_DOMAIN[decadePal.name]||decadePal.name;
         var dTone=tone(decadePal);
         var dJi=hasJi(decadePal);
-        lines.push('DECADE ACTIVE (大限 age '+decadePal.decadeRange+'): '+decadePal.name+' → domain: '+dd+' | TONE:'+dTone+(dJi?' | 化忌 present':''));
+        lines.push('DECADE ACTIVE (大限 age '+decadePal.decadeRange+'): palace='+decadePal.name+' → ADD TIMING SENTENCE TO SECTION: '+dd+' | TONE:'+dTone+(dJi?' | 化忌 present — timing note should reflect difficulty or pressure':''));
       }
 
       if(xiaoxianPal){
@@ -513,7 +513,7 @@ async function generate(){
         var xTone=tone(xiaoxianPal);
         var xJi=hasJi(xiaoxianPal);
         var xSame=decadePal&&xiaoxianPal.name===decadePal.name;
-        lines.push('SMALL LIMIT THIS YEAR (小限 age '+age+'): '+xiaoxianPal.name+' → domain: '+xd+' | TONE:'+xTone+(xJi?' | 化忌 present':'')+(xSame?' [same as decade — doubled activation]':''));
+        lines.push('SMALL LIMIT THIS YEAR (小限 age '+age+'): palace='+xiaoxianPal.name+' → ADD TIMING SENTENCE TO SECTION: '+xd+' | TONE:'+xTone+(xJi?' | 化忌 present — timing note should reflect difficulty or pressure':'')+(xSame?' [same palace as decade — doubled activation, emphasise concentration]':''));
       }
 
       return lines.join('\n');
@@ -603,7 +603,7 @@ async function generate(){
 '===PALACES===\n'+
 '[7 sections in this exact order: Who You Are \u00b7 Spouse/Partner \u00b7 Parents \u00b7 Kids \u00b7 Wealth \u00b7 Career \u00b7 Inner Peace\n'+
 'Format: [Section Name] \u2014 [text]. No ** bold markers. No markdown. Every sentence must add new information \u2014 do not explain or restate the previous one. Section lengths vary — write as much as the chart warrants, no more.\n\n'+
-'TIMING RULE: Check DECADE ACTIVE and SMALL LIMIT THIS YEAR from the pre-computed data. If a domain is currently activated by either — add one plain sentence at the end of that section stating where the person is in time on that specific thing. Only write a timing sentence when the domain is genuinely activated. If neither the decade nor the small limit touches a domain, write no timing sentence for it. Never use astrological terms in the timing sentence — say what is happening, not which palace is active. If the same domain is activated by both decade and small limit, note that this period is particularly concentrated for that area.\n\n'+
+'TIMING RULE: The pre-computed data contains DECADE ACTIVE and SMALL LIMIT THIS YEAR. Each entry tells you the domain it maps to (e.g. "domain: INNER PEACE"). You must add one timing sentence at the end of EXACTLY those domains — no others. Do not move timing to a different domain because it feels more relevant. Do not add timing to domains not listed. The domain label in the pre-computed data is the exact section name to add it to. If both entries map to the same domain, note the concentration. Never use palace names, astrological terms, or age numbers in the timing sentence — say what is actually happening for this person right now in that area of life.\n\n'+
 
 'WHO YOU ARE (3-5 sentences): The LIFE PALACE CHARACTER above tells you exactly what this person is. Start with the single most defining quality — stated plainly, not as a label. This MUST come from LIFE PALACE CHARACTER data, not general ZWDS knowledge. Then: how it shows up in behavior, what it enables, what it costs. Greatest asset and most reliable liability should emerge from the description, not be named. If Body Palace differs, one sentence on how they modify each other (never name the palace or location). Then: how peers, close friends, and siblings fit into this person\'s life — are they a genuine asset or source of friction? TONE from Siblings palace drives this. POSITIVE/MOSTLY-POSITIVE: genuine support, say so. MIXED-DIFFICULT/CHALLENGING: unreliable or draining. NEUTRAL-THIN: present but not warm. Only mention money friction between peers if 化忌 is present in Siblings palace.\n\n'+
 
@@ -682,7 +682,7 @@ async function generate(){
 '===PALACES===\n'+
 '[7\u6bb5\u9806\u5e8f\uff1a\u547d\u5bae/\u81ea\u5df1\u00b7\u592b\u59bb/\u4f34\u4fa3\u00b7\u7236\u6bcd\u00b7\u5b50\u5973\u00b7\u8ca1\u5bcc\u00b7\u4e8b\u696d\u00b7\u5fc3\u9748\n'+
 '\u683c\u5f0f\uff1a[\u6bb5\u843d\u540d] \u2014 [\u5167\u5bb9]\u3002\u4e0d\u7528**\u7c97\u9ad4\u6a19\u8a18\u3002\u4e0d\u7528markdown\u683c\u5f0f\u3002\u6bcf\u53e5\u52a0\u5165\u65b0\u8cc7\u8a0a\uff0c\u4e0d\u89e3\u91cb\u4e5f\u4e0d\u91cd\u8ff0\u4e0a\u4e00\u53e5\u3002\u6bb5\u843d\u9577\u5ea6\u4f9d\u547d\u76e4\u800c\u5b9a\uff0c\u4e0d\u5f37\u8981\u5747\u7b49\u3002]\n\n'+
-'\u6642\u9593\u898f\u5247\uff1a\u67e5\u770b\u9810\u5148\u8a08\u7b97\u8cc7\u6599\u4e2d\u7684DECADE ACTIVE\u548cSMALL LIMIT THIS YEAR\u3002\u5982\u679c\u67d0\u500b\u9818\u57df\u76ee\u524d\u88ab\u5176\u4e2d\u4e00\u500b\u6fc0\u6d3b\uff0c\u5728\u90a3\u500b\u6bb5\u843d\u7d50\u5c3e\u52a0\u4e00\u53e5\u767d\u8a71\uff0c\u8aaa\u6e05\u695a\u9019\u500b\u4eba\u5728\u9019\u500b\u9818\u57df\u76ee\u524d\u5728\u6642\u9593\u4e0a\u8655\u65bc\u4ec0\u9ebc\u4f4d\u7f6e\u3002\u53ea\u6709\u5728\u5c0d\u61c9\u9818\u57df\u771f\u6b63\u88ab\u6fc0\u6d3b\u6642\u624d\u5beb\u6642\u9593\u53e5\u3002\u5982\u679c\u5927\u9650\u548c\u5c0f\u9650\u540c\u6642\u6307\u5411\u540c\u4e00\u9818\u57df\uff0c\u8aaa\u660e\u9019\u500b\u6642\u671f\u5c0d\u90a3\u500b\u9818\u57df\u7279\u5225\u96c6\u4e2d\u3002\u7d55\u5c0d\u4e0d\u7528\u547d\u7406\u8853\u8a9e\u2014\u2014\u76f4\u63a5\u8aaa\u767c\u751f\u7684\u4e8b\uff0c\u4e0d\u8aaa\u54ea\u500b\u5bae\u4f4d\u6fc0\u6d3b\u3002\n\n'+
+'\u6642\u9593\u898f\u5247\uff1a\u9810\u5148\u8a08\u7b97\u8cc7\u6599\u4e2d\u7684DECADE ACTIVE\u548cSMALL LIMIT THIS YEAR\u5404\u81ea\u6a19\u660e\u4e86\u5c0d\u61c9\u7684\u9818\u57df\uff08\u4f8b\u5982\u300cdomain: \u5fc3\u9748\u300d\uff09\u3002\u4f60\u5fc5\u9808\u5728\u300c\u5c31\u662f\u300d\u90a3\u500b\u9818\u57df\u7684\u6bb5\u843d\u7d50\u5c3e\u52a0\u4e00\u53e5\u6642\u9593\u53e5\u2014\u2014\u4e0d\u662f\u5176\u4ed6\u9818\u57df\u3002\u4e0d\u8981\u56e0\u70ba\u89ba\u5f97\u67d0\u500b\u9818\u57df\u66f4\u9069\u5408\u5c31\u79fb\u52d5\u5230\u90a3\u88e1\u3002\u5982\u679c\u5169\u500b\u90fd\u6307\u5411\u540c\u4e00\u9818\u57df\uff0c\u8aaa\u660e\u9019\u500b\u6642\u671f\u7279\u5225\u96c6\u4e2d\u5728\u90a3\u500b\u65b9\u5411\u3002\u7d55\u5c0d\u4e0d\u7528\u5bae\u4f4d\u540d\u3001\u547d\u7406\u8853\u8a9e\u6216\u5e74\u9f61\u2014\u2014\u76f4\u63a5\u8aaa\u9019\u500b\u4eba\u5728\u9019\u500b\u9818\u57df\u73fe\u5728\u5be6\u969b\u767c\u751f\u7684\u4e8b\u3002\n\n'+
 '命宮/自己（3-5句）：先說這個人最核心的一個特質——直接說，不用分類標籤。這必須直接來自LIFE PALACE CHARACTER資料。然後從那個特質展開：它在行為中怎麼出現，讓這個人能做什麼，付出什麼代價。最大優勢與弱點應從描述中自然浮現。若身宮與命宮不同，一句說兩者怎麼互相修正（不說宮位名稱）。然後：兄弟和同儕對這個人是支持、占耗還是保持中立？用兄弟宮TONE主導。POSITIVE/MOSTLY-POSITIVE：真實資產，直接說。MIXED-DIFFICULT/CHALLENGING：不可靠或占耗。NEUTRAL-THIN：存在但不溫暖。只有兄弟宮有化忌才提財務摩擦。\n\n'+
 '夫妻/伴侶（3-4句）：（1）外貌與氣質。（2）性格與類型——這張命盤持續吸引什麼樣的人，對方的氣質、行事方式、帶來什麼。（3）關係質地——用mVerdict，隨時間是撐住、改善還是惡化。（4）若僕役宮TONE是POSITIVE：這個人周圍的社交圈積極支持他們建立的關係和生活。若CHALLENGING：更廣的社交圈製造漏進親密關係的摩擦。不推斷對方收入方式。\n'+
 '  外貌參考（內部使用，不輸出星名）：天相/天府/紫微 → 儀態端正、氣質穩重。天機/天梁 → 清瘦、書卷氣、靈活。太陽 → 高挑、開朗、氣場外向。太陰 → 溫柔、白淨、安靜的氣質。武曲/七殺 → 結實、直接、行事爽快。貪狼 → 有魅力、吸引人、有存在感。廉貞/破軍 → 外形出挑、有鋒芒感。巨門 → 表情深沉、思慮感重。\n\n'+
@@ -806,6 +806,9 @@ function renderResults(text,name,year,month,day,hrTxt,gender,chart){
     if(cur.trim())groups.push(cur.trim());
     groups.forEach(function(para){
       if(!para)return;
+      // Strip the header to check if there's actual content
+      var stripped=para.replace(EN_PAL,'').replace(ZH_PAL,'').trim();
+      if(!stripped)return; // skip header-only entries (duplicate blank sections)
       para=para.replace(EN_PAL,'<span class="pal-name">$1</span> \u2014 ');
       para=para.replace(ZH_PAL,'<span class="pal-name">$1</span> \u2014 ');
       h+='<div class="pal-para">'+para+'</div>';
